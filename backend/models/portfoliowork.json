@@ -1,0 +1,13 @@
+[
+    {
+        "id": 1,
+        "title": "Küchenutensilien",
+        "description": "Alles für die Küche",
+        "images": [
+            "https://example.com/images/kitchen1.jpg",
+            "https://example.com/images/kitchen2.jpg",
+            "https://example.com/images/kitchen3.jpg"
+        ],
+        "categoryID": 1
+    }
+]
