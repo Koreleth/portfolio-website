@@ -1,8 +1,14 @@
 [
     {
         "id": 1,
-        "name": "Küchenutensilien",
-        "description": "Alles für die Küche",
+        "name": "3D-Modellierung",
+        "description": "Erstellte Werke Blender",
+        "image": "https://example.com/images/kitchen.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Kundenprojekte",
+        "description": "Photoshop, Illustrator, InDesign",
         "image": "https://example.com/images/kitchen.jpg"
     }
 ]

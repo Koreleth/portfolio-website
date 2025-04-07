@@ -1,13 +1,24 @@
 [
     {
         "id": 1,
-        "title": "Küchenutensilien",
-        "description": "Alles für die Küche",
+        "title": "Moka Kanne",
+        "description": "Abgabe für das Modul 3D-Modellierung im 3. Semester.",
         "images": [
             "https://example.com/images/kitchen1.jpg",
             "https://example.com/images/kitchen2.jpg",
             "https://example.com/images/kitchen3.jpg"
         ],
         "categoryID": 1
+    },
+    {
+        "id": 2,
+        "title": "Café Eisberg",
+        "description": "Neugründigung Café Eisberg",
+        "images": [
+            "https://example.com/images/kitchen1.jpg",
+            "https://example.com/images/kitchen2.jpg",
+            "https://example.com/images/kitchen3.jpg"
+        ],
+        "categoryID": 2
     }
 ]
