@@ -13,6 +13,7 @@ if (data.length > 0) {
 
 
 const getAllPortfolios = (req, res) => {
+    console.log("GET Portfolio Data");
     return { status: 200, data: portfolios };
 }
 

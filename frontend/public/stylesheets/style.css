@@ -1,0 +1,150 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+body {
+  background: #fff;
+  color: #333;
+}
+
+nav {
+  background: #4a4747;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar .logo {
+  color: white;
+  font-size: 1.5rem;
+}
+
+.navbar button {
+  background: #ccc;
+  border: none;
+  margin: 0 5px;
+  padding: 5px 10px;
+}
+
+.video {
+  padding: 2rem;
+  background: #eee;
+  text-align: center;
+}
+
+.video-box {
+  width: 100%;
+  max-width: 600px;
+  height: 200px;
+  background: #ddd;
+  margin: 0 auto;
+  position: relative;
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 50%;
+  padding: 10px;
+  font-size: 24px;
+}
+
+.grid {
+  padding: 2rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.card {
+  height: 100px;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+}
+
+.content {
+  padding: 2rem;
+}
+
+.flexbox {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar {
+  width: 30%;
+  height: 200px;
+  background: #aaa;
+}
+
+.main-content {
+  flex-grow: 1;
+  height: 200px;
+  background: #f1f1f1;
+}
+
+.wide-content {
+  height: 150px;
+  background: #aaa;
+  margin-top: 1rem;
+}
+
+.faq {
+  padding: 2rem;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.faq-item {
+  display: flex;
+  height: 40px;
+  background: #d6c4c4;
+}
+
+.faq-item:nth-child(even) {
+  background: #e5dede;
+}
+
+.scroll-dot {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 20px;
+}
+
+footer {
+  padding: 2rem;
+  background: #f9f9f9;
+}
+
+.footer-columns {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.footer-box {
+  flex: 1;
+  height: 60px;
+  background: #e5e5e5;
+}
