@@ -2,11 +2,11 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 body {
-  background: #fff;
+  background: #96919c;
   color: #333;
 }
 
@@ -15,6 +15,11 @@ nav {
   padding: 1rem;
   display: flex;
   justify-content: space-between;
+}
+
+a {
+  text-decoration: none;
+  color: black;
 }
 
 .navbar {
@@ -39,16 +44,9 @@ nav {
   padding: 2rem;
   background: #eee;
   text-align: center;
+  height: 100vh;
 }
 
-.video-box {
-  width: 100%;
-  max-width: 600px;
-  height: 200px;
-  background: #ddd;
-  margin: 0 auto;
-  position: relative;
-}
 
 .play-button {
   position: absolute;
@@ -67,15 +65,33 @@ nav {
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-top: 1rem;
 }
 
 .card {
-  height: 100px;
+  display: flex;
+  width: (100/4);
+  height: auto;
+  align-content: center;
+  flex-direction: column;
   background: #f5f5f5;
-  border: 1px solid #ccc;
+  border-radius: 1rem;
+  box-shadow: #333 0px 0px 5px;
+}
+.card img {
+	max-width: 100%;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+	height: auto;
+	aspect-ratio: 1/1; /*Format 16:9*/
+	object-fit: cover;
+}
+.card p {
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
 }
 
 .content {
@@ -148,3 +164,9 @@ footer {
   height: 60px;
   background: #e5e5e5;
 }
+
+.center {
+  text-align: center;
+  margin-top: 1rem;
+}
+

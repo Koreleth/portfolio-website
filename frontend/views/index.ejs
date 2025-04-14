@@ -1,25 +1,10 @@
 <%- include('parts/head') %>
 <%- include('parts/navbar') %>
     <section class="video">
-      <div class="video-box">
-        <div class="play-button">▶</div>
-      </div>
+        <iframe width="90%" height="90%" src="https://www.youtube.com/embed/BwQMkzwDvD8?si=Ev9qpFcdsc1JjLzA" title="Kurze Vorstellung" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </section>
   
-    <section class="grid">
-      <h2>Unsere Angebote</h2>
-      <div class="card-grid">
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-      </div>
-    </section>
+    <%- include('parts/cards', {data: data} ) %>
   
     <section class="content">
       <h2>Details</h2>

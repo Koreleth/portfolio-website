@@ -3,12 +3,26 @@
         "id": 1,
         "name": "3D-Modellierung",
         "description": "Erstellte Werke Blender",
-        "image": "https://example.com/images/kitchen.jpg"
+        "images": ["/img/work1.jpg"]
     },
     {
         "id": 2,
-        "name": "Kundenprojekte",
-        "description": "Photoshop, Illustrator, InDesign",
-        "image": "https://example.com/images/kitchen.jpg"
+        "name": "Progammierung",
+        "description": "Code Projekte und Abgaben",
+        "images": ["/img/work2.jpg"]
+    },
+    {
+        "id": 3,
+        "name": "Fotografie",
+        "description": "Fotografien und Bildbearbeitung",
+        "images": ["/img/work1.jpg"]
+    },
+    {
+        "id": 4,
+        "name": "Grafikdesign",
+        "description": "Illustrationen",
+        "images": ["/img/work1.jpg"]
     }
+   
+   
 ]

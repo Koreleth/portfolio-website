@@ -1,0 +1,16 @@
+<section class="grid">
+  <!-- Render CardItems -->
+    <h2>Mein Portfolio</h2>
+
+    <div class="card-grid">
+      <% data.forEach((portfolio)=> { %>
+      <div class="card"> 
+        <img src="http://localhost:3000<%= portfolio.images[0] %>" alt="true"></img>
+        <h3 class="center"><%= portfolio.title %></h3>
+        <p><%= portfolio.description%></p>
+      </div>
+      <% }); %>
+    </div>
+
+
+  </section>

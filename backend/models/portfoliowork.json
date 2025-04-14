@@ -4,9 +4,7 @@
         "title": "Moka Kanne",
         "description": "Abgabe für das Modul 3D-Modellierung im 3. Semester.",
         "images": [
-            "https://example.com/images/kitchen1.jpg",
-            "https://example.com/images/kitchen2.jpg",
-            "https://example.com/images/kitchen3.jpg"
+            "/img/work1.jpg"
         ],
         "categoryID": 1
     },
@@ -15,9 +13,25 @@
         "title": "Café Eisberg",
         "description": "Neugründigung Café Eisberg",
         "images": [
-            "https://example.com/images/kitchen1.jpg",
-            "https://example.com/images/kitchen2.jpg",
-            "https://example.com/images/kitchen3.jpg"
+             "/img/work2.jpg"
+        ],
+        "categoryID": 2
+    },
+    {
+        "id": 1,
+        "title": "Moka Kanne",
+        "description": "Abgabe für das Modul 3D-Modellierung im 3. Semester.",
+        "images": [
+            "/img/work1.jpg"
+        ],
+        "categoryID": 1
+    },
+    {
+        "id": 2,
+        "title": "Café Eisberg",
+        "description": "Neugründigung Café Eisberg",
+        "images": [
+             "/img/work2.jpg"
         ],
         "categoryID": 2
     }
