@@ -12,7 +12,7 @@ if (data.length > 0) {
 
 
 
-const getAllPortfolios = (req, res) => {
+const getPortfolioData = (req, res) => {
     console.log("GET Portfolio Data");
     return { status: 200, data: portfolios };
 }
@@ -22,5 +22,5 @@ const getAllPortfolios = (req, res) => {
 
 
 module.exports = {
-    getAllPortfolios
+    getPortfolioData
 }

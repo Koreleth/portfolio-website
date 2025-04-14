@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var portfolioController = require('./portfolioController');
+var categorieController = require('./categorieController');
 var axios = require('axios');
 
 
@@ -12,7 +13,7 @@ var axios = require('axios');
 const getIndex = async (req) => {
 
     // Holt die Equipment-Daten vom Equipment-Controller
-    let response = await portfolioController.getAllPortfolioData(req);
+    let response = await categorieController.getAllCategories(req);
 
     return { "status": 200, data: response.data , title: "Home"};
 }

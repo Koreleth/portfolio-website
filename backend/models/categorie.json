@@ -22,7 +22,14 @@
         "name": "Grafikdesign",
         "description": "Illustrationen",
         "images": ["/img/work1.jpg"]
+    },
+    {
+        "id": 5,
+        "name": "Grafikdesign",
+        "description": "Illustrationen",
+        "images": ["/img/work1.jpg"]
     }
+    
    
    
 ]
