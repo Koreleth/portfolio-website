@@ -1,0 +1,19 @@
+<section class="timeline">
+    <h2>Lebenslauf</h2>
+ 
+    <div class="timeline-container">
+<% if (data.length > 0) { %>
+    <% data.forEach((item) => { %>
+        <div class="time-card toleft">
+            <div class="time-content">
+                <div class="time-cardtitle">
+                  <div class="time-cardyear"><h2><%=item.time %> </h2></div>
+                  <div class="time-cardheader"><h2><%=item.title %></h2></div>
+                </div>
+                <div class="time-cardtext"><p><%=item.description %></p></div>
+            </div>
+        </div>
+        <% }); %>
+<% } %>
+    </div>
+</section>

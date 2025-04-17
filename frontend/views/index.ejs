@@ -2,29 +2,17 @@
 <%- include('parts/navbar') %>
 
     <section class="video">
-        <iframe width="90%" height="90%" src="https://www.youtube.com/embed/BwQMkzwDvD8?si=Ev9qpFcdsc1JjLzA" title="Kurze Vorstellung" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <iframe width="90%" height="90%" src="https://www.youtube.com/embed/BwQMkzwDvD8?si=Ev9qpFcdsc1JjLzA" title="Kurze Vorstellung" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+        </iframe>
+        <div class="line"></div>
     </section>
+   
   
-    <%- include('parts/cards', {data: data} ) %>
+<%- include('parts/cards', {data: data.categories} ) %>
+   
   
-    <section class="content">
-      <h2>Details</h2>
-      <div class="flexbox">
-        <aside class="sidebar"></aside>
-        <article class="main-content"></article>
-      </div>
-      <div class="wide-content"></div>
-    </section>
+<%- include('parts/me') %>
   
-    <section class="faq">
-      <h2>FAQ</h2>
-      <div class="faq-list">
-        <div class="faq-item"></div>
-        <div class="faq-item"></div>
-        <div class="faq-item"></div>
-        <div class="faq-item"></div>
-      </div>
-      <div class="scroll-dot">⬤</div>
-    </section>
+<%- include('parts/timeline', {data: data.lifeline}) %>
   
 <%- include('parts/footer') %>
