@@ -33,6 +33,7 @@ const getAllPortfolioData = async (req) => {
 };
 
 const getPortolios = async (id) => {
+    console.log("ID: " + id);
     let response = await axios.get('http://localhost:3000/categorie/' + id);
     //response.auth = false;
     // Wenn der Benutzer eingeloggt und Administrator ist, werden Bearbeitungsrechte hinzugefügt
@@ -48,7 +49,14 @@ const getPortolios = async (id) => {
     return response;
 };
 
+const getSinglePort = async (id) => {
+    console.log("ID: " + id);
+    let response = await axios.get('http://localhost:3000/portolio/' + id);
+    
+    };
+
 module.exports = {
     getAllPortfolioData,
-    getPortolios
+    getPortolios,
+    getSinglePort
 }

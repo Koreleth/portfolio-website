@@ -13,5 +13,12 @@ router.route('/:id')
   res.render('categories/categorie', {data: response.data ,title: 'Categorie1'});
 })
 
+router.route('/:idcat/:idport')
+.get(async(req,res,next)=> {
+  // Ruft die Daten für die Startseite vom Index-Controller ab
+  let response = await portfolioController.getSinglePort(req.params.id);
+  // Rendert die Startseite mit den beliebtesten Artikeln und dem Seitentitel
+  res.render('categories/portolio', {data: response.data ,title: 'Portolio'});
+})
 
 module.exports = router;
