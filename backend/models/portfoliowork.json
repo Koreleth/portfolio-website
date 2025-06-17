@@ -18,7 +18,7 @@
         "categoryID": 2
     },
     {
-        "id": 1,
+        "id": 3,
         "title": "Moka Kanne",
         "description": "Abgabe für das Modul 3D-Modellierung im 3. Semester.",
         "images": [
@@ -27,7 +27,7 @@
         "categoryID": 1
     },
     {
-        "id": 2,
+        "id": 4,
         "title": "Café Eisberg",
         "description": "Neugründigung Café Eisberg",
         "images": [

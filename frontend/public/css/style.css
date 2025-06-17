@@ -35,16 +35,22 @@ nav {
   justify-content:left;
   align-items: left;
   box-shadow: 0px 0px 7px black;
-  z-index: 2;
+  z-index: 5;
 }
 
 .nav-links {
   align-self: center;
 }
+.nav-active {
+  background: #333;
+  color: white;
+  border-radius: 10px;
+}
 
 a {
   text-decoration: none;
   color: black;
+  color: inherit;
 }
 
 nav a {
@@ -70,6 +76,10 @@ iframe {
 .logo img{
   width: 30px;
   height: auto;
+}
+
+.grid {
+  padding-top: 5rem;
 }
 
 .card-grid {
@@ -108,21 +118,19 @@ iframe {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+  height: 550px;
 }
 
-.sidebar {
-  width: 38%;
-  height: 200px;
-}
 
 .main-content {
-
+  width: 100%;
+  flex: 2;
 }
 
 .main-content img {
     border-radius: 5px;
-    width: auto;
-    height: 550px;
+    width: 100%;
+    height: 100%;
     aspect-ratio: 16/9; /*Format 16:9*/
     object-fit: cover;
 }
@@ -172,11 +180,12 @@ span {
 }
 
 .sidebar {
+  flex: 1;
   padding: 1rem;
   background: #111;
   position: relative;
   border-radius: 5px;
-  height: 550px;
+  height: 100%;
 }
 
 
@@ -271,4 +280,10 @@ span {
   padding: 10px 20px;
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 6px;
+}
+
+.socials img {
+  width: 30px;
+  height: auto;
+  margin-right: 10px;
 }

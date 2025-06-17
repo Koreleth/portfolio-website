@@ -75,3 +75,29 @@ function animateText() {
     window.addEventListener('scroll', checkCards);
     window.addEventListener('load', checkCards);
 });
+
+ //Elemns active in navbar
+document.addEventListener("DOMContentLoaded", function() {
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    console.log(navLinks)
+
+    function activateLink() {
+        let index = sections.length;
+        console.log(index);
+        while(--index && window.scrollY + 50 < sections[index].offsetTop) {}
+
+        navLinks.forEach((link) => link.classList.remove('nav-active'));
+        navLinks[index].classList.add('nav-active');
+    }
+
+    window.addEventListener('scroll', activateLink);
+    window.addEventListener('load', activateLink);
+    activateLink(); // Initial call to set the active link on page load
+});
+
+document.querySelectorAll('.dynamic-link').forEach(link => {
+    const id = link.getAttribute('data-id');
+    const currentUrl = window.location.origin + window.location.pathname;
+    link.href = currentUrl + id;
+  });

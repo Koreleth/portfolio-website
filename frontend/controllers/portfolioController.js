@@ -32,6 +32,23 @@ const getAllPortfolioData = async (req) => {
     return response;
 };
 
+const getPortolios = async (id) => {
+    let response = await axios.get('http://localhost:3000/categorie/' + id);
+    //response.auth = false;
+    // Wenn der Benutzer eingeloggt und Administrator ist, werden Bearbeitungsrechte hinzugefügt
+    /*if (utils.auth(req)) {
+        response.data.forEach(element => {
+            element.edit = true;
+        });
+        response.auth = true;
+    }*/
+    console.log(response.data);
+    // Filtert die Equipment-Daten basierend auf einer Suchanfrage
+
+    return response;
+};
+
 module.exports = {
     getAllPortfolioData,
+    getPortolios
 }
