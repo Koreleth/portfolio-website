@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var categorieRouter = require('./routes/categories');
+var portfolioRouter = require('./routes/portfoliowork');
 
 var app = express();
 
@@ -20,8 +21,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/', indexRouter);
 app.use('/categorie', categorieRouter);
+app.use('/', indexRouter);
+
 
 
 

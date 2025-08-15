@@ -5,19 +5,13 @@ const axios = require('axios');
 let portfolioController = require('../controllers/portfolioController');
 
 /* GET categorie Page. */
-router.route('/:slug')
-.get(async(req,res,next)=> {
-  // Ruft die Daten für die Startseite vom Index-Controller ab
-  let response = await portfolioController.getPortolios(req.params.slug);
-  // Rendert die Startseite mit den beliebtesten Artikeln und dem Seitentitel
-  res.render('categories/categorie', {data: response.data ,title: 'Categorie1'});
-})
-router.route('/:catSlug/:slug')
+router.route(':catSlug/:slug')
 .get(async(req,res,next)=> {
   // Ruft die Daten für die Startseite vom Index-Controller ab
   let response = await portfolioController.getSinglePortfolio(req.params.catSlug, req.params.slug);
   // Rendert die Startseite mit den beliebtesten Artikeln und dem Seitentitel
   res.render('portfolio/portfoliowork', {data: response.data ,title: req.params.slug});
 })
+
 
 module.exports = router;

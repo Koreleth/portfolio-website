@@ -12,6 +12,7 @@ router.route("/portfolio")
   res.status(response.status).json(response.data);
 })
 
+
 router.route("/categories")
 .get((req,res,next)=> {
   let response = categorieController.getCategorieData();
@@ -23,6 +24,7 @@ router.route("/lifeline")
   let response = lifelineController.getLifeline(req);
   res.status(response.status).json(response.data);
 })
+
 
 
 

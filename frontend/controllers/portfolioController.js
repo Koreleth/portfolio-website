@@ -32,8 +32,8 @@ const getAllPortfolioData = async (req) => {
     return response;
 };
 
-const getPortolios = async (id) => {
-    let response = await axios.get('http://localhost:3000/categorie/' + id);
+const getPortolios = async (slug) => {
+    let response = await axios.get('http://localhost:3000/categorie/' + slug);
     //response.auth = false;
     // Wenn der Benutzer eingeloggt und Administrator ist, werden Bearbeitungsrechte hinzugefügt
     /*if (utils.auth(req)) {
@@ -48,7 +48,13 @@ const getPortolios = async (id) => {
     return response;
 };
 
+const getSinglePortfolio = async (catSlug, slug) => {
+    let response = await axios.get('http://localhost:3000/portfoliowork/' + catSlug + '/' + slug);
+    return response;
+};
+
 module.exports = {
     getAllPortfolioData,
-    getPortolios
+    getPortolios,
+    getSinglePortfolio
 }

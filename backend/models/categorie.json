@@ -4,35 +4,40 @@
         "type": "categorie",
         "name": "3D-Modellierung",
         "description": "Erstellte Werke Blender",
-        "images": ["/img/work1.jpg"]
+        "images": ["/img/work1.jpg"],
+        "slug": "3d-modellierung"
     },
     {
         "id": 2,
         "type": "categorie",
-        "name": "Progammierung",
+        "name": "Programmierung",
         "description": "Code Projekte und Abgaben",
-        "images": ["/img/work2.jpg"]
+        "images": ["/img/work2.jpg"],
+        "slug": "programmierung"
     },
     {
         "id": 3,
         "type": "categorie",
         "name": "Fotografie",
         "description": "Fotografien und Bildbearbeitung",
-        "images": ["/img/work1.jpg"]
+        "images": ["/img/work1.jpg"],
+        "slug": "fotografie"
     },
     {
         "id": 4,
         "type": "categorie",
         "name": "Grafikdesign",
         "description": "Illustrationen",
-        "images": ["/img/work1.jpg"]
+        "images": ["/img/work1.jpg"],
+        "slug": "grafikdesign"
     },
     {
         "id": 5,
         "type": "categorie",
         "name": "Grafikdesign",
         "description": "Illustrationen",
-        "images": ["/img/work1.jpg"]
+        "images": ["/img/work1.jpg"],
+        "slug": "grafikdesign-2"
     }
     
    

@@ -4,7 +4,7 @@
 
     <div class="card-grid">
       <% data.forEach((element)=> { %>
-      <a data-id="<%= element.type %>/<%= element.id %>" class="card-link dynamic-link">
+      <a data-id="<%= element.type %>/<%= element.slug %>" class="card-link dynamic-link">
         <div class="card"> 
           <img src="http://localhost:3000<%= element.images[0] %>" alt="true"></img>
           <h3 class="center"><%= element.title %></h3>

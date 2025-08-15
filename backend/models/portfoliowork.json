@@ -6,7 +6,8 @@
         "images": [
             "/img/work1.jpg"
         ],
-        "categoryID": 1
+        "categoryID": 1,
+        "slug": "moka-kanne"
     },
     {
         "id": 2,
@@ -15,7 +16,8 @@
         "images": [
              "/img/work2.jpg"
         ],
-        "categoryID": 2
+        "categoryID": 2,
+        "slug": "cafe-eisberg"
     },
     {
         "id": 3,
@@ -24,7 +26,8 @@
         "images": [
             "/img/work1.jpg"
         ],
-        "categoryID": 1
+        "categoryID": 1,
+        "slug": "moka-kanne-2"
     },
     {
         "id": 4,
@@ -33,6 +36,7 @@
         "images": [
              "/img/work2.jpg"
         ],
-        "categoryID": 2
+        "categoryID": 2,
+        "slug": "cafe-eisberg"
     }
 ]
