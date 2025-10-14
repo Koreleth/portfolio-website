@@ -4,13 +4,6 @@ Dieses Repository enthält meine persönliche Portfolio-Webseite, in der ich Pro
 
 ---
 
-## 🌐 Live-Demo
-
-*(Falls die Seite gehostet ist, hier den Link einfügen)*  
-Beispiel: [https://koreleth.github.io/Portfolio](https://koreleth.github.io/Portfolio)
-
----
-
 ## 📂 Projektstruktur
 
 ```text
