@@ -9,6 +9,40 @@ body {
   color: #333;
 }
 
+.upperpart{
+  padding-top: 5rem;
+  display: flex;
+  justify-content: center;
+}
+.titletext {
+padding: 1rem;
+}
+.titleimg {
+  padding: 1rem;
+  width: 30%;
+}
+.titleimg img{
+  width: 100%;
+  height: auto;
+}
+
+.middlepart{
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.middlepart *{
+  border-style: solid;
+}
+
+.middleimg {
+  width: 30%;
+}
+.middleimg img{
+  width: 100%;
+}
 section {
   padding: 2rem;
 }
