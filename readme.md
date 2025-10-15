@@ -11,10 +11,8 @@ Dieses Repository enthält meine persönliche Portfolio-Webseite, in der ich Pro
 
 ```text
 Portfolio/
-├── index.html         # Startseite deines Portfolios
-├── css/               # Stylesheets (z. B. style.css)
-├── js/                # JavaScript-Dateien
-├── assets/            # Bilder, Icons, Medien
+├── backend            # Datein, Information, Accounts
+├── frontend           # HTML, CSS, Routing
 └── README.md
 ```
 
