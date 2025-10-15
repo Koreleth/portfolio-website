@@ -23,9 +23,9 @@ Portfolio/
 ## 🛠️ Technologien & Tools
 
 - HTML5 & CSS3  
-- JavaScript (ggf. Frameworks oder Bibliotheken)  
-- Responsive Design für verschiedene Endgeräte  
-- (Optional) GitHub Pages oder ein anderer Hostingdienst  
+- JavaScript
+- Node.js + Express
+- Fetch
 
 ---
 
@@ -37,10 +37,24 @@ Portfolio/
    git clone https://github.com/Koreleth/Portfolio.git
    cd Portfolio
    ```
+2. Node Module installieren:
+    ```bash
+   npm install
+   ```
 
-2. Lokale Vorschau:
+3. Backend starten:
+    ```bash
+   cd backend
+   npm run dev
+   ```
 
-   Öffne `index.html` im Browser oder nutze einen Live-Server (z. B. mit VS Code–Live Server oder einem einfachen HTTP-Server).
+4. Frontend starten:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+5. Gebe anschließend `localhost` im Browser ein.
 
 ---
 
@@ -49,21 +63,8 @@ Portfolio/
 In deinem Portfolio findest du typischerweise:
 
 - Eine **Über mich**-Sektion mit biografischen Informationen  
-- Eine **Projektübersicht** mit Screenshots, Links und Beschreibungen  
-- Eine **Fähigkeiten-/Technologie-Liste**  
+- Eine **Projektübersicht** mit Screenshots, Links und Beschreibungen   
 - Eine **Kontaktsektion** mit Formular oder Social-Media-Links  
-- **Responsives Design** für Smartphones, Tablets und Desktop  
-
----
-
-## 🧩 Personalisierung
-
-Du kannst das Portfolio leicht anpassen:
-
-- Passe Farben, Schriftarten und Layout in CSS an  
-- Füge neue Projekte im HTML-/JS-Bereich hinzu  
-- Ersetze Bilder in `assets/`  
-- Wenn du GitHub Pages nutzt, aktiviere Pages und setze Source auf `main` oder `gh-pages`
 
 ---
 
