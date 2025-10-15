@@ -1,6 +1,9 @@
 # Portfolio
 
-Dieses Repository enthält meine persönliche Portfolio-Webseite, in der ich Projekte, Fähigkeiten und Kontaktinformationen präsentiere.
+Dieses Repository enthält meine persönliche Portfolio-Webseite, in der ich Projekte, Fähigkeiten und Kontaktinformationen präsentiere. (Noch in Bearbeitung)
+
+<img width="2843" height="1491" alt="portoflio-website" src="https://github.com/user-attachments/assets/8fca225f-36c5-482c-a46b-a22048932d2c" />
+
 
 ---
 
