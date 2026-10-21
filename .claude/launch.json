@@ -2,16 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "backend",
+      "name": "portfolio",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "backend", "start"],
+      "runtimeArgs": ["run", "dev"],
       "port": 3000
-    },
-    {
-      "name": "frontend",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "frontend", "run", "dev"],
-      "port": 80
     }
   ]
 }

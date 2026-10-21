@@ -10,9 +10,14 @@ Dieses Repository enthält meine persönliche Portfolio-Webseite, in der ich Pro
 ## 📂 Projektstruktur
 
 ```text
-Portfolio/
-├── backend            # Datein, Information, Accounts
-├── frontend           # HTML, CSS, Routing
+portfolio-website/
+├── app.js             # Express-App: Seiten, JSON-API unter /api, Fehlerseiten
+├── bin/www            # Startet den Server (Port 3000, über PORT änderbar)
+├── controllers/       # Logik: Kategorien, Projekte, Lebenslauf
+├── models/            # Daten als JSON + store.js zum Lesen/Schreiben
+├── routes/            # Seiten-Routen und API-Routen
+├── views/             # EJS-Templates
+├── public/            # CSS, JavaScript, Bilder
 └── README.md
 ```
 
@@ -23,7 +28,7 @@ Portfolio/
 - HTML5 & CSS3  
 - JavaScript
 - Node.js + Express
-- Fetch
+- EJS (Templates)
 
 ---
 
@@ -40,19 +45,12 @@ Portfolio/
    npm install
    ```
 
-3. Backend starten:
+3. Server starten:
     ```bash
-   cd backend
    npm run dev
    ```
 
-4. Frontend starten:
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-
-5. Gebe anschließend `localhost` im Browser ein.
+4. Gebe anschließend `localhost:3000` im Browser ein.
 
 ---
 
