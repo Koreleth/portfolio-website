@@ -8,17 +8,21 @@ function animateText(textElement) {
       const lineContainer = document.createElement('span');
       lineContainer.className = 'code-line';
       lineContainer.id = 'line-' + lineIndex;
-      textElement.appendChild(lineContainer);
 
       const characters = [...line];
 
       setTimeout(() => {
+        // Zeile erst beim Tippen anlegen, damit die Zeilennummern mitwachsen
+        textElement.appendChild(lineContainer);
+        textElement.scrollTop = textElement.scrollHeight;
         textElement.querySelectorAll('.typing').forEach(el => el.classList.remove('typing'));
         lineContainer.classList.add('typing');
 
         characters.forEach((char, charIndex) => {
           setTimeout(() => {
             lineContainer.appendChild(document.createTextNode(char));
+            // Wie im Terminal: immer die zuletzt getippte Zeile zeigen
+            textElement.scrollTop = textElement.scrollHeight;
           }, charIndex * 5);
         });
 
@@ -52,38 +56,96 @@ function animateText(textElement) {
   });
 
 
-  //TIMELINE
+  //LEBENSLAUF: Station per Klick aufklappen (immer nur eine offen)
   document.addEventListener("DOMContentLoaded", function() {
-    const cards = document.querySelectorAll('.time-card');
-    if (cards.length === 0) return;
+    const heads = document.querySelectorAll('.cv-head');
 
-    function checkCards() {
-        let closestCard = null;
-        let closestDistance = Infinity;
-        const screenMiddle = window.innerHeight / 2;
+    heads.forEach(head => {
+        head.addEventListener('click', () => {
+            const item = head.closest('.cv-item');
+            const wasOpen = item.classList.contains('is-open');
 
-        cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
-            const cardMiddle = rect.top + rect.height / 2;
-            const distance = Math.abs(screenMiddle - cardMiddle);
+            heads.forEach(other => {
+                other.closest('.cv-item').classList.remove('is-open');
+                other.setAttribute('aria-expanded', 'false');
+            });
 
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestCard = card;
+            if (!wasOpen) {
+                item.classList.add('is-open');
+                head.setAttribute('aria-expanded', 'true');
             }
         });
+    });
+});
 
-        // Zuerst alle Karten deaktivieren
-        cards.forEach(card => card.classList.remove('active'));
+// Startseite (Desktop): Mausrad/Touchpad springt immer genau einen Bereich weiter
+document.addEventListener("DOMContentLoaded", function() {
+    const sections = [...document.querySelectorAll('.hero, .screen')];
+    if (sections.length < 2) return;
 
-        // Nur die am nächsten zur Mitte aktivieren
-        if (closestCard) {
-            closestCard.classList.add('active');
+    // Gleiche Bedingung wie das Einrasten in style.css
+    const snapQuery = window.matchMedia('(min-width: 861px) and (min-height: 600px)');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let locked = false;
+    let lastWheel = 0;
+
+    // Kann ein Element unter dem Mauszeiger (z. B. das Code-Fenster) selbst noch weiterscrollen?
+    const canScrollInside = (target, direction) => {
+        for (let el = target; el && el !== document.body; el = el.parentElement) {
+            if (!/(auto|scroll)/.test(getComputedStyle(el).overflowY) || el.scrollHeight <= el.clientHeight) continue;
+            if (direction > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0) return true;
         }
-    }
+        return false;
+    };
 
-    window.addEventListener('scroll', checkCards, { passive: true });
-    window.addEventListener('load', checkCards);
+    // Erst wieder freigeben, wenn das Rad kurz Ruhe gibt (Touchpads scrollen nach)
+    const unlock = () => {
+        if (Date.now() - lastWheel < 180) return setTimeout(unlock, 120);
+        locked = false;
+    };
+
+    window.addEventListener('wheel', (e) => {
+        if (!snapQuery.matches || e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+        // Nur wenn alle Bereiche wirklich auf den Bildschirm passen
+        if (sections.some(section => section.offsetHeight > window.innerHeight + 2)) return;
+
+        const direction = Math.sign(e.deltaY);
+        if (direction === 0 || canScrollInside(e.target, direction)) return;
+
+        e.preventDefault();
+        lastWheel = Date.now();
+        if (locked) return;
+
+        const current = sections.reduce((best, section, index) =>
+            Math.abs(section.offsetTop - window.scrollY) < Math.abs(sections[best].offsetTop - window.scrollY) ? index : best, 0);
+        const next = Math.min(sections.length - 1, Math.max(0, current + direction));
+        if (next === current) return;
+
+        locked = true;
+        window.scrollTo({ top: sections[next].offsetTop, behavior: reduceMotion ? 'auto' : 'smooth' });
+        setTimeout(unlock, 700);
+    }, { passive: false });
+});
+
+// Navigation wird dunkel, solange sie über einem dunklen Bereich liegt (Hero, Kontakt)
+document.addEventListener("DOMContentLoaded", function() {
+    const nav = document.querySelector('nav');
+    const darkAreas = document.querySelectorAll('.hero, footer');
+    if (!nav || darkAreas.length === 0) return;
+
+    const updateNav = () => {
+        const navRect = nav.getBoundingClientRect();
+        const navMiddle = navRect.top + navRect.height / 2;
+        const onDark = [...darkAreas].some(area => {
+            const rect = area.getBoundingClientRect();
+            return rect.top <= navMiddle && rect.bottom >= navMiddle;
+        });
+        nav.classList.toggle('nav-on-dark', onDark);
+    };
+
+    window.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', updateNav);
+    updateNav();
 });
 
  //Elemente active in navbar (über die IDs der Sektionen)
@@ -116,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Sanftes Einblenden der Inhalte beim Scrollen
 document.addEventListener("DOMContentLoaded", function() {
-    const items = document.querySelectorAll('section > h2, .card-link, .flexbox, .timeline-container, .upperpart > *, .middlepart > *');
+    const items = document.querySelectorAll('section > h2, .card-link, .about-grid > *, .upperpart > *, .middlepart > *');
     if (!('IntersectionObserver' in window)) return;
 
     const observer = new IntersectionObserver((entries) => {
@@ -143,18 +205,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const hero = document.querySelector('.hero');
     if (!hero) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Navigation wird dunkel, solange sie über dem Hero liegt
-    const nav = document.querySelector('nav');
-    if (nav) {
-        const updateNav = () => {
-            const navRect = nav.getBoundingClientRect();
-            nav.classList.toggle('nav-on-dark', hero.getBoundingClientRect().bottom > navRect.top + navRect.height / 2);
-        };
-        window.addEventListener('scroll', updateNav, { passive: true });
-        window.addEventListener('resize', updateNav);
-        updateNav();
-    }
 
     // Punkteraster leuchtet rund um den Mauszeiger auf
     let pointerX = 0;

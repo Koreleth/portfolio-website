@@ -1,12 +1,17 @@
-<section class="grid" id="portfolio">
+<%
+  // Startseite: alle Kacheln passen auf einen Bildschirm, die Reihen werden gleichmäßig gefüllt
+  const rows = data.length <= 3 ? 1 : (data.length <= 8 ? 2 : 3);
+  const perRow = Math.max(1, Math.ceil(data.length / rows));
+%>
+<section class="grid<%= locals.fullscreen ? ' screen' : '' %>" id="portfolio">
   <!-- Render CardItems -->
     <h2><%= locals.heading || 'Mein Portfolio' %></h2>
 
     <% if (data.length === 0) { %>
     <p class="empty-state">Hier entstehen gerade neue Projekte – schau bald wieder vorbei.</p>
     <% } else { %>
-    <div class="card-grid">
-      <% data.forEach((element)=> { %>
+    <div class="card-grid<%= locals.fullscreen ? ' card-grid--fill' : '' %>"<% if (locals.fullscreen) { %> style="--per-row: <%= perRow %>"<% } %>>
+      <% data.forEach((element, index)=> { %>
       <%
         // Kategorien verlinken auf ihre Übersicht, Projekte auf ihre Detailseite
         const href = element.type === 'categorie'
@@ -16,6 +21,7 @@
       <a href="<%= href %>" class="card-link">
         <div class="card">
           <div class="card-img"><img src="<%= element.images[0] %>" alt="<%= element.title || element.name %>"></div>
+          <% if (locals.fullscreen) { %><span class="card-index"><%= String(index + 1).padStart(2, '0') %></span><% } %>
           <div class="card-body">
             <h3><%= element.title || element.name %></h3>
             <p><%= element.description%></p>
@@ -27,6 +33,8 @@
     </div>
     <% } %>
 
+    <% if (!locals.fullscreen) { %>
     <div class="line"></div>
+    <% } %>
 
   </section>

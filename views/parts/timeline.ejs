@@ -1,19 +1,18 @@
-<section class="timeline" id="lebenslauf">
-    <h2>Lebenslauf</h2>
+<div class="about-cv">
+    <p class="eyebrow">Lebenslauf</p>
 
-    <div class="timeline-container">
-<% if (data.length > 0) { %>
-    <% data.forEach((item) => { %>
-        <div class="time-card toleft">
-            <div class="time-content">
-                <div class="time-cardtitle">
-                  <div class="time-cardyear"><h3><%=item.time %></h3></div>
-                  <div class="time-cardheader"><h3><%=item.title %></h3></div>
-                </div>
-                <div class="time-cardtext"><p><%=item.description %></p></div>
+    <ol class="cv">
+    <% data.forEach((item, index) => { %>
+        <li class="cv-item<%= index === 0 ? ' is-open' : '' %>">
+            <button class="cv-head" type="button" aria-expanded="<%= index === 0 %>" aria-controls="cv-<%= item.id %>">
+                <span class="cv-year"><%= item.time %></span>
+                <span class="cv-title"><%= item.title %></span>
+                <span class="cv-icon" aria-hidden="true"></span>
+            </button>
+            <div class="cv-body" id="cv-<%= item.id %>">
+                <div><p><%= item.description %></p></div>
             </div>
-        </div>
-        <% }); %>
-<% } %>
-    </div>
-</section>
+        </li>
+    <% }); %>
+    </ol>
+</div>
