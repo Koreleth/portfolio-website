@@ -32,8 +32,8 @@ Portfolio/
 1. Repository klonen:
 
    ```bash
-   git clone https://github.com/Koreleth/Portfolio.git
-   cd Portfolio
+   git clone https://github.com/Koreleth/portfolio-website.git
+   cd portfolio-website
    ```
 2. Node Module installieren:
     ```bash
