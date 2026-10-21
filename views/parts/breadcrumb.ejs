@@ -1,0 +1,12 @@
+<%# Seitenpfad, z. B. Start / Portfolio / 3D-Modellierung – der letzte Eintrag ist die aktuelle Seite %>
+<div class="breadcrumb" role="navigation" aria-label="Seitenpfad">
+    <ol>
+    <% items.forEach((item, index) => { %>
+        <% if (index < items.length - 1) { %>
+        <li><a href="<%= item.href %>"><%= item.label %></a></li>
+        <% } else { %>
+        <li><span aria-current="page"><%= item.label %></span></li>
+        <% } %>
+    <% }); %>
+    </ol>
+</div>

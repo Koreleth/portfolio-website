@@ -1,0 +1,16 @@
+<%- include('../parts/head') %>
+<%- include('../parts/navbar') %>
+
+<header class="page-header">
+    <%- include('../parts/breadcrumb', { items: [
+        { label: 'Start', href: '/' },
+        { label: 'Portfolio' }
+    ] }) %>
+    <p class="eyebrow">Übersicht</p>
+    <h1>Portfolio</h1>
+    <p>Alle Kategorien im Überblick – wähle eine aus, um ihre Projekte zu sehen.</p>
+</header>
+
+<%- include('../parts/cards', { data: data, heading: 'Kategorien' }) %>
+
+<%- include('../parts/footer') %>

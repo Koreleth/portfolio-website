@@ -1,9 +1,12 @@
 
 <div class="upperpart">
     <div class="titletext">
-    <% if (data.categorie) { %>
-    <a class="back-link" href="/categorie/<%= data.categorie.slug %>">&larr; <%= data.categorie.name %></a>
-    <% } %>
+    <%- include('breadcrumb', { items: [
+        { label: 'Start', href: '/' },
+        { label: 'Portfolio', href: '/portfolio' },
+        { label: data.categorie.name, href: '/portfolio/' + data.categorie.slug },
+        { label: data.title }
+    ] }) %>
     <p class="eyebrow">Projekt</p>
     <h1><%= data.title %></h1>
     <p><%= data.description %></p>

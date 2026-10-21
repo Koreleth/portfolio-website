@@ -152,8 +152,8 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const sections = document.querySelectorAll('section[id], footer[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
-    // Unterseiten ohne eigene Sektionen: keine Markierung
-    if (!document.querySelector('section[id]')) return;
+    // Nur auf der Startseite; Unterseiten markieren den Menüpunkt serverseitig (activeNav)
+    if (!document.querySelector('.hero')) return;
 
     function activateLink() {
         let current = sections[0];

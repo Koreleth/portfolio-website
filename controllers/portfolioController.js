@@ -1,9 +1,5 @@
 let store = require('../models/store');
 
-const getPortfolioData = () => {
-    return { status: 200, data: store.read('portfoliowork') };
-}
-
 const getPortfolioByCategorie = (slug) => {
     const categorieEntry = store.read('categorie').find(element => element.slug === slug);
     if (!categorieEntry) {
@@ -32,7 +28,6 @@ const getSinglePortfolio = (catSlug, slug) => {
 };
 
 module.exports = {
-    getPortfolioData,
     getPortfolioByCategorie,
     getSinglePortfolio
 }

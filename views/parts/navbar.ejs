@@ -2,7 +2,8 @@
       <div class="logo"><a href="/#home"> <img src="/img/1Korel-Logo.png" alt="Korel Logo"> </a></div>
       <div class="nav-links">
         <a href="/#home">Home</a>
-        <a href="/#portfolio">Portfolio</a>
+        <%# Auf den Unterseiten unter /portfolio ist "Portfolio" fest markiert (activeNav) %>
+        <a href="/#portfolio"<% if (locals.activeNav === 'portfolio') { %> class="nav-active"<% } %>>Portfolio</a>
         <a href="/#ueber-mich">Über mich</a>
         <a href="/#kontakt">Kontakt</a>
       </div>

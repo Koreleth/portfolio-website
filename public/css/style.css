@@ -729,6 +729,17 @@ nav.nav-on-dark .logo img {
   color: var(--ink);
 }
 
+/* Letzte Kachel „Alle Kategorien“: dunkel mit Punkteraster wie im Hero */
+.card-link--all .card {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.16) 1px, transparent 1.6px) 0 0 / 22px 22px,
+    var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), var(--shadow-sm);
+}
+.card-link--all .card-body h3 {
+  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+}
+
 @media (min-width: 861px) {
   .card-grid--fill {
     flex: 1 1 auto;
@@ -1168,7 +1179,7 @@ footer.footer--screen .copyright {
 }
 
 /* ==========================================================
-   Kategorie-Kopf & Zurück-Link
+   Seitenkopf der Unterseiten & Seitenpfad
    ========================================================== */
 .page-header {
   max-width: var(--content);
@@ -1184,17 +1195,31 @@ footer.footer--screen .copyright {
   color: var(--muted);
 }
 
-.back-link {
-  display: inline-block;
+/* Seitenpfad: Start / Portfolio / Kategorie / Projekt */
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   margin-bottom: 2rem;
+  list-style: none;
   font-size: 0.9rem;
-  font-weight: 500;
   color: var(--muted);
-  transition: color 0.25s ease, transform 0.35s var(--ease);
 }
-.back-link:hover {
+.breadcrumb li + li::before {
+  content: '/';
+  margin-right: 0.4rem;
+  color: #c4c4c4;
+}
+.breadcrumb a {
+  font-weight: 500;
+  transition: color 0.25s ease;
+}
+.breadcrumb a:hover {
   color: var(--text-strong);
-  transform: translateX(-4px);
+}
+.breadcrumb [aria-current] {
+  font-weight: 500;
+  color: var(--text-strong);
 }
 
 /* ==========================================================

@@ -1,22 +1,23 @@
 <%
-  // Startseite: alle Kacheln passen auf einen Bildschirm, die Reihen werden gleichmäßig gefüllt
-  const rows = data.length <= 3 ? 1 : (data.length <= 8 ? 2 : 3);
-  const perRow = Math.max(1, Math.ceil(data.length / rows));
+  // Startseite: alle Kacheln (inkl. "Alle Kategorien") passen auf einen Bildschirm, die Reihen werden gleichmäßig gefüllt
+  const tiles = data.length + (locals.showAll ? 1 : 0);
+  const rows = tiles <= 3 ? 1 : (tiles <= 8 ? 2 : 3);
+  const perRow = Math.max(1, Math.ceil(tiles / rows));
 %>
 <section class="grid<%= locals.fullscreen ? ' screen' : '' %>" id="portfolio">
   <!-- Render CardItems -->
     <h2><%= locals.heading || 'Mein Portfolio' %></h2>
 
-    <% if (data.length === 0) { %>
+    <% if (tiles === 0) { %>
     <p class="empty-state">Hier entstehen gerade neue Projekte – schau bald wieder vorbei.</p>
     <% } else { %>
     <div class="card-grid<%= locals.fullscreen ? ' card-grid--fill' : '' %>"<% if (locals.fullscreen) { %> style="--per-row: <%= perRow %>"<% } %>>
       <% data.forEach((element, index)=> { %>
       <%
-        // Kategorien verlinken auf ihre Übersicht, Projekte auf ihre Detailseite
+        // Kategorien führen zu /portfolio/:kategorie, Projekte zu /portfolio/:kategorie/:projekt
         const href = element.type === 'categorie'
-          ? '/categorie/' + element.slug
-          : '/categorie/' + locals.catSlug + '/' + element.slug;
+          ? '/portfolio/' + element.slug
+          : '/portfolio/' + locals.catSlug + '/' + element.slug;
       %>
       <a href="<%= href %>" class="card-link">
         <div class="card">
@@ -30,6 +31,19 @@
         </div>
       </a>
       <% }); %>
+
+      <% if (locals.showAll) { %>
+      <!-- Letzte Kachel: zur Übersicht aller Kategorien -->
+      <a href="/portfolio" class="card-link card-link--all">
+        <div class="card">
+          <div class="card-body">
+            <h3>Alle Kategorien</h3>
+            <p><%= locals.total ? locals.total + ' Kategorien im Überblick' : 'Zur Übersicht' %></p>
+          </div>
+          <span class="card-arrow" aria-hidden="true">&rarr;</span>
+        </div>
+      </a>
+      <% } %>
     </div>
     <% } %>
 

@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var categorieRouter = require('./routes/categories');
+var portfolioRouter = require('./routes/portfolio');
 var apiRouter = require('./routes/api');
 
 var app = express();
@@ -23,8 +23,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // JSON-Schnittstelle (früher das separate Backend)
 app.use('/api', apiRouter);
-// Seiten
-app.use('/categorie', categorieRouter);
+// Seiten: /portfolio → /portfolio/:kategorie → /portfolio/:kategorie/:projekt
+app.use('/portfolio', portfolioRouter);
 app.use('/', indexRouter);
 
 

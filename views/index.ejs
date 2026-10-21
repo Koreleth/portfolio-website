@@ -43,7 +43,8 @@
     </section>
 
 
-<%- include('parts/cards', {data: data.categories, fullscreen: true} ) %>
+<%# Startseite: bis zu 5 Kategorien + Kachel "Alle Kategorien" (→ /portfolio) %>
+<%- include('parts/cards', {data: data.categories.slice(0, 5), fullscreen: true, showAll: true, total: data.categories.length} ) %>
 
 
     <section class="about screen" id="ueber-mich">

@@ -2,7 +2,11 @@
 <%- include('../parts/navbar') %>
 
 <header class="page-header">
-    <a class="back-link" href="/#portfolio">&larr; Alle Kategorien</a>
+    <%- include('../parts/breadcrumb', { items: [
+        { label: 'Start', href: '/' },
+        { label: 'Portfolio', href: '/portfolio' },
+        { label: data.categorie.name }
+    ] }) %>
     <p class="eyebrow">Kategorie</p>
     <h1><%= data.categorie.name %></h1>
     <p><%= data.categorie.description %></p>
