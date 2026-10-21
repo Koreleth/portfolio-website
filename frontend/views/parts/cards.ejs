@@ -1,16 +1,19 @@
-<section class="grid">
+<section class="grid" id="portfolio">
   <!-- Render CardItems -->
     <h2>Mein Portfolio</h2>
 
     <div class="card-grid">
       <% data.forEach((element)=> { %>
       <a data-id="<%= element.type %>/<%= element.slug %>" class="card-link dynamic-link">
-        <div class="card"> 
-          <img src="http://localhost:3000<%= element.images[0] %>" alt="true"></img>
-          <h3 class="center"><%= element.title %></h3>
-          <p><%= element.description%></p>
+        <div class="card">
+          <div class="card-img"><img src="http://localhost:3000<%= element.images[0] %>" alt="<%= element.title || element.name %>"></div>
+          <div class="card-body">
+            <h3><%= element.title || element.name %></h3>
+            <p><%= element.description%></p>
+          </div>
+          <span class="card-arrow" aria-hidden="true">&rarr;</span>
         </div>
-      </a> 
+      </a>
       <% }); %>
     </div>
 

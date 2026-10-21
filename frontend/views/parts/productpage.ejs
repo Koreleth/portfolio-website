@@ -1,18 +1,19 @@
 
 <div class="upperpart">
     <div class="titletext">
+    <p class="eyebrow">Projekt</p>
     <h1><%= data.title %></h1>
     <p><%= data.description %></p>
     </div>
 
-    <div class="titleimg"> <img src="http://localhost:3000<%= data.images[0] %>" alt=""></div>
+    <div class="titleimg"> <img src="http://localhost:3000<%= data.images[0] %>" alt="<%= data.title %>"></div>
 </div>
 
 <div class="middlepart">
-    <div class="middleimg"> <img src="http://localhost:3000<%= data.images[0] %>" alt=""></div>
+    <div class="middleimg"> <img src="http://localhost:3000<%= data.images[0] %>" alt="<%= data.title %>"></div>
 
     <div class="middletext">
-        <h1><%= data.title %></h1>
+        <h2><%= data.title %></h2>
         <p><%= data.text %></p>
     </div>
 </div>

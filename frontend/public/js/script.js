@@ -1,25 +1,33 @@
-function animateText() {
-    const textElement = document.querySelector('.text');
+function animateText(textElement) {
     const printText = textElement.dataset.text;
 
-    const contentArray = printText.split('/n');
+    // Nachlaufende Leerzeichen/Umbrüche aus dem Template entfernen
+    const contentArray = printText.split('/n').map(line => line.replace(/\s+$/, ''));
 
     contentArray.forEach((line, lineIndex) => {
       const lineContainer = document.createElement('span');
-      lineContainer.style.display = 'block';
+      lineContainer.className = 'code-line';
       lineContainer.id = 'line-' + lineIndex;
       textElement.appendChild(lineContainer);
 
       const characters = [...line];
 
       setTimeout(() => {
+        textElement.querySelectorAll('.typing').forEach(el => el.classList.remove('typing'));
+        lineContainer.classList.add('typing');
+
         characters.forEach((char, charIndex) => {
           setTimeout(() => {
-            const charSpan = document.createElement('span');
-            charSpan.textContent = char;
-            lineContainer.appendChild(charSpan);
+            lineContainer.appendChild(document.createTextNode(char));
           }, charIndex * 5);
         });
+
+        if (lineIndex === contentArray.length - 1) {
+          setTimeout(() => {
+            lineContainer.classList.remove('typing');
+            textElement.classList.add('done');
+          }, characters.length * 5);
+        }
       }, lineIndex * 200);
     });
   }
@@ -27,11 +35,12 @@ function animateText() {
   // Scroll-Trigger mit IntersectionObserver
   document.addEventListener('DOMContentLoaded', function () {
     const target = document.querySelector('.text');
+    if (!target) return;
 
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          animateText();
+          animateText(entry.target);
           observer.unobserve(entry.target); // nur einmal ausführen
         }
       });
@@ -43,9 +52,10 @@ function animateText() {
   });
 
 
-  //TIMELINE 
+  //TIMELINE
   document.addEventListener("DOMContentLoaded", function() {
     const cards = document.querySelectorAll('.time-card');
+    if (cards.length === 0) return;
 
     function checkCards() {
         let closestCard = null;
@@ -72,28 +82,60 @@ function animateText() {
         }
     }
 
-    window.addEventListener('scroll', checkCards);
+    window.addEventListener('scroll', checkCards, { passive: true });
     window.addEventListener('load', checkCards);
 });
 
- //Elemns active in navbar
+ //Elemente active in navbar (über die IDs der Sektionen)
 document.addEventListener("DOMContentLoaded", function() {
-    const sections = document.querySelectorAll('section');
+    const sections = document.querySelectorAll('section[id], footer[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
-    console.log(navLinks)
+    // Unterseiten ohne eigene Sektionen: keine Markierung
+    if (!document.querySelector('section[id]')) return;
 
     function activateLink() {
-        let index = sections.length;
-        console.log(index);
-        while(--index && window.scrollY + 50 < sections[index].offsetTop) {}
+        let current = sections[0];
+        sections.forEach(section => {
+            if (window.scrollY + 120 >= section.offsetTop) current = section;
+        });
 
-        navLinks.forEach((link) => link.classList.remove('nav-active'));
-        navLinks[index].classList.add('nav-active');
+        // Ganz unten angekommen: letzte Sektion (Kontakt) aktivieren
+        if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 2) {
+            current = sections[sections.length - 1];
+        }
+
+        navLinks.forEach((link) => {
+            link.classList.toggle('nav-active', link.hash === '#' + current.id);
+        });
     }
 
-    window.addEventListener('scroll', activateLink);
+    window.addEventListener('scroll', activateLink, { passive: true });
     window.addEventListener('load', activateLink);
     activateLink(); // Initial call to set the active link on page load
+});
+
+// Sanftes Einblenden der Inhalte beim Scrollen
+document.addEventListener("DOMContentLoaded", function() {
+    const items = document.querySelectorAll('section > h2, .card-link, .flexbox, .timeline-container, .upperpart > *, .middlepart > *');
+    if (!('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    items.forEach((item, i) => {
+      item.classList.add('reveal');
+      // Karten nacheinander einblenden
+      if (item.classList.contains('card-link')) {
+        item.style.transitionDelay = (i % 4) * 80 + 'ms';
+      }
+      observer.observe(item);
+    });
 });
 
 document.querySelectorAll('.dynamic-link').forEach(link => {

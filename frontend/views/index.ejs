@@ -1,18 +1,21 @@
 <%- include('parts/head') %>
 <%- include('parts/navbar') %>
 
-    <section class="video">
-        <iframe width="90%" height="90%" src="https://www.youtube.com/embed/BwQMkzwDvD8?si=Ev9qpFcdsc1JjLzA" title="Kurze Vorstellung" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-        </iframe>
+    <section class="video" id="home">
+        <p class="eyebrow">Kurze Vorstellung</p>
+        <div class="video-frame">
+            <iframe src="https://www.youtube.com/embed/BwQMkzwDvD8?si=Ev9qpFcdsc1JjLzA" title="Kurze Vorstellung" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+            </iframe>
+        </div>
         <div class="line"></div>
     </section>
-   
-  
+
+
 <%- include('parts/cards', {data: data.categories} ) %>
-   
-  
+
+
 <%- include('parts/me') %>
-  
+
 <%- include('parts/timeline', {data: data.lifeline}) %>
-  
+
 <%- include('parts/footer') %>
