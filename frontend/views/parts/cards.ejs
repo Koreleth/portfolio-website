@@ -1,12 +1,21 @@
 <section class="grid" id="portfolio">
   <!-- Render CardItems -->
-    <h2>Mein Portfolio</h2>
+    <h2><%= locals.heading || 'Mein Portfolio' %></h2>
 
+    <% if (data.length === 0) { %>
+    <p class="empty-state">Hier entstehen gerade neue Projekte – schau bald wieder vorbei.</p>
+    <% } else { %>
     <div class="card-grid">
       <% data.forEach((element)=> { %>
-      <a data-id="<%= element.type %>/<%= element.slug %>" class="card-link dynamic-link">
+      <%
+        // Kategorien verlinken auf ihre Übersicht, Projekte auf ihre Detailseite
+        const href = element.type === 'categorie'
+          ? '/categorie/' + element.slug
+          : '/categorie/' + locals.catSlug + '/' + element.slug;
+      %>
+      <a href="<%= href %>" class="card-link">
         <div class="card">
-          <div class="card-img"><img src="http://localhost:3000<%= element.images[0] %>" alt="<%= element.title || element.name %>"></div>
+          <div class="card-img"><img src="<%= backendUrl %><%= element.images[0] %>" alt="<%= element.title || element.name %>"></div>
           <div class="card-body">
             <h3><%= element.title || element.name %></h3>
             <p><%= element.description%></p>
@@ -16,6 +25,7 @@
       </a>
       <% }); %>
     </div>
+    <% } %>
 
     <div class="line"></div>
 

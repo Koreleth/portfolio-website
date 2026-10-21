@@ -1,3 +1,15 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<%- include('parts/head') %>
+<%- include('parts/navbar') %>
+
+<main class="error-page">
+    <p class="error-code" aria-hidden="true"><%= status %></p>
+    <p class="eyebrow">Fehler <%= status %></p>
+    <h1><%= status === 404 ? 'Diese Seite gibt es nicht.' : 'Da ist etwas schiefgelaufen.' %></h1>
+    <p><%= status === 404 ? 'Vielleicht wurde sie verschoben oder der Link ist falsch.' : 'Bitte versuch es gleich noch einmal.' %></p>
+    <a class="btn btn-dark" href="/">Zur Startseite</a>
+    <% if (error.stack) { %>
+    <pre><%= error.stack %></pre>
+    <% } %>
+</main>
+
+<%- include('parts/footer') %>

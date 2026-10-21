@@ -8,8 +8,8 @@ let portfolioController = require('../controllers/portfolioController')
 
 router.route("/:catSlug/:slug")
 .get(async(req,res,next)=> {
-  // Ruft die Daten für die Startseite vom Index-Controller ab
-  let response = await portfolioController.getSinglePortfolio(req.params.slug);
+  // Ruft ein einzelnes Projekt innerhalb seiner Kategorie ab
+  let response = await portfolioController.getSinglePortfolio(req.params.catSlug, req.params.slug);
 
   res.status(response.status).json(response.data);
 })

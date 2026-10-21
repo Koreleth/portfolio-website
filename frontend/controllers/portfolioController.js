@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var axios = require('axios');
+var config = require('../config');
 
 
 
@@ -10,7 +11,7 @@ var axios = require('axios');
  * @returns {Object} - Die Antwort des Backend-Servers.
  */
 const getAllPortfolioData = async (req) => {
-    let response = await axios.get('http://localhost:3000/portfolio');
+    let response = await axios.get(config.backendUrl + '/portfolio');
     //response.auth = false;
     // Wenn der Benutzer eingeloggt und Administrator ist, werden Bearbeitungsrechte hinzugefügt
     /*if (utils.auth(req)) {
@@ -33,7 +34,7 @@ const getAllPortfolioData = async (req) => {
 };
 
 const getPortolios = async (slug) => {
-    let response = await axios.get('http://localhost:3000/categorie/' + slug);
+    let response = await axios.get(config.backendUrl + '/categorie/' + slug);
     //response.auth = false;
     // Wenn der Benutzer eingeloggt und Administrator ist, werden Bearbeitungsrechte hinzugefügt
     /*if (utils.auth(req)) {
@@ -49,7 +50,7 @@ const getPortolios = async (slug) => {
 };
 
 const getSinglePortfolio = async (catSlug, slug) => {
-    let response = await axios.get('http://localhost:3000/portfoliowork/' + catSlug + '/' + slug);
+    let response = await axios.get(config.backendUrl + '/portfoliowork/' + catSlug + '/' + slug);
     return response;
 };
 

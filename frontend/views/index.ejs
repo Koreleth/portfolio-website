@@ -1,13 +1,45 @@
 <%- include('parts/head') %>
 <%- include('parts/navbar') %>
 
-    <section class="video" id="home">
-        <p class="eyebrow">Kurze Vorstellung</p>
-        <div class="video-frame">
-            <iframe src="https://www.youtube.com/embed/BwQMkzwDvD8?si=Ev9qpFcdsc1JjLzA" title="Kurze Vorstellung" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-            </iframe>
+<%
+  // YouTube-ID des Vorstellungsvideos
+  const videoId = 'BwQMkzwDvD8';
+  // Kategorienamen für die Schreibmaschinen-Zeile (ohne Duplikate)
+  const words = [...new Set(data.categories.map(element => element.name))];
+%>
+    <section class="hero" id="home">
+        <div class="hero-inner">
+            <div class="hero-text">
+                <p class="eyebrow hero-eyebrow">Hallo, ich bin</p>
+                <h1 class="hero-title">
+                    <span class="hero-line"><span>Korel</span></span>
+                    <span class="hero-line"><span>Özekin</span></span>
+                </h1>
+                <% if (words.length > 0) { %>
+                <p class="hero-role">
+                    Projekte rund um
+                    <span class="hero-type" aria-hidden="true" data-words="<%= JSON.stringify(words) %>"><%= words[0] %></span>
+                    <span class="sr-only"><%= words.join(', ') %></span>
+                </p>
+                <% } %>
+                <div class="hero-actions">
+                    <a class="btn btn-light" href="#portfolio">Portfolio ansehen <span aria-hidden="true">&darr;</span></a>
+                    <a class="btn btn-ghost" href="#kontakt">Kontakt</a>
+                </div>
+            </div>
+
+            <div class="hero-media">
+                <div class="video-card" data-video="<%= videoId %>">
+                    <a class="video-trigger" href="https://www.youtube.com/watch?v=<%= videoId %>" aria-label="Kurze Vorstellung abspielen">
+                        <img src="https://i.ytimg.com/vi/<%= videoId %>/maxresdefault.jpg" alt="" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/<%= videoId %>/hqdefault.jpg'">
+                        <span class="play-btn" aria-hidden="true"></span>
+                        <span class="video-caption">Kurze Vorstellung</span>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="line"></div>
+
+        <a class="scroll-cue" href="#portfolio">Scroll</a>
     </section>
 
 

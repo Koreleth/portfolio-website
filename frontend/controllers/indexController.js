@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var lifelineController = require('./lifelinecontroller');
+var lifelineController = require('./lifelineController');
 var portfolioController = require('./portfolioController');
 var categorieController = require('./categorieController');
 var axios = require('axios');

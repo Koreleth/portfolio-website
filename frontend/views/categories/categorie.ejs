@@ -1,6 +1,13 @@
 <%- include('../parts/head') %>
 <%- include('../parts/navbar') %>
 
-<%- include('../parts/cards', {data: data} ) %>
+<header class="page-header">
+    <a class="back-link" href="/#portfolio">&larr; Alle Kategorien</a>
+    <p class="eyebrow">Kategorie</p>
+    <h1><%= data.categorie.name %></h1>
+    <p><%= data.categorie.description %></p>
+</header>
+
+<%- include('../parts/cards', { data: data.portfolios, catSlug: data.categorie.slug, heading: 'Projekte' }) %>
 
 <%- include('../parts/footer') %>

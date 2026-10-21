@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var axios = require('axios');
+var config = require('../config');
 
 
 
@@ -10,7 +11,7 @@ var axios = require('axios');
  * @returns {Object} - Die Antwort des Backend-Servers.
  */
 const getAllCategories = async (req) => {
-    let response = await axios.get('http://localhost:3000/categories');
+    let response = await axios.get(config.backendUrl + '/categories');
     //response.auth = false;
     // Wenn der Benutzer eingeloggt und Administrator ist, werden Bearbeitungsrechte hinzugefügt
     /*if (utils.auth(req)) {

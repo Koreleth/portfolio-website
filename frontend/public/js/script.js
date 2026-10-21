@@ -138,8 +138,102 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-document.querySelectorAll('.dynamic-link').forEach(link => {
-    const id = link.getAttribute('data-id');
-    const currentUrl = window.location.origin + window.location.pathname;
-    link.href = currentUrl + id;
-  });
+// HERO: Spotlight, Video-Karte und Schreibmaschinen-Zeile
+document.addEventListener("DOMContentLoaded", function() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Navigation wird dunkel, solange sie über dem Hero liegt
+    const nav = document.querySelector('nav');
+    if (nav) {
+        const updateNav = () => {
+            const navRect = nav.getBoundingClientRect();
+            nav.classList.toggle('nav-on-dark', hero.getBoundingClientRect().bottom > navRect.top + navRect.height / 2);
+        };
+        window.addEventListener('scroll', updateNav, { passive: true });
+        window.addEventListener('resize', updateNav);
+        updateNav();
+    }
+
+    // Punkteraster leuchtet rund um den Mauszeiger auf
+    let pointerX = 0;
+    let pointerY = 0;
+    let frame = null;
+    hero.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        pointerX = e.clientX;
+        pointerY = e.clientY;
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+            const rect = hero.getBoundingClientRect();
+            hero.style.setProperty('--mx', (pointerX - rect.left) + 'px');
+            hero.style.setProperty('--my', (pointerY - rect.top) + 'px');
+            frame = null;
+        });
+    });
+
+    // Video-Karte neigt sich leicht in Richtung Maus
+    const card = hero.querySelector('.video-card');
+    if (card && !reduceMotion) {
+        card.addEventListener('pointermove', (e) => {
+            if (e.pointerType !== 'mouse' || card.classList.contains('is-playing')) return;
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.setProperty('--rx', (-y * 8) + 'deg');
+            card.style.setProperty('--ry', (x * 10) + 'deg');
+        });
+        card.addEventListener('pointerleave', () => {
+            card.style.removeProperty('--rx');
+            card.style.removeProperty('--ry');
+        });
+    }
+
+    // YouTube wird erst beim Klick geladen (schneller und datensparsamer)
+    const trigger = hero.querySelector('.video-trigger');
+    if (card && trigger) {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://www.youtube-nocookie.com/embed/' + card.dataset.video + '?autoplay=1&rel=0';
+            iframe.title = 'Kurze Vorstellung';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.allowFullscreen = true;
+            card.classList.add('is-playing');
+            card.style.removeProperty('--rx');
+            card.style.removeProperty('--ry');
+            trigger.replaceWith(iframe);
+        });
+    }
+
+    // Schreibmaschine: tippt die Kategorien nacheinander
+    const typeEl = hero.querySelector('.hero-type');
+    if (typeEl && !reduceMotion) {
+        const words = JSON.parse(typeEl.dataset.words || '[]');
+        if (words.length > 1) {
+            let wordIndex = 0;
+            let charIndex = words[0].length;
+            let deleting = true;
+
+            const tick = () => {
+                const word = words[wordIndex];
+                charIndex += deleting ? -1 : 1;
+                typeEl.textContent = word.slice(0, charIndex);
+
+                if (!deleting && charIndex === word.length) {
+                    deleting = true;
+                    return setTimeout(tick, 1800);
+                }
+                if (deleting && charIndex === 0) {
+                    deleting = false;
+                    wordIndex = (wordIndex + 1) % words.length;
+                    return setTimeout(tick, 350);
+                }
+                setTimeout(tick, deleting ? 35 : 75);
+            };
+            setTimeout(tick, 2400);
+        }
+    }
+});
