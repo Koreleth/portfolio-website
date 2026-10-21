@@ -1,0 +1,52 @@
+<%- include('../parts/head') %>
+
+<main class="admin">
+    <%- include('parts/header') %>
+
+    <%
+      // Nur bekannte Hinweise anzeigen (kein beliebiger Text aus der URL)
+      const notices = { gespeichert: 'Projekt gespeichert.', geloescht: 'Projekt gelöscht.' };
+    %>
+    <% if (notice && notices[notice]) { %>
+    <p class="alert alert--ok" role="status"><%= notices[notice] %></p>
+    <% } %>
+
+    <div class="admin-head">
+        <h1>Projekte</h1>
+        <a class="btn btn-dark" href="/admin/projekte/neu">+ Neues Projekt</a>
+    </div>
+
+    <% categories.forEach((categorie) => { %>
+    <% const items = portfolios.filter(portfolio => portfolio.categoryID === parseInt(categorie.id)); %>
+    <div class="admin-group">
+        <h2><%= categorie.name %> <span>(<%= items.length %>)</span></h2>
+
+        <% if (items.length === 0) { %>
+        <p class="admin-empty">Noch keine Projekte in dieser Kategorie.</p>
+        <% } else { %>
+        <ul class="admin-list">
+            <% items.forEach((portfolio) => { %>
+            <li class="admin-item">
+                <img src="<%= portfolio.images[0] %>" alt="">
+                <div class="admin-item-text">
+                    <strong><%= portfolio.title %></strong>
+                    <small>/portfolio/<%= categorie.slug %>/<%= portfolio.slug %></small>
+                </div>
+                <div class="admin-item-actions">
+                    <a class="btn btn-outline btn-small" href="/portfolio/<%= categorie.slug %>/<%= portfolio.slug %>" target="_blank" rel="noopener">Ansehen</a>
+                    <a class="btn btn-outline btn-small" href="/admin/projekte/<%= portfolio.id %>/bearbeiten">Bearbeiten</a>
+                    <form method="post" action="/admin/projekte/<%= portfolio.id %>/loeschen" data-confirm="„<%= portfolio.title %>“ wirklich löschen?">
+                        <button class="btn btn-danger btn-small" type="submit">Löschen</button>
+                    </form>
+                </div>
+            </li>
+            <% }); %>
+        </ul>
+        <% } %>
+    </div>
+    <% }); %>
+</main>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

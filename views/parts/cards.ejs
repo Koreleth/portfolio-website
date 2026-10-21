@@ -3,10 +3,12 @@
   const tiles = data.length + (locals.showAll ? 1 : 0);
   const rows = tiles <= 3 ? 1 : (tiles <= 8 ? 2 : 3);
   const perRow = Math.max(1, Math.ceil(tiles / rows));
+  // Auf /portfolio ist die Überschrift die Hauptüberschrift der Seite (h1)
+  const headingTag = locals.headingTag === 'h1' ? 'h1' : 'h2';
 %>
 <section class="grid<%= locals.fullscreen ? ' screen' : '' %>" id="portfolio">
   <!-- Render CardItems -->
-    <h2><%= locals.heading || 'Mein Portfolio' %></h2>
+    <<%= headingTag %> class="section-title"><%= locals.heading || 'Mein Portfolio' %></<%= headingTag %>>
 
     <% if (tiles === 0) { %>
     <p class="empty-state">Hier entstehen gerade neue Projekte – schau bald wieder vorbei.</p>
@@ -26,6 +28,13 @@
           <div class="card-body">
             <h3><%= element.title || element.name %></h3>
             <p><%= element.description%></p>
+            <% if (element.tools && element.tools.length > 0) { %>
+            <ul class="card-tools">
+              <% element.tools.forEach((tool) => { %>
+              <li title="<%= tool.name %>"><%- include('tool-icon', { tool: tool }) %><span class="sr-only"><%= tool.name %></span></li>
+              <% }); %>
+            </ul>
+            <% } %>
           </div>
           <span class="card-arrow" aria-hidden="true">&rarr;</span>
         </div>

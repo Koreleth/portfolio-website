@@ -1,0 +1,78 @@
+<%- include('../parts/head') %>
+
+<main class="admin">
+    <%- include('parts/header') %>
+
+    <p class="admin-back"><a href="/admin">&larr; Alle Projekte</a></p>
+    <h1><%= isNew ? 'Neues Projekt' : 'Projekt bearbeiten' %></h1>
+
+    <% if (error) { %>
+    <p class="alert alert--error" role="alert"><%= error %></p>
+    <% } %>
+
+    <form class="admin-form" method="post" action="<%= isNew ? '/admin/projekte' : '/admin/projekte/' + project.id %>" enctype="multipart/form-data">
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="title">Titel</label>
+                <input class="input" id="title" name="title" required value="<%= project.title || '' %>">
+            </div>
+            <div class="form-field">
+                <label for="categoryID">Kategorie</label>
+                <select class="input" id="categoryID" name="categoryID" required>
+                    <option value="">Bitte wählen …</option>
+                    <% categories.forEach((categorie) => { %>
+                    <option value="<%= categorie.id %>"<%= parseInt(categorie.id) === parseInt(project.categoryID) ? ' selected' : '' %>><%= categorie.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label for="slug">URL-Name <small>(optional)</small></label>
+            <input class="input" id="slug" name="slug" value="<%= project.slug || '' %>" placeholder="wird aus dem Titel erzeugt">
+            <small>Erscheint in der Adresse: /portfolio/kategorie/<strong>url-name</strong></small>
+        </div>
+
+        <div class="form-field">
+            <label for="description">Kurzbeschreibung</label>
+            <input class="input" id="description" name="description" required maxlength="160" value="<%= project.description || '' %>">
+            <small>Steht auf der Projektkarte und oben auf der Projektseite.</small>
+        </div>
+
+        <div class="form-field">
+            <label for="text">Text</label>
+            <textarea class="input" id="text" name="text" rows="8"><%= project.text || '' %></textarea>
+        </div>
+
+        <fieldset class="form-field">
+            <legend>Verwendete Tools</legend>
+            <div class="tool-picker">
+                <% tools.forEach((tool) => { %>
+                <label class="tool-option">
+                    <input type="checkbox" name="tools" value="<%= tool.id %>"<%= (project.tools || []).includes(tool.id) ? ' checked' : '' %>>
+                    <%- include('../parts/tool-icon', { tool: tool }) %>
+                    <span><%= tool.name %></span>
+                </label>
+                <% }); %>
+            </div>
+        </fieldset>
+
+        <%# Das Bild steht bewusst am Ende: so kommen alle Textfelder auch bei einem Upload-Fehler an %>
+        <div class="form-field">
+            <label for="image">Bild<% if (!isNew) { %> <small>(leer lassen = aktuelles Bild behalten)</small><% } %></label>
+            <% if (project.images && project.images[0]) { %>
+            <img class="form-preview" src="<%= project.images[0] %>" alt="Aktuelles Bild">
+            <% } %>
+            <input class="input" id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif"<%= isNew ? ' required' : '' %>>
+            <small>JPG, PNG, WebP oder GIF, höchstens 5 MB.</small>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-dark" type="submit">Speichern</button>
+            <a class="btn btn-outline" href="/admin">Abbrechen</a>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

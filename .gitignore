@@ -1,1 +1,4 @@
 node_modules/
+
+# Zugangsdaten für den Admin-Bereich (Vorlage: .env.example)
+.env

@@ -8,7 +8,11 @@
             "/img/work1.jpg"
         ],
         "categoryID": 1,
-        "slug": "moka-kanne"
+        "slug": "moka-kanne",
+        "tools": [
+            "blender",
+            "photoshop"
+        ]
     },
     {
         "id": 2,
@@ -16,10 +20,15 @@
         "description": "Neugründigung Café Eisberg",
         "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         "images": [
-             "/img/work2.jpg"
+            "/img/work2.jpg"
         ],
         "categoryID": 2,
-        "slug": "cafe-eisberg"
+        "slug": "cafe-eisberg",
+        "tools": [
+            "vscode",
+            "github",
+            "figma"
+        ]
     },
     {
         "id": 3,
@@ -30,7 +39,11 @@
             "/img/work1.jpg"
         ],
         "categoryID": 1,
-        "slug": "moka-kanne-2"
+        "slug": "moka-kanne-2",
+        "tools": [
+            "blender",
+            "photoshop"
+        ]
     },
     {
         "id": 4,
@@ -38,9 +51,13 @@
         "description": "Neugründigung Café Eisberg",
         "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         "images": [
-             "/img/work2.jpg"
+            "/img/work2.jpg"
         ],
         "categoryID": 2,
-        "slug": "cafe-eisberg"
+        "slug": "cafe-eisberg",
+        "tools": [
+            "vscode",
+            "github"
+        ]
     }
 ]

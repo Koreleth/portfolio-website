@@ -1,0 +1,2 @@
+<%# Icon eines Tools; ohne hinterlegtes Icon erscheinen die ersten zwei Buchstaben %>
+<% if (tool.icon) { %><img class="tool-icon" src="<%= encodeURI(tool.icon) %>" alt="" loading="lazy"><% } else { %><span class="tool-icon tool-monogram" aria-hidden="true"><%= tool.name.slice(0, 2) %></span><% } %>

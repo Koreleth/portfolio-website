@@ -6,5 +6,6 @@
         <a href="/#portfolio"<% if (locals.activeNav === 'portfolio') { %> class="nav-active"<% } %>>Portfolio</a>
         <a href="/#ueber-mich">Über mich</a>
         <a href="/#kontakt">Kontakt</a>
+        <% if (locals.isAdmin) { %><a href="/admin">Admin</a><% } %>
       </div>
 </nav>

@@ -1,0 +1,27 @@
+<%- include('../parts/head') %>
+
+<main class="admin admin--login">
+    <form class="login-card" method="post" action="/admin/login">
+        <img class="login-logo" src="/img/1Korel-Logo.png" alt="">
+        <h1>Admin-Login</h1>
+
+        <% if (error) { %>
+        <p class="alert alert--error" role="alert"><%= error %></p>
+        <% } %>
+
+        <div class="form-field">
+            <label for="username">Benutzername</label>
+            <input class="input" id="username" name="username" autocomplete="username" required value="<%= username %>">
+        </div>
+        <div class="form-field">
+            <label for="password">Passwort</label>
+            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+
+        <button class="btn btn-dark btn-block" type="submit">Anmelden</button>
+        <a class="login-back" href="/">&larr; Zur Website</a>
+    </form>
+</main>
+
+</body>
+</html>
