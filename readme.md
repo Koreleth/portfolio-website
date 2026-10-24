@@ -14,9 +14,11 @@ portfolio-website/
 ├── app.js             # Express-App: Seiten, JSON-API unter /api, Admin, Fehlerseiten
 ├── bin/www            # Startet den Server (Port 3000, über PORT änderbar)
 ├── controllers/       # Logik: Kategorien, Projekte, Tools, Lebenslauf
-├── models/            # Daten als JSON (inkl. tools.json) + store.js zum Lesen/Schreiben
-├── routes/            # Seiten-, API- und Admin-Routen
-├── views/             # EJS-Templates (views/admin: Login, Übersicht, Formular)
+├── models/            # Daten als JSON (Projekte, Kategorien, Tools, Über mich, Lebenslauf) + store.js
+├── routes/            # Seiten- und API-Routen; routes/admin: Login, Projekte, Kategorien, Tools
+├── middleware/        # Schutz des Admin-Bereichs (Login-Pflicht, nur eigene Formulare)
+├── utils/             # Hilfen: URL-Namen, Bild-Uploads und Aufräumen alter Uploads
+├── views/             # EJS-Templates (views/admin: Login, Übersicht, Formulare)
 ├── public/            # CSS, JavaScript, Bilder (Uploads: public/img/uploads)
 ├── .env.example       # Vorlage für die Admin-Zugangsdaten (.env)
 └── README.md
@@ -57,7 +59,20 @@ portfolio-website/
 
 ## 🔐 Admin-Bereich
 
-Unter `localhost:3000/admin` kannst du nach dem Login Projekte anlegen, bearbeiten und löschen – inklusive Bild-Upload und Auswahl der verwendeten Tools.
+Unter `localhost:3000/admin` verwaltest du nach dem Login die Inhalte der Seite:
+
+- **Projekte:** Titelbild, zweites Bild, Text, verwendete Tools und beliebig viele weitere **Abschnitte**. Die ganze Projektseite liegt in einem Raster aus Dritteln; jeder Abschnitt wählt sein Spalten-Layout (ganze Breite, ⅔ + ⅓, ⅓ + ⅔, 3 × ⅓) und bekommt pro Spalte Bausteine untereinander – **Titel**, **Text**, **Bild** oder **Karussell** (mehrere Bilder zum Durchblättern). Alle Bilder erscheinen im festen Format 4:3 (über die ganze Breite 16:9); ein Klick öffnet das ganze Foto in einer Bildansicht. Bearbeitet wird **direkt im Layout der Projektseite**: Titel, Kurzbeschreibung, Texte und Bildunterschriften sind Textfelder an ihrer Stelle, Bilder werden auf dem Bild ausgetauscht, Abschnitte und Bausteine im echten Raster angeordnet – gespeichert wird mit dem Knopf ganz unten, danach öffnet sich direkt die fertige Projektseite. Nach dem letzten Abschnitt folgt, durch einen Strich abgesetzt, der Bereich **Mitwirkende**: links unter der Überschrift die Namen (eine Zeile pro Person), rechts daneben ein freier Text, z. B. eine Danksagung (beide leer = nicht angezeigt)
+- **Kategorien:** anlegen, bearbeiten, löschen (nur leere Kategorien)
+- **Tools:** Name und Icon – aus allen SVGs unter `public/img` wählen oder ein eigenes hochladen
+- **Über mich:** Foto mit Bildunterschrift, Inhalt des Code-Fensters und der Lebenslauf (Stationen hinzufügen, sortieren, entfernen)
+
+Vor dem Löschen oder Entfernen fragt ein Dialog im Design der Seite nach. Wer den Bearbeitungsmodus eines Projekts mit ungespeicherten Änderungen über einen Link verlässt, wird ebenfalls gefragt (beim Schließen oder Neuladen des Tabs übernimmt das die Abfrage des Browsers).
+
+Bilder dürfen bis zu **20 MB** groß sein (Icons bis 1 MB). Größere Fotos werden beim Hochladen automatisch auf höchstens 2400 px verkleinert und komprimiert (mit `sharp`). Sie landen in `public/img/uploads` und werden gelöscht, sobald sie nirgends mehr verwendet werden.
+
+Die Daten liegen als JSON in `models/`. Mit der Umgebungsvariable `DATA_DIR` lässt sich ein anderer Ordner verwenden, z. B. ein dauerhafter Speicher beim Hoster.
+
+**Einrichtung:**
 
 1. `.env.example` nach `.env` kopieren (die `.env` wird nicht committet).
 2. Einen bcrypt-Hash deines Passworts erzeugen und als `ADMIN_PASSWORD_HASH` eintragen (in einfachen Anführungszeichen):
@@ -69,8 +84,6 @@ Unter `localhost:3000/admin` kannst du nach dem Login Projekte anlegen, bearbeit
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
 4. Server neu starten und mit `ADMIN_USER` (Standard: `admin`) und deinem Passwort anmelden.
-
-Neue Tools trägst du in `models/tools.json` ein (`id`, `name`, Pfad zum `icon` unter `public/img`).
 
 ---
 

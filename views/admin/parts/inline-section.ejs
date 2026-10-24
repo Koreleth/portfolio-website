@@ -1,0 +1,51 @@
+<%#
+  Ein Abschnitt im Bearbeitungsmodus, im selben Raster wie auf der Projektseite.
+  Parameter: key (Abschnitts-Schlüssel), section ({ layout, valign, columns })
+  Es gibt immer drei Spalten; das Layout blendet die nicht benötigten aus (CSS + admin.js).
+  Die Reihenfolge der Abschnitte ergibt sich aus der Reihenfolge der versteckten sectionKeys-Felder.
+%>
+<%
+  const layouts = [['1', 'Ganze Breite'], ['2-1', '⅔ + ⅓'], ['1-2', '⅓ + ⅔'], ['1-1-1', '3 × ⅓']];
+  const layout = layouts.some(([value]) => value === section.layout) ? section.layout : '1';
+  const columns = section.columns || [];
+%>
+<div class="edit-section" data-repeat-item>
+    <input type="hidden" name="sectionKeys" value="<%= key %>">
+
+    <div class="edit-section-bar">
+        <strong class="edit-section-label">Abschnitt</strong>
+        <div class="layout-picker" role="radiogroup" aria-label="Spalten-Layout">
+            <% layouts.forEach(([value, label]) => { %>
+            <label class="layout-option">
+                <input class="sr-only" type="radio" name="section_<%= key %>_layout" value="<%= value %>"<%= layout === value ? ' checked' : '' %> data-layout-input>
+                <span class="layout-icon layout-icon--<%= value %>" aria-hidden="true"><% value.split('-').forEach(() => { %><i></i><% }); %></span>
+                <span><%= label %></span>
+            </label>
+            <% }); %>
+        </div>
+        <label class="valign-field">
+            Ausrichtung
+            <select class="input input--small" name="section_<%= key %>_valign" data-valign-input>
+                <option value="top"<%= section.valign !== 'center' ? ' selected' : '' %>>oben</option>
+                <option value="center"<%= section.valign === 'center' ? ' selected' : '' %>>mittig</option>
+            </select>
+        </label>
+        <%- include('repeat-actions') %>
+    </div>
+
+    <section class="psection<%= section.valign === 'center' ? ' psection--center' : '' %>" data-layout="<%= layout %>">
+        <% [0, 1, 2].forEach((columnIndex) => { %>
+        <div class="psection-col" data-col>
+            <div class="edit-blocks" data-col-blocks><% (columns[columnIndex] || []).forEach((block, blockIndex) => { %>
+                <%- include('inline-block', { key: key + 'c' + columnIndex + 'b' + blockIndex, block: block, refName: 'section_' + key + '_col' + columnIndex + '_blocks' }) %>
+            <% }); %></div>
+            <div class="edit-add">
+                <button type="button" data-add-block="title">+ Titel</button>
+                <button type="button" data-add-block="text">+ Text</button>
+                <button type="button" data-add-block="image">+ Bild</button>
+                <button type="button" data-add-block="carousel">+ Karussell</button>
+            </div>
+        </div>
+        <% }); %>
+    </section>
+</div>

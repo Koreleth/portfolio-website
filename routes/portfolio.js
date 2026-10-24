@@ -29,7 +29,9 @@ router.route('/:catSlug/:slug')
   if (response.status === 404) {
     return next(createError(404));
   }
-  res.render('portfolio/portfoliowork', {data: response.data, title: response.data.title, activeNav: 'portfolio'});
+  // Nach dem Speichern im Bearbeitungsmodus (?gespeichert) bekommt der Admin einen kurzen Hinweis
+  const saved = 'gespeichert' in req.query && res.locals.isAdmin;
+  res.render('portfolio/portfoliowork', {data: response.data, title: response.data.title, activeNav: 'portfolio', saved});
 })
 
 module.exports = router;

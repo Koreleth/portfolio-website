@@ -1,0 +1,6 @@
+{
+    "photo": "/img/lf.jpg",
+    "photoCaption": "Das bin ich",
+    "fileName": "about-me.js",
+    "code": "\nlet data = {\n    name: 'Korel',\n    surname: 'Öztekin',\n    from: 'Fulda, Hessen'\n    age: 26;\n    }\n\n\nlet hobbys = {\n    fussball: [\n        verein: 'SG Marbach/Dietershan',\n        position: 'LM',\n        mitglied: 'seit 2017',\n        ],\n    aktivitaeten: [\n        'Basketball',\n        'Volleyball',\n        'Mountainbiking',\n        'Camping',\n        'Malen',\n        'Reisen'\n        ],\n    mich: [\n        'Tee liebhaber',\n        'Tiermensch',\n        'Familienmensch'\n        ]\n    }\n\n echo('Hello World');"
+}

@@ -1,5 +1,6 @@
 var categorieController = require('./categorieController');
 var personaldataController = require('./personaldataController');
+var aboutController = require('./aboutController');
 
 
 /**
@@ -11,7 +12,8 @@ const getIndex = () => {
         status: 200,
         data: {
             categories: categorieController.getCategorieData().data,
-            lifeline: personaldataController.getLifeline().data
+            lifeline: personaldataController.getLifeline().data,
+            about: aboutController.getAboutData().data
         },
         title: "Home"
     };

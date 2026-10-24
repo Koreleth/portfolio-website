@@ -1,0 +1,31 @@
+<%#
+  Bilder-Karussell. Parameter: images, caption (optional), label (für Screenreader)
+  Wischen und Trackpad laufen über natives Scrollen, Pfeile/Punkte/Tastatur über public/js/script.js.
+  Ein Klick auf ein Bild (oder Enter im Karussell) zeigt das ganze Foto in der Bildansicht.
+%>
+<figure class="carousel" data-carousel role="region" aria-roledescription="Karussell" aria-label="<%= label %>">
+    <div class="carousel-viewport">
+        <div class="carousel-track"<%- images.length > 1 ? ' tabindex="0"' : '' %>>
+            <% images.forEach((image, index) => { %>
+            <div class="carousel-slide" role="group" aria-roledescription="Bild" aria-label="<%= index + 1 %> von <%= images.length %>">
+                <%- include('zoom-image', { src: image, alt: label + ' – Bild ' + (index + 1), caption: caption, lazy: index > 0, focusable: images.length === 1 }) %>
+            </div>
+            <% }); %>
+        </div>
+
+        <% if (images.length > 1) { %>
+        <button class="carousel-arrow carousel-arrow--prev" type="button" data-carousel-prev aria-label="Vorheriges Bild">&larr;</button>
+        <button class="carousel-arrow carousel-arrow--next" type="button" data-carousel-next aria-label="Nächstes Bild">&rarr;</button>
+
+        <div class="carousel-bar">
+            <span class="carousel-count"><span data-carousel-current>01</span> / <%= String(images.length).padStart(2, '0') %></span>
+            <div class="carousel-dots">
+                <% images.forEach((image, index) => { %>
+                <button type="button" data-carousel-dot="<%= index %>" aria-label="Bild <%= index + 1 %> zeigen" aria-current="<%= index === 0 %>"></button>
+                <% }); %>
+            </div>
+        </div>
+        <% } %>
+    </div>
+    <% if (caption) { %><figcaption class="carousel-caption"><%= caption %></figcaption><% } %>
+</figure>

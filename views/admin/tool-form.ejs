@@ -1,0 +1,67 @@
+<%- include('../parts/head') %>
+
+<main class="admin">
+    <%- include('parts/header') %>
+
+    <p class="admin-back"><a href="/admin#tools">&larr; Alle Tools</a></p>
+    <h1><%= isNew ? 'Neues Tool' : 'Tool bearbeiten' %></h1>
+
+    <% if (error) { %>
+    <p class="alert alert--error" role="alert"><%= error %></p>
+    <% } %>
+
+    <form class="admin-form" method="post" action="<%= isNew ? '/admin/tools' : '/admin/tools/' + tool.id %>" enctype="multipart/form-data">
+        <div class="form-field">
+            <label for="name">Name</label>
+            <input class="input" id="name" name="name" required value="<%= tool.name || '' %>">
+            <% if (!isNew) { %><small>Interne ID: <code><%= tool.id %></code> (bleibt gleich, damit die Projekte das Tool weiter finden)</small><% } %>
+        </div>
+
+        <fieldset class="form-field">
+            <legend>Icon auswählen</legend>
+            <small>Alle SVG-Dateien aus <code>public/img</code>. Neue Icons kannst du dort ablegen oder unten hochladen.</small>
+            <%
+              // Icons nach Ordner gruppieren, z. B. "adobe", "blender", "uploads/icons"
+              const groups = {};
+              iconFiles.forEach((file) => {
+                const folder = file.replace(/^\/img\//, '').split('/').slice(0, -1).join('/') || 'img';
+                (groups[folder] = groups[folder] || []).push(file);
+              });
+            %>
+            <div class="icon-picker">
+                <label class="icon-option icon-option--none">
+                    <input type="radio" name="icon" value=""<%= !tool.icon ? ' checked' : '' %>>
+                    <span class="tool-icon tool-monogram" aria-hidden="true"><%= (tool.name || 'Ab').slice(0, 2) %></span>
+                    <span>Kein Icon (Kürzel)</span>
+                </label>
+            </div>
+            <% Object.keys(groups).forEach((folder) => { %>
+            <p class="icon-group-title"><%= folder %></p>
+            <div class="icon-picker">
+                <% groups[folder].forEach((file) => { %>
+                <label class="icon-option" title="<%= file %>">
+                    <input type="radio" name="icon" value="<%= file %>"<%= tool.icon === file ? ' checked' : '' %>>
+                    <img class="tool-icon" src="<%= encodeURI(file) %>" alt="" loading="lazy">
+                    <span><%= file.split('/').pop().replace(/\.svg$/i, '') %></span>
+                </label>
+                <% }); %>
+            </div>
+            <% }); %>
+        </fieldset>
+
+        <div class="form-field">
+            <label for="iconFile">Oder neues Icon hochladen <small>(optional)</small></label>
+            <input class="input" id="iconFile" name="iconFile" type="file" accept="image/svg+xml,image/png,image/webp">
+            <small>SVG, PNG oder WebP, höchstens 1 MB. Ein hochgeladenes Icon ersetzt die Auswahl oben.</small>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-dark" type="submit">Speichern</button>
+            <a class="btn btn-outline" href="/admin#tools">Abbrechen</a>
+        </div>
+    </form>
+</main>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

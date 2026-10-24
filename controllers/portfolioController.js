@@ -1,22 +1,106 @@
 let store = require('../models/store');
+let { slugify, uniqueSlug } = require('../utils/slugify');
+let { isImagePath, collectImages, removeUnusedUploads } = require('../utils/uploads');
+
+/*
+ * Aufbau eines Projekts in models/portfoliowork.json:
+ *   images:   [Titelbild, zweites Bild (optional)]
+ *   sections: beliebig viele Abschnitte untereinander. Jeder Abschnitt hat ein Spalten-Layout
+ *             und pro Spalte beliebig viele Bausteine untereinander:
+ *     { layout: '2-1', valign: 'center', columns: [[baustein, …], [baustein, …]] }
+ *   Bausteine:
+ *     { type: 'title', text }                  – Zwischenüberschrift
+ *     { type: 'text', text }                   – Fließtext (Leerzeile = neuer Absatz)
+ *     { type: 'image', images: [bild], caption }
+ *     { type: 'carousel', images: [...], caption }
+ *   contributors:     Namen der Mitwirkenden (nach den Abschnitten, links unter der Überschrift „Mitwirkende“)
+ *   contributorsText: freier Text rechts daneben, z. B. eine Danksagung
+ *   (beide leer = der Bereich wird nicht angezeigt)
+ */
+const BLOCK_TYPES = ['title', 'text', 'image', 'carousel'];
+
+// Spalten-Layouts im Drittel-Raster und ihre Spaltenanzahl, z. B. '2-1' = ⅔ + ⅓
+const LAYOUTS = { '1': 1, '2-1': 2, '1-2': 2, '1-1-1': 3 };
+
+// Gültiges Layout; das frühere halb/halb ('1-1') passt nicht ins Raster und wird zu ⅔ + ⅓ (beide Spalten bleiben)
+const toLayout = (layout) => layout === '1-1' ? '2-1' : (LAYOUTS[layout] ? layout : '1');
 
 /**
- * Macht aus einem Titel einen URL-Namen, z. B. "Café Eisberg" -> "cafe-eisberg".
- * @param {string} text
- * @returns {string}
+ * Bringt Abschnitte aus älteren Formaten in das Spalten-Format:
+ * - einzelne Bausteine hintereinander -> ein einspaltiger Abschnitt
+ * - { title, text, images } -> Text links (⅔), Bild/Karussell rechts (⅓) – oder einspaltig, wenn eins fehlt
  */
-const slugify = (text) => String(text || '')
-    .toLowerCase()
-    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+const normalizeSections = (sections) => {
+    const result = [];
+    let loose = null;
+    (sections || []).forEach(section => {
+        if (Array.isArray(section.columns)) {
+            loose = null;
+            result.push({ ...section, layout: toLayout(section.layout) });
+            return;
+        }
+        if (BLOCK_TYPES.includes(section.type)) {
+            if (!loose) {
+                loose = { layout: '1', valign: 'top', columns: [[]] };
+                result.push(loose);
+            }
+            loose.columns[0].push(section);
+            return;
+        }
+        loose = null;
+        const textBlocks = [];
+        if (section.title) textBlocks.push({ type: 'title', text: section.title });
+        if (section.text) textBlocks.push({ type: 'text', text: section.text });
+        const images = section.images || [];
+        const media = images.length === 0 ? [] : [{ type: images.length > 1 ? 'carousel' : 'image', images, caption: '' }];
+        if (textBlocks.length > 0 && media.length > 0) {
+            result.push({ layout: '2-1', valign: 'center', columns: [textBlocks, media] });
+        } else if (textBlocks.length + media.length > 0) {
+            result.push({ layout: '1', valign: 'top', columns: [[...textBlocks, ...media]] });
+        }
+    });
+    return result;
+};
+
+// Einen Baustein prüfen; leere Bausteine (ohne Text bzw. ohne Bilder) fallen weg
+const cleanBlock = (block) => {
+    const text = String(block.text || '').replace(/\r\n/g, '\n').trim();
+    const caption = String(block.caption || '').trim();
+    const images = [].concat(block.images || []).filter(isImagePath);
+    switch (block.type) {
+        case 'title':
+        case 'text':
+            return text ? { type: block.type, text } : null;
+        case 'image':
+            return images.length > 0 ? { type: 'image', images: images.slice(0, 1), caption } : null;
+        case 'carousel':
+            return images.length > 0 ? { type: 'carousel', images, caption } : null;
+        default:
+            return null;
+    }
+};
+
+// Abschnitte prüfen: gültiges Layout, passende Spaltenanzahl; Abschnitte ganz ohne Inhalt fallen weg
+const cleanSections = (sections) => (sections || [])
+    .map(section => {
+        const layout = toLayout(section.layout);
+        const columns = Array.from({ length: LAYOUTS[layout] }, (_, index) =>
+            ((section.columns || [])[index] || []).map(cleanBlock).filter(Boolean));
+        return { layout, valign: section.valign === 'center' ? 'center' : 'top', columns };
+    })
+    .filter(section => section.columns.some(column => column.length > 0));
 
 // Tool-IDs eines Projekts (z. B. "photoshop") in Name + Icon auflösen
 const withTools = (portfolio, tools) => ({
     ...portfolio,
     tools: (portfolio.tools || []).map(id => tools.find(tool => tool.id === id)).filter(Boolean)
 });
+
+// Alle Bilder eines Projekts (für das Aufräumen alter Uploads)
+const allImages = (portfolio) => [
+    ...(portfolio.images || []),
+    ...collectImages(portfolio.sections || [])
+];
 
 const getPortfolioByCategorie = (slug) => {
     const categorieEntry = store.read('categorie').find(element => element.slug === slug);
@@ -43,7 +127,7 @@ const getSinglePortfolio = (catSlug, slug) => {
         return { status: 404, data: "Portfolio not found" };
     }
 
-    return { status: 200, data: { ...withTools(portfolio, store.read('tools')), categorie: categorieEntry } };
+    return { status: 200, data: { ...withTools(portfolio, store.read('tools')), sections: normalizeSections(portfolio.sections), categorie: categorieEntry } };
 };
 
 /* ---------- Admin: Projekte verwalten ---------- */
@@ -63,12 +147,14 @@ const getPortfolioById = (id) => {
     if (!portfolio) {
         return { status: 404, data: "Portfolio not found" };
     }
-    return { status: 200, data: portfolio };
+    return { status: 200, data: { ...portfolio, sections: normalizeSections(portfolio.sections) } };
 };
 
 /**
  * Prüft die Formulardaten und baut daraus die Felder eines Projekts.
- * @param {Object} input - title, slug, categoryID, description, text, tools, image
+ * @param {Object} input - title, slug, categoryID, description, text, tools,
+ *                         cover / second (neu hochgeladene Bilder), removeSecond, sections,
+ *                         contributors (Namen der Mitwirkenden), contributorsText (Text daneben, z. B. Danksagung)
  * @param {Array} portfolios - alle vorhandenen Projekte
  * @param {Object|null} current - das bearbeitete Projekt (null beim Anlegen)
  * @returns {Object} - { values } oder { error }
@@ -77,29 +163,33 @@ const validatePortfolio = (input, portfolios, current) => {
     const title = String(input.title || '').trim();
     const description = String(input.description || '').trim();
     const text = String(input.text || '').trim();
+    const contributors = String(input.contributors || '').replace(/\r\n/g, '\n').trim();
+    const contributorsText = String(input.contributorsText || '').replace(/\r\n/g, '\n').trim();
     const categoryID = parseInt(input.categoryID);
     const categorie = store.read('categorie').find(element => parseInt(element.id) === categoryID);
     const knownTools = store.read('tools').map(tool => tool.id);
     const tools = [].concat(input.tools || []).filter(id => knownTools.includes(id));
-    const images = input.image ? [input.image] : (current ? current.images : []);
+
+    // Titelbild und zweites Bild: neu hochgeladen oder vom bisherigen Stand übernommen
+    const currentImages = (current && current.images) || [];
+    const cover = input.cover || currentImages[0];
+    const second = input.second || (input.removeSecond ? null : currentImages[1]);
+
+    const sections = cleanSections(input.sections);
 
     if (!title) return { error: 'Bitte gib einen Titel ein.' };
     if (!categorie) return { error: 'Bitte wähle eine Kategorie.' };
     if (!description) return { error: 'Bitte gib eine Kurzbeschreibung ein (sie steht auf der Projektkarte).' };
-    if (images.length === 0) return { error: 'Bitte lade ein Bild für das Projekt hoch.' };
+    if (!cover) return { error: 'Bitte wähle ein Titelbild aus.' };
 
     const baseSlug = slugify(input.slug || title);
     if (!baseSlug) return { error: 'Der URL-Name braucht mindestens einen Buchstaben oder eine Zahl.' };
 
     // Der URL-Name muss innerhalb der Kategorie eindeutig sein
-    const taken = (candidate) => portfolios.some(element =>
-        element.id !== (current && current.id) && element.categoryID === categoryID && element.slug === candidate);
-    let slug = baseSlug;
-    for (let n = 2; taken(slug); n++) {
-        slug = baseSlug + '-' + n;
-    }
+    const slug = uniqueSlug(baseSlug, candidate => portfolios.some(element =>
+        element.id !== (current && current.id) && element.categoryID === categoryID && element.slug === candidate));
 
-    return { values: { title, description, text, images, categoryID, slug, tools } };
+    return { values: { title, description, text, images: [cover, second].filter(Boolean), categoryID, slug, tools, sections, contributors, contributorsText } };
 };
 
 const createPortfolio = (input) => {
@@ -128,8 +218,11 @@ const updatePortfolio = (id, input) => {
         return { status: 400, data: result.error };
     }
 
-    portfolios[index] = { ...portfolios[index], ...result.values };
+    const previous = portfolios[index];
+    portfolios[index] = { ...previous, ...result.values };
     store.write('portfoliowork', portfolios);
+    // Ersetzte oder entfernte Bilder löschen, sofern sie nirgends mehr verwendet werden
+    removeUnusedUploads(allImages(previous));
     return { status: 200, data: portfolios[index] };
 };
 
@@ -141,11 +234,13 @@ const deletePortfolio = (id) => {
     }
 
     store.write('portfoliowork', portfolios.filter(element => element !== portfolio));
+    removeUnusedUploads(allImages(portfolio));
     return { status: 200, data: portfolio };
 };
 
 module.exports = {
-    slugify,
+    LAYOUTS,
+    toLayout,
     getPortfolioByCategorie,
     getSinglePortfolio,
     getPortfoliosForAdmin,

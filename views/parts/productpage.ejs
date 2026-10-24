@@ -1,4 +1,8 @@
-
+<%#
+  Projektseite. Kopf, Projekttext und alle Abschnitte liegen im selben Raster aus drei gleich breiten
+  Spalten (⅓, ⅔ oder ganze Breite, siehe style.css). Alle Bilder haben ein festes Format;
+  ein Klick zeigt das ganze Foto (zoom-image.ejs, lightbox.ejs).
+%>
 <div class="upperpart">
     <div class="titletext">
     <%- include('breadcrumb', { items: [
@@ -25,22 +29,49 @@
     <% } %>
     </div>
 
-    <div class="titleimg"> <img src="<%= data.images[0] %>" alt="<%= data.title %>"></div>
+    <div class="titleimg"><%- include('zoom-image', { src: data.images[0], alt: data.title, caption: '', lazy: false, focusable: true }) %></div>
 </div>
 
+<% if (data.text || data.images[1]) { %>
 <div class="middlepart">
-    <div class="middleimg"> <img src="<%= data.images[0] %>" alt="<%= data.title %>"></div>
+    <%# Zweites Bild; ohne eigenes zweites Bild wird das Titelbild verwendet %>
+    <div class="middleimg"><%- include('zoom-image', { src: data.images[1] || data.images[0], alt: data.title, caption: '', lazy: true, focusable: true }) %></div>
 
     <div class="middletext">
         <h2><%= data.title %></h2>
-        <p><%= data.text %></p>
+        <%- include('rich-text', { text: data.text }) %>
     </div>
 </div>
+<% } %>
 
-<div class="midsec">
-    <p>test</p>
+<% if (data.sections && data.sections.length > 0) { %>
+<%# Weitere Abschnitte aus dem Admin-Bereich: je Abschnitt ein Spalten-Layout, pro Spalte Bausteine untereinander %>
+<div class="project-sections">
+    <% data.sections.forEach((section) => { %>
+    <section class="psection psection--<%= section.layout %><%= section.valign === 'center' ? ' psection--center' : '' %>">
+        <% section.columns.forEach((column) => { %>
+        <div class="psection-col">
+            <% column.forEach((block) => { %>
+            <%- include('block', { block: block, fallbackAlt: data.title }) %>
+            <% }); %>
+        </div>
+        <% }); %>
+    </section>
+    <% }); %>
 </div>
+<% } %>
 
-<div class="carousell">
-
+<% if (data.contributors || data.contributorsText) { %>
+<%# Mitwirkende: nach dem letzten Abschnitt, mit Strich darüber; links (⅓) Überschrift und Namen, rechts (⅔) ein freier Text, z. B. eine Danksagung %>
+<div class="project-credits">
+    <section class="credits">
+        <div>
+            <h2 class="block-title">Mitwirkende</h2>
+            <% if (data.contributors) { %><div class="block-text credits-names"><%- include('rich-text', { text: data.contributors }) %></div><% } %>
+        </div>
+        <div class="block-text credits-text"><%- include('rich-text', { text: data.contributorsText }) %></div>
+    </section>
 </div>
+<% } %>
+
+<%- include('lightbox') %>

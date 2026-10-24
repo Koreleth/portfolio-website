@@ -1,44 +1,18 @@
+<%# Inhalte aus models/about.json – im Admin-Bereich unter „Über mich“ bearbeitbar %>
 <div class="about-code">
+    <% if (about.photo) { %>
     <figure class="about-photo">
-        <img src="/img/lf.jpg" alt="Portrait von Korel" loading="lazy">
-        <figcaption>Das bin ich</figcaption>
+        <img src="<%= about.photo %>" alt="Portrait von Korel" loading="lazy">
+        <% if (about.photoCaption) { %><figcaption><%= about.photoCaption %></figcaption><% } %>
     </figure>
+    <% } %>
         <aside class="sidebar">
             <div class="editor-bar">
                 <i></i><i></i><i></i>
-                <em>about-me.js</em>
+                <em><%= about.fileName %></em>
             </div>
 
-        <p class="text" data-text="
-        /nlet data = { 
-        /n    name: 'Korel',
-        /n    surname: 'Öztekin',
-        /n    from: 'Fulda, Hessen'
-        /n    age: 26;
-        /n    }
-        /n 
-        /n 
-        /nlet hobbys = {
-   	    /n    fussball: [
-        /n        verein: 'SG Marbach/Dietershan',
-        /n        position: 'LM',
-        /n        mitglied: 'seit 2017',
-        /n        ],
-		/n    aktivitaeten: [
-        /n        'Basketball',
-        /n        'Volleyball',
-        /n        'Mountainbiking',
-        /n        'Camping',
-        /n        'Malen',
-        /n        'Reisen'
-        /n        ],
-        /n    mich: [
-        /n        'Tee liebhaber',
-        /n        'Tiermensch',
-        /n        'Familienmensch'
-        /n        ]
-        /n    }
-		/n
-        /n echo('Hello World');"></p>
+        <%# Der Code wird beim Hineinscrollen Zeile für Zeile getippt (siehe script.js) %>
+        <p class="text" data-text="<%= about.code %>"></p>
         </aside>
 </div>

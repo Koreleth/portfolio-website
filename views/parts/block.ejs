@@ -1,0 +1,13 @@
+<%# Ein Baustein in einer Spalte. Parameter: block ({ type, text, images, caption }), fallbackAlt %>
+<% if (block.type === 'title') { %>
+<h2 class="block-title"><%= block.text %></h2>
+<% } else if (block.type === 'text') { %>
+<div class="block-text"><%- include('rich-text', { text: block.text }) %></div>
+<% } else if (block.type === 'image') { %>
+<figure class="block-image">
+    <%- include('zoom-image', { src: block.images[0], alt: block.caption || fallbackAlt, caption: block.caption, lazy: true, focusable: true }) %>
+    <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
+</figure>
+<% } else if (block.type === 'carousel') { %>
+<%- include('carousel', { images: block.images, caption: block.caption, label: block.caption || fallbackAlt }) %>
+<% } %>

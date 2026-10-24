@@ -1,0 +1,74 @@
+<%- include('../parts/head') %>
+
+<main class="admin">
+    <%- include('parts/header') %>
+
+    <p class="admin-back"><a href="/admin#ueber-mich">&larr; Zur Übersicht</a></p>
+    <h1>Über mich bearbeiten</h1>
+
+    <% if (error) { %>
+    <p class="alert alert--error" role="alert"><%= error %></p>
+    <% } %>
+
+    <form class="admin-form" method="post" action="/admin/ueber-mich" enctype="multipart/form-data">
+
+        <fieldset class="form-block">
+            <legend>Foto</legend>
+            <div class="form-grid">
+                <%- include('parts/image-field', {
+                    name: 'photo',
+                    label: 'Foto (Polaroid am Code-Fenster)',
+                    current: about.photo,
+                    required: false,
+                    hint: 'Leer lassen = behalten. Ohne Foto wird kein Polaroid angezeigt.',
+                    removable: true,
+                    removeName: 'removePhoto'
+                }) %>
+                <div class="form-field">
+                    <label for="photoCaption">Bildunterschrift <small>(optional)</small></label>
+                    <input class="input" id="photoCaption" name="photoCaption" maxlength="40" value="<%= about.photoCaption || '' %>">
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-block">
+            <legend>Code-Fenster</legend>
+            <div class="form-field">
+                <label for="fileName">Dateiname in der Titelleiste</label>
+                <input class="input input--code" id="fileName" name="fileName" maxlength="40" value="<%= about.fileName || '' %>" placeholder="about-me.js">
+            </div>
+            <div class="form-field">
+                <label for="code">Inhalt</label>
+                <%# Der Zeilenumbruch nach dem öffnenden Tag ist Absicht: der Browser verschluckt ihn, eine leere erste Zeile bleibt so erhalten %>
+                <textarea class="input input--code" id="code" name="code" rows="20" wrap="off" spellcheck="false">
+<%= about.code || '' %></textarea>
+                <small>Wird auf der Startseite Zeile für Zeile „getippt“. Einrückungen und Leerzeilen bleiben erhalten.</small>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-block">
+            <legend>Lebenslauf</legend>
+            <p class="form-note">Die Reihenfolge hier ist die Reihenfolge auf der Seite. Die erste Station ist beim Laden aufgeklappt.</p>
+            <div class="repeat-list" data-repeat-list="cv" data-remove-title="Station entfernen?" data-remove-confirm="Die Station wird aus dem Lebenslauf entfernt. Endgültig ist das erst nach dem Speichern.">
+                <% (lifeline || []).forEach((entry, index) => { %>
+                <%- include('parts/cv-editor', { key: 'c' + index, entry: entry }) %>
+                <% }); %>
+            </div>
+            <button class="btn btn-outline" type="button" data-repeat-add="cv">+ Station hinzufügen</button>
+        </fieldset>
+
+        <div class="form-actions">
+            <button class="btn btn-dark" type="submit">Speichern</button>
+            <a class="btn btn-outline" href="/admin#ueber-mich">Abbrechen</a>
+        </div>
+    </form>
+
+    <%# Vorlage für neue Stationen (__KEY__ wird per JavaScript ersetzt) %>
+    <template data-repeat-template="cv">
+        <%- include('parts/cv-editor', { key: '__KEY__', entry: {} }) %>
+    </template>
+</main>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

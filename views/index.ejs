@@ -50,7 +50,7 @@
     <section class="about screen" id="ueber-mich">
         <h2>Über mich</h2>
         <div class="about-grid">
-            <%- include('parts/me') %>
+            <%- include('parts/me', {about: data.about}) %>
 
             <%- include('parts/timeline', {data: data.lifeline}) %>
         </div>

@@ -33,6 +33,15 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// SVG-Dateien (z. B. hochgeladene Tool-Icons) dürfen keine Skripte ausführen, auch nicht direkt geöffnet
+app.use(function(req, res, next) {
+  if (/\.svg$/i.test(req.path)) {
+    res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; img-src data:");
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Login-Cookie für den Admin-Bereich: signiert, nicht per JavaScript lesbar, 8 Stunden gültig

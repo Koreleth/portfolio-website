@@ -2,49 +2,145 @@
 
 <main class="admin">
     <%- include('parts/header') %>
+    <h1 class="sr-only">Admin-Übersicht</h1>
 
     <%
       // Nur bekannte Hinweise anzeigen (kein beliebiger Text aus der URL)
-      const notices = { gespeichert: 'Projekt gespeichert.', geloescht: 'Projekt gelöscht.' };
+      const notices = {
+        'projekt-gespeichert': ['ok', 'Projekt gespeichert.'],
+        'projekt-geloescht': ['ok', 'Projekt gelöscht.'],
+        'kategorie-gespeichert': ['ok', 'Kategorie gespeichert.'],
+        'kategorie-geloescht': ['ok', 'Kategorie gelöscht.'],
+        'kategorie-nicht-leer': ['error', 'Die Kategorie enthält noch Projekte. Verschiebe oder lösche sie zuerst.'],
+        'tool-gespeichert': ['ok', 'Tool gespeichert.'],
+        'tool-geloescht': ['ok', 'Tool gelöscht und aus allen Projekten entfernt.'],
+        'ueber-mich-gespeichert': ['ok', '„Über mich“ und Lebenslauf gespeichert.']
+      };
+      const shown = notices[notice];
     %>
-    <% if (notice && notices[notice]) { %>
-    <p class="alert alert--ok" role="status"><%= notices[notice] %></p>
+    <% if (shown) { %>
+    <p class="alert alert--<%= shown[0] %>" role="status"><%= shown[1] %></p>
     <% } %>
 
-    <div class="admin-head">
-        <h1>Projekte</h1>
-        <a class="btn btn-dark" href="/admin/projekte/neu">+ Neues Projekt</a>
+    <div class="admin-tabs">
+        <a href="#projekte">Projekte <span><%= portfolios.length %></span></a>
+        <a href="#kategorien">Kategorien <span><%= categories.length %></span></a>
+        <a href="#tools">Tools <span><%= tools.length %></span></a>
+        <a href="#ueber-mich">Über mich</a>
     </div>
 
-    <% categories.forEach((categorie) => { %>
-    <% const items = portfolios.filter(portfolio => portfolio.categoryID === parseInt(categorie.id)); %>
-    <div class="admin-group">
-        <h2><%= categorie.name %> <span>(<%= items.length %>)</span></h2>
+    <!-- Projekte, nach Kategorie gruppiert -->
+    <div class="admin-section" id="projekte">
+        <div class="admin-head">
+            <h2 class="admin-title">Projekte</h2>
+            <a class="btn btn-dark" href="/admin/projekte/neu">+ Neues Projekt</a>
+        </div>
 
-        <% if (items.length === 0) { %>
-        <p class="admin-empty">Noch keine Projekte in dieser Kategorie.</p>
-        <% } else { %>
+        <% categories.forEach((categorie) => { %>
+        <% const items = portfolios.filter(portfolio => portfolio.categoryID === parseInt(categorie.id)); %>
+        <div class="admin-group">
+            <h3><%= categorie.name %> <span>(<%= items.length %>)</span></h3>
+
+            <% if (items.length === 0) { %>
+            <p class="admin-empty">Noch keine Projekte in dieser Kategorie.</p>
+            <% } else { %>
+            <ul class="admin-list">
+                <% items.forEach((portfolio) => { %>
+                <li class="admin-item">
+                    <img src="<%= portfolio.images[0] %>" alt="">
+                    <div class="admin-item-text">
+                        <strong><%= portfolio.title %></strong>
+                        <small>/portfolio/<%= categorie.slug %>/<%= portfolio.slug %> · <%= (portfolio.sections || []).length %> Abschnitt(e)</small>
+                    </div>
+                    <div class="admin-item-actions">
+                        <a class="btn btn-outline btn-small" href="/portfolio/<%= categorie.slug %>/<%= portfolio.slug %>" target="_blank" rel="noopener">Ansehen</a>
+                        <a class="btn btn-outline btn-small" href="/admin/projekte/<%= portfolio.id %>/bearbeiten">Bearbeiten</a>
+                        <form method="post" action="/admin/projekte/<%= portfolio.id %>/loeschen" data-confirm-title="Projekt löschen?" data-confirm="„<%= portfolio.title %>“ wird endgültig gelöscht und verschwindet aus dem Portfolio.">
+                            <button class="btn btn-danger btn-small" type="submit">Löschen</button>
+                        </form>
+                    </div>
+                </li>
+                <% }); %>
+            </ul>
+            <% } %>
+        </div>
+        <% }); %>
+    </div>
+
+    <!-- Kategorien -->
+    <div class="admin-section" id="kategorien">
+        <div class="admin-head">
+            <h2 class="admin-title">Kategorien</h2>
+            <a class="btn btn-dark" href="/admin/kategorien/neu">+ Neue Kategorie</a>
+        </div>
         <ul class="admin-list">
-            <% items.forEach((portfolio) => { %>
+            <% categories.forEach((categorie) => { %>
             <li class="admin-item">
-                <img src="<%= portfolio.images[0] %>" alt="">
+                <img src="<%= categorie.images[0] %>" alt="">
                 <div class="admin-item-text">
-                    <strong><%= portfolio.title %></strong>
-                    <small>/portfolio/<%= categorie.slug %>/<%= portfolio.slug %></small>
+                    <strong><%= categorie.name %></strong>
+                    <small>/portfolio/<%= categorie.slug %> · <%= categorie.projectCount %> Projekt(e)</small>
                 </div>
                 <div class="admin-item-actions">
-                    <a class="btn btn-outline btn-small" href="/portfolio/<%= categorie.slug %>/<%= portfolio.slug %>" target="_blank" rel="noopener">Ansehen</a>
-                    <a class="btn btn-outline btn-small" href="/admin/projekte/<%= portfolio.id %>/bearbeiten">Bearbeiten</a>
-                    <form method="post" action="/admin/projekte/<%= portfolio.id %>/loeschen" data-confirm="„<%= portfolio.title %>“ wirklich löschen?">
+                    <a class="btn btn-outline btn-small" href="/portfolio/<%= categorie.slug %>" target="_blank" rel="noopener">Ansehen</a>
+                    <a class="btn btn-outline btn-small" href="/admin/kategorien/<%= categorie.id %>/bearbeiten">Bearbeiten</a>
+                    <% if (categorie.projectCount > 0) { %>
+                    <button class="btn btn-danger btn-small" type="button" disabled title="Die Kategorie enthält noch Projekte">Löschen</button>
+                    <% } else { %>
+                    <form method="post" action="/admin/kategorien/<%= categorie.id %>/loeschen" data-confirm-title="Kategorie löschen?" data-confirm="„<%= categorie.name %>“ wird endgültig gelöscht.">
                         <button class="btn btn-danger btn-small" type="submit">Löschen</button>
+                    </form>
+                    <% } %>
+                </div>
+            </li>
+            <% }); %>
+        </ul>
+    </div>
+
+    <!-- Tools -->
+    <div class="admin-section" id="tools">
+        <div class="admin-head">
+            <h2 class="admin-title">Tools</h2>
+            <a class="btn btn-dark" href="/admin/tools/neu">+ Neues Tool</a>
+        </div>
+        <ul class="admin-tools">
+            <% tools.forEach((tool) => { %>
+            <li class="admin-tool">
+                <%- include('../parts/tool-icon', { tool: tool }) %>
+                <div class="admin-item-text">
+                    <strong><%= tool.name %></strong>
+                    <small><%= tool.usageCount %> Projekt(e)</small>
+                </div>
+                <div class="admin-item-actions">
+                    <a class="btn btn-outline btn-small" href="/admin/tools/<%= tool.id %>/bearbeiten">Bearbeiten</a>
+                    <form method="post" action="/admin/tools/<%= tool.id %>/loeschen" data-confirm-title="Tool löschen?" data-confirm="„<%= tool.name %>“ wird endgültig gelöscht<%= tool.usageCount > 0 ? ' und aus ' + tool.usageCount + ' Projekt(en) entfernt' : '' %>.">
+                        <button class="btn btn-danger btn-small" type="submit" aria-label="<%= tool.name %> löschen">&times;</button>
                     </form>
                 </div>
             </li>
             <% }); %>
         </ul>
-        <% } %>
     </div>
-    <% }); %>
+
+    <!-- Über mich: Foto, Code-Fenster und Lebenslauf -->
+    <div class="admin-section" id="ueber-mich">
+        <div class="admin-head">
+            <h2 class="admin-title">Über mich</h2>
+            <a class="btn btn-dark" href="/admin/ueber-mich">Bearbeiten</a>
+        </div>
+        <div class="admin-about">
+            <% if (about.photo) { %><img class="admin-about-photo" src="<%= about.photo %>" alt=""><% } %>
+            <div class="admin-about-text">
+                <strong><%= about.fileName %></strong>
+                <small><%= about.code ? about.code.split('\n').length : 0 %> Zeilen im Code-Fenster · <%= lifeline.length %> Station(en) im Lebenslauf</small>
+                <ol class="admin-cv-preview">
+                    <% lifeline.forEach((entry) => { %>
+                    <li><span><%= entry.time %></span><%= entry.title %></li>
+                    <% }); %>
+                </ol>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script src="/js/admin.js"></script>

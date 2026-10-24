@@ -29,6 +29,10 @@
   --content: 1200px;
   --gutter: clamp(1rem, 4vw, 2.5rem);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Projektseite: Abstand der Raster-Spalten und festes Bildformat */
+  --grid-gap: clamp(1.5rem, 4vw, 3.5rem);
+  --media-ratio: 4 / 3;
 }
 
 * {
@@ -1151,14 +1155,45 @@ footer.footer--screen .copyright {
 
 /* ==========================================================
    Projektseite
+   Kopf, Projekttext und alle Abschnitte liegen im selben Raster aus drei gleich
+   breiten Spalten: Inhalte belegen ⅓, ⅔ oder die ganze Breite, die Kanten fluchten
+   untereinander. Bis 860px Breite steht alles untereinander.
    ========================================================== */
+.upperpart,
+.middlepart,
+.psection,
+.credits {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--grid-gap);
+}
+@media (min-width: 861px) {
+  .upperpart,
+  .middlepart,
+  .psection,
+  .credits {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .titletext,
+  .middletext,
+  .credits-text,
+  .psection--2-1 > .psection-col:first-child,
+  .psection--1-2 > .psection-col:last-child {
+    grid-column: span 2;
+  }
+  .psection--1 > .psection-col {
+    grid-column: 1 / -1;
+  }
+  /* Über die ganze Breite wäre ein 4:3-Bild höher als der Bildschirm – dort Breitbild */
+  .psection--1 {
+    --media-ratio: 16 / 9;
+  }
+}
+
 .upperpart {
   max-width: var(--content);
   margin: 0 auto;
   padding: 9rem var(--gutter) 4rem;
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 3rem;
   align-items: center;
 }
 
@@ -1169,23 +1204,10 @@ footer.footer--screen .copyright {
   max-width: 34ch;
 }
 
-.titleimg img,
-.middleimg img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-}
-
 .middlepart {
   max-width: var(--content);
   margin: 0 auto;
   padding: 4rem var(--gutter);
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 3rem;
   align-items: center;
   border-top: 1px solid var(--border);
 }
@@ -1197,11 +1219,395 @@ footer.footer--screen .copyright {
   color: var(--muted);
 }
 
-.midsec,
-.carousell {
+.middletext p + p {
+  margin-top: 1rem;
+}
+
+/* Weitere Abschnitte eines Projekts (aus dem Admin-Bereich): Spalten-Layout, pro Spalte Bausteine untereinander */
+.project-sections {
   max-width: var(--content);
   margin: 0 auto;
-  padding: 0 var(--gutter);
+  padding: 0 var(--gutter) 4rem;
+}
+.psection {
+  align-items: start;
+  max-width: none;
+  margin: 0;
+  padding: 3.5rem 0;
+  border-top: 1px solid var(--border);
+}
+.psection--center {
+  align-items: center;
+}
+/* Direkt nach dem Projekttext beginnt der erste Abschnitt ohne Trennstrich */
+.middlepart + .project-sections > .psection:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* Mitwirkende: nach dem letzten Abschnitt, wieder mit Strich darüber; Überschrift ⅓, Text ⅔ */
+.project-credits {
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 0 var(--gutter) 4rem;
+}
+/* Vor den Mitwirkenden reicht der Abstand des letzten Abschnitts */
+.project-sections:has(+ .project-credits) {
+  padding-bottom: 0;
+}
+.credits {
+  align-items: baseline;
+  max-width: none;
+  margin: 0;
+  padding: 3.5rem 0 0;
+  border-top: 1px solid var(--border);
+}
+/* Namen unter der Überschrift */
+.credits-names {
+  margin-top: 0.75rem;
+}
+/* Bausteine in einer Spalte stehen untereinander */
+.psection-col {
+  min-width: 0;
+}
+.psection-col > * + * {
+  margin-top: 1.25rem;
+}
+.psection-col > .block-title + * {
+  margin-top: 0.75rem;
+}
+
+/* Bausteine */
+.block-title {
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+}
+.block-text {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+/* Einspaltig: Text auf angenehme Zeilenlänge begrenzen */
+.psection--1 .block-text,
+.psection--1 .block-title {
+  max-width: 68ch;
+}
+.block-text p + p {
+  margin-top: 1rem;
+}
+.block-image figcaption,
+.carousel-caption {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Projektbilder im festen Format: auf --media-ratio zugeschnitten, ein Klick zeigt das ganze Foto (Bildansicht) */
+.zoom {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  cursor: zoom-in;
+}
+.zoom img {
+  width: 100%;
+  aspect-ratio: var(--media-ratio);
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+}
+/* Vergrößern-Symbol oben rechts, sobald die Maus (oder der Tastatur-Fokus) auf dem Bild ist */
+.zoom::after {
+  content: '';
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7'/%3E%3C/svg%3E") center / 16px no-repeat;
+  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.3s ease, transform 0.3s var(--ease);
+  pointer-events: none;
+}
+.zoom:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+.zoom:focus-visible::after,
+.carousel-track:focus-visible .zoom::after {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: hover) {
+  .zoom:hover img {
+    transform: scale(1.03);
+  }
+  .zoom:hover::after {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Karussell: Wischen/Trackpad laufen nativ, Pfeile, Punkte und Tastatur über script.js */
+.carousel {
+  margin: 0;
+}
+.carousel-viewport {
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.carousel-track {
+  display: flex;
+  aspect-ratio: var(--media-ratio);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+.carousel-track:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -6px;
+}
+.carousel-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+/* Folien füllen das Karussell ganz aus; Rundung und Schatten hat schon der Rahmen */
+.carousel-slide .zoom {
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+.carousel-slide img {
+  height: 100%;
+  user-select: none;
+}
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-top: -24px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 1.15rem;
+  cursor: pointer;
+  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s var(--ease), opacity 0.3s ease;
+}
+.carousel-arrow--prev {
+  left: 1rem;
+}
+.carousel-arrow--next {
+  right: 1rem;
+}
+.carousel-arrow:hover {
+  transform: scale(1.08);
+}
+.carousel-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+.carousel-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2.5rem 1.25rem 1rem;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  pointer-events: none;
+}
+.carousel-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+}
+.carousel-dots {
+  display: flex;
+  gap: 0.4rem;
+  pointer-events: auto;
+}
+.carousel-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: width 0.3s var(--ease), background-color 0.3s ease;
+}
+.carousel-dots button[aria-current="true"] {
+  width: 24px;
+  background: #fff;
+}
+
+/* ==========================================================
+   Kurzer Hinweis unten in der Mitte, z. B. „Projekt gespeichert“
+   nach dem Bearbeiten eines Projekts (script.js blendet ihn aus)
+   ========================================================== */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.25rem 0.7rem 0.8rem;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  animation: toast-in 0.4s var(--ease) both;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+/* Häkchen im weißen Kreis */
+.toast::before {
+  content: '';
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 13px no-repeat;
+}
+.toast.is-leaving {
+  opacity: 0;
+  transform: translate(-50%, 8px);
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+}
+
+/* ==========================================================
+   Bildansicht (Lightbox): das ganze Foto ohne Zuschnitt, gesteuert über script.js
+   ========================================================== */
+html:has(.lightbox[open]) {
+  overflow: hidden;
+}
+.lightbox {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(10, 10, 10, 0.94);
+  color: #fff;
+  overflow: hidden;
+}
+.lightbox::backdrop {
+  background: transparent;
+}
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+  animation: lightbox-in 0.35s var(--ease);
+}
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+.lightbox-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+}
+/* Ganzes Bild: so groß wie möglich, ohne die Knöpfe zu verdecken */
+.lightbox-image {
+  max-width: calc(100vw - 11rem);
+  max-height: calc(100vh - 11rem);
+  max-height: calc(100dvh - 11rem);
+  border-radius: var(--radius-sm);
+  user-select: none;
+}
+.lightbox-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+  max-width: 60ch;
+  padding: 0 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.75);
+}
+.lightbox-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: #fff;
+}
+.lightbox-btn {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease), opacity 0.3s ease;
+}
+.lightbox-btn:hover {
+  transform: scale(1.08);
+}
+.lightbox-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.lightbox-btn:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+.lightbox-close {
+  top: 1.25rem;
+  right: 1.25rem;
+  font-size: 1.6rem;
+}
+.lightbox-arrow {
+  top: 50%;
+  margin-top: -24px;
+}
+.lightbox-arrow--prev {
+  left: 1.25rem;
+}
+.lightbox-arrow--next {
+  right: 1.25rem;
 }
 
 /* ==========================================================
@@ -1447,13 +1853,115 @@ section > h1.section-title {
 .admin-group {
   margin-bottom: 2.25rem;
 }
-.admin-group h2 {
+.admin-group h3 {
   margin-bottom: 0.75rem;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
 }
-.admin-group h2 span {
+.admin-group h3 span {
   font-weight: 400;
   color: var(--muted);
+}
+
+/* Übersicht: Sprungmarken und die drei Bereiche */
+.admin-tabs {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 5;
+  display: flex;
+  gap: 0.35rem;
+  width: fit-content;
+  margin-bottom: 2.5rem;
+  padding: 0.3rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+.admin-tabs a {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.admin-tabs a:hover {
+  background: var(--surface-2);
+}
+.admin-tabs span {
+  margin-left: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.admin-section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 4.5rem;
+}
+.admin-title {
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+}
+
+/* Tools als Raster */
+.admin-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.6rem;
+  list-style: none;
+}
+.admin-tool {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.6rem 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.admin-tool .admin-item-actions {
+  flex-wrap: nowrap;
+}
+
+/* "Über mich" in der Übersicht */
+.admin-about {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.admin-about-photo {
+  flex: none;
+  width: 96px;
+  height: 120px;
+  object-fit: cover;
+  object-position: 55% 30%;
+  border-radius: 6px;
+}
+.admin-about-text {
+  min-width: 0;
+}
+.admin-about-text small {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--muted);
+}
+.admin-cv-preview {
+  list-style: none;
+  font-size: 0.9rem;
+}
+.admin-cv-preview li + li {
+  margin-top: 0.3rem;
+}
+.admin-cv-preview span {
+  display: inline-block;
+  min-width: 7.5rem;
+  margin-right: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 .admin-empty {
   font-size: 0.95rem;
@@ -1557,9 +2065,875 @@ textarea.input {
   border-radius: var(--radius-sm);
 }
 .form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
   display: flex;
   gap: 0.75rem;
   margin-top: 2rem;
+  padding: 1rem 0;
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+.form-note {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.form-note a {
+  font-weight: 500;
+  color: var(--text-strong);
+  text-decoration: underline;
+}
+.admin code {
+  padding: 0.1rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  background: var(--surface);
+  border-radius: 4px;
+}
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.checkbox input {
+  accent-color: var(--ink);
+}
+
+/* Formular in Blöcke gegliedert */
+.form-block {
+  min-width: 0;
+  margin-bottom: 2rem;
+  padding: 1.5rem 1.5rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.form-block > legend {
+  padding: 0 0.5rem;
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.form-block .tool-picker,
+.form-block .repeat-list {
+  margin-bottom: 1.25rem;
+}
+/* Code-Fenster von "Über mich": Monospace, Zeilen werden nicht umgebrochen */
+.input--code {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  white-space: pre;
+  tab-size: 4;
+}
+.form-grid--cv {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+}
+
+/* Bildfelder mit Vorschau */
+.image-field-preview {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--surface);
+  border: 1px dashed #d4d4d4;
+  border-radius: var(--radius-sm);
+}
+.image-field-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-field-preview span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.file-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.file-preview:empty {
+  display: none;
+}
+.file-preview img {
+  width: 88px;
+  height: 66px;
+  object-fit: cover;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+}
+
+/* Wiederholbare Einträge: Projekt-Abschnitte, Lebenslauf-Stationen (nummeriert) */
+.repeat-list {
+  counter-reset: eintrag;
+}
+.repeat-item {
+  counter-increment: eintrag;
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.1rem 0.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.repeat-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.repeat-label::after {
+  content: ' ' counter(eintrag);
+}
+.repeat-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* Abschnitte im Bearbeitungsmodus: Layout-Auswahl und Ausrichtung */
+.layout-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.layout-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.72rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.layout-option:has(input:checked) {
+  border-color: var(--ink);
+}
+.layout-option:has(input:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.layout-icon {
+  display: flex;
+  gap: 3px;
+  width: 52px;
+  height: 26px;
+}
+.layout-icon i {
+  flex: 1;
+  background: #d4d4d4;
+  border-radius: 3px;
+}
+.layout-option:has(input:checked) .layout-icon i {
+  background: var(--ink);
+}
+.layout-icon--2-1 i:first-child,
+.layout-icon--1-2 i:last-child {
+  flex: 2;
+}
+.valign-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.input--small {
+  width: auto;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+/* Bilder eines Bausteins: vorhandene + neu gesammelte */
+.uploader {
+  margin-bottom: 0.5rem;
+}
+.uploader-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.uploader-list:not(:has(img)) {
+  display: none;
+}
+.uploader-new {
+  display: contents;
+}
+.uploader-tile {
+  position: relative;
+}
+.uploader-tile img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border: 2px dashed var(--ink);
+  border-radius: 6px;
+}
+.uploader-tile span {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  padding: 0 0.3rem;
+  font-size: 0.6rem;
+  color: #fff;
+  background: var(--ink);
+  border-radius: 4px;
+}
+.uploader-tile button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: #fff;
+  background: #a11a1a;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.uploader-add:has(input:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.uploader-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.image-keep-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+/* Vorhandenes Bild: Häkchen = behalten, abgewählt = wird entfernt */
+.image-keep {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+}
+.image-keep label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+/* Karussell: Pfeile zum Umsortieren */
+.image-keep-move {
+  display: flex;
+  gap: 0.25rem;
+}
+.image-keep-move button {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--text-strong);
+  background: var(--bg);
+  border: 1px solid #d4d4d4;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.image-keep-move button:hover {
+  border-color: var(--ink);
+}
+.image-keep img {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+.image-keep input {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  accent-color: var(--ink);
+}
+.image-keep:has(input:not(:checked)) img {
+  opacity: 0.35;
+  border-color: #d4d4d4;
+}
+.image-keep:has(input:not(:checked)) span {
+  color: #a11a1a;
+}
+
+/* ==========================================================
+   Admin: Projekt direkt im Layout der Projektseite bearbeiten
+   (gleiche Klassen wie parts/productpage.ejs, die Inhalte sind Formularfelder)
+   ========================================================== */
+/* Leiste oben statt der Navigation: der Bearbeitungsmodus ist aktiv */
+.edit-topbar {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: min(calc(100% - 2rem), 760px);
+  padding: 0.6rem 1.2rem;
+  transform: translateX(-50%);
+  background: rgba(17, 17, 17, 0.92);
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+}
+.edit-topbar a {
+  color: #cfcfcf;
+  transition: color 0.2s ease;
+}
+.edit-topbar a:hover {
+  color: #fff;
+}
+.edit-topbar strong {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+}
+.edit-topbar strong::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 0.5rem;
+  vertical-align: 0.1em;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* Bearbeitbare Texte sehen aus wie der Text auf der Seite, mit dezentem gestricheltem Rahmen */
+.page-editor .inline-field,
+.page-editor .inline-select {
+  display: block;
+  width: calc(100% + 0.5em);
+  margin: 0 -0.25em;
+  padding: 0.05em 0.25em;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  resize: none;
+  overflow: hidden;
+  outline: 1.5px dashed #dcdcdc;
+  outline-offset: 2px;
+  transition: outline-color 0.2s ease, background-color 0.2s ease;
+}
+.page-editor .inline-field:hover,
+.page-editor .inline-select:hover {
+  outline-color: #a8a8a8;
+}
+.page-editor .inline-field:focus,
+.page-editor .inline-select:focus {
+  outline: 2px solid var(--ink);
+  background: rgba(255, 255, 255, 0.9);
+}
+.page-editor .inline-field::placeholder {
+  color: #b5b5b5;
+}
+/* Kategorie direkt im Seitenpfad */
+.page-editor .inline-select {
+  display: inline-block;
+  width: auto;
+  margin: 0;
+  padding: 0 0.3em;
+  font-weight: 500;
+  cursor: pointer;
+}
+.page-editor .alert {
+  margin-bottom: 1.5rem;
+}
+.inline-slug {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+  max-width: 34rem;
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.inline-slug span {
+  white-space: nowrap;
+}
+.page-editor .inline-slug .inline-field {
+  flex: 1 1 10rem;
+  width: auto;
+  margin: 0;
+}
+.page-editor .inline-text .inline-field {
+  color: var(--muted);
+}
+.page-editor .inline-caption {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Tools: gewählte wie auf der Seite, alle zum Auswählen aufklappbar */
+.page-editor .tools:empty::before {
+  content: 'Noch keine Tools gewählt';
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.inline-tools {
+  margin-top: 0.75rem;
+}
+.inline-tools summary {
+  display: inline-flex;
+  padding: 0.3rem 0.85rem;
+  border: 1px dashed #c4c4c4;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  list-style: none;
+  cursor: pointer;
+}
+.inline-tools summary::-webkit-details-marker {
+  display: none;
+}
+.inline-tools summary:hover,
+.inline-tools[open] summary {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.inline-tools .tool-picker {
+  margin: 0.75rem 0 0.5rem;
+}
+
+/* Bilder: „Bild ändern“ direkt auf dem Bild */
+.page-editor .zoom {
+  cursor: default;
+}
+.page-editor .zoom::after {
+  display: none;
+}
+.page-editor .zoom:hover img {
+  transform: none;
+}
+.inline-image.is-empty {
+  aspect-ratio: var(--media-ratio);
+  background: repeating-linear-gradient(45deg, #f1f1f1 0 14px, #e9e9e9 14px 28px);
+}
+.inline-image.is-empty img {
+  display: none;
+}
+.inline-image.is-fallback img,
+.inline-image.is-removed img {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+.inline-image.is-missing {
+  outline: 3px solid #a11a1a;
+  outline-offset: 3px;
+}
+.inline-image-btn,
+.inline-image-remove {
+  position: absolute;
+  bottom: 0.75rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.45);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.inline-image-btn {
+  left: 0.75rem;
+}
+.inline-image-remove {
+  right: 0.75rem;
+  font-weight: 500;
+}
+.inline-image-remove input {
+  accent-color: var(--ink);
+}
+.inline-image-btn:hover,
+.inline-image-remove:hover {
+  background: #fff;
+}
+.inline-image-btn:focus-within,
+.inline-image-remove:focus-within {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.inline-image-note {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-strong);
+}
+.inline-image:not(.is-fallback) .inline-image-note {
+  display: none;
+}
+
+/* Abschnitte: gestrichelter Rahmen, darüber die Leiste für Layout, Ausrichtung und Reihenfolge */
+.edit-section {
+  counter-increment: eintrag;
+  position: relative;
+  margin: 1.5rem -1rem;
+  padding: 0 1rem;
+  border: 1.5px dashed #d4d4d4;
+  border-radius: var(--radius);
+}
+.edit-section-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem 1.25rem;
+  margin: 0 -1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px dashed #e0e0e0;
+}
+.edit-section-label {
+  align-self: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.edit-section-label::after {
+  content: ' ' counter(eintrag);
+}
+.edit-section-bar .repeat-actions {
+  align-self: center;
+  margin-left: auto;
+}
+.page-editor .psection {
+  padding: 1.75rem 0 1.25rem;
+  border-top: 0;
+}
+/* Spalten nach Layout wie .psection--1 / --2-1 / --1-2 / --1-1-1; nicht benötigte Spalten sind ausgeblendet */
+.psection[data-layout="1"] > .psection-col:nth-child(n + 2),
+.psection[data-layout="2-1"] > .psection-col:nth-child(3),
+.psection[data-layout="1-2"] > .psection-col:nth-child(3) {
+  display: none;
+}
+.psection[data-layout="1"] .block-move-side {
+  display: none;
+}
+@media (min-width: 861px) {
+  .psection[data-layout="1"] > .psection-col {
+    grid-column: 1 / -1;
+  }
+  .psection[data-layout="2-1"] > .psection-col:first-child,
+  .psection[data-layout="1-2"] > .psection-col:nth-child(2) {
+    grid-column: span 2;
+  }
+  .psection[data-layout="1"] {
+    --media-ratio: 16 / 9;
+  }
+}
+
+/* Bausteine: die Werkzeuge erscheinen beim Darüberfahren oder Bearbeiten */
+.edit-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.edit-blocks:not(:has([data-block]))::before {
+  content: 'Leere Spalte – füge unten einen Baustein hinzu';
+  padding: 1.5rem 1rem;
+  border: 1px dashed #d4d4d4;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--muted);
+}
+.edit-block {
+  position: relative;
+}
+.edit-block-tools {
+  position: absolute;
+  top: -1.1rem;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.edit-block:hover > .edit-block-tools,
+.edit-block:focus-within > .edit-block-tools {
+  opacity: 1;
+}
+@media (hover: none) {
+  .edit-block-tools {
+    opacity: 1;
+  }
+}
+.edit-block-tools button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+.edit-block-tools button:hover {
+  background: var(--surface-2);
+}
+.edit-block-tools .block-remove {
+  color: #a11a1a;
+}
+.edit-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.edit-add button,
+.edit-add-section {
+  padding: 0.3rem 0.75rem;
+  border: 1px dashed #c4c4c4;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.edit-add button:hover,
+.edit-add-section:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.edit-add-section {
+  display: block;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+}
+/* Zwischen „+ Abschnitt hinzufügen“ und dem Strich über den Mitwirkenden etwas Luft lassen */
+.page-editor .project-sections:has(+ .project-credits) {
+  padding-bottom: 2.5rem;
+}
+
+/* Karussell: alle Bilder als Kacheln auf dunklem Grund, zum Sortieren, Entfernen und Hinzufügen */
+.edit-carousel .uploader {
+  margin: 0;
+  padding: 1rem;
+  background: var(--ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.edit-carousel .uploader-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+.edit-carousel .image-keep img,
+.edit-carousel .uploader-tile img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-color: #fff;
+}
+.edit-carousel .image-keep {
+  color: #cfcfcf;
+}
+.edit-carousel .uploader-hint {
+  color: #8a8a8a;
+}
+
+/* Speichern ganz unten; die Leiste bleibt beim Scrollen am unteren Rand sichtbar */
+.edit-savebar {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 40;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(calc(100% - 2rem), 760px);
+  margin: 3rem auto 2rem;
+  padding: 0.55rem 0.55rem 0.55rem 1.25rem;
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+.edit-savebar span {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .edit-topbar {
+    gap: 0.6rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+  }
+  /* Auf dem Handy nur die beiden Knöpfe, damit die Leiste wenig verdeckt */
+  .edit-savebar {
+    justify-content: flex-end;
+    padding-left: 0.55rem;
+  }
+  .edit-savebar span {
+    display: none;
+  }
+}
+
+/* ==========================================================
+   Admin: Bestätigungs-Dialog im Design der Seite (statt window.confirm), erzeugt in admin.js
+   ========================================================== */
+.confirm-dialog {
+  width: min(calc(100% - 2rem), 440px);
+  max-width: none;
+  margin: auto; /* mittig im Fenster (der Reset oben setzt margin: 0) */
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+.confirm-dialog[open] {
+  animation: dialog-in 0.25s var(--ease);
+}
+.confirm-dialog::backdrop {
+  background: rgba(17, 17, 17, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+/* Der Inhalt füllt den Dialog; ein Klick daneben (auf den Hintergrund) bricht ab */
+.confirm-dialog form {
+  padding: 1.75rem 1.75rem 1.5rem;
+}
+/* Papierkorb im hellroten Kreis */
+.confirm-icon {
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: #f9eded url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a11a1a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6'/%3E%3C/svg%3E") center / 22px no-repeat;
+}
+.confirm-dialog h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+}
+.confirm-dialog p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+.confirm-actions .btn-confirm {
+  background: #a11a1a;
+  border-color: #a11a1a;
+  color: #fff;
+}
+.confirm-actions .btn-confirm:hover {
+  background: #861414;
+  border-color: #861414;
+}
+.confirm-actions .btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+}
+
+/* Icon-Auswahl beim Tool */
+.icon-group-title {
+  margin: 1rem 0 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.4rem;
+}
+.icon-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.icon-option span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.icon-option input {
+  accent-color: var(--ink);
+}
+.icon-option:has(input:checked) {
+  border-color: var(--ink);
+  background: var(--surface);
+}
+.icon-option .tool-icon {
+  width: 24px;
+  height: 24px;
 }
 
 /* Tool-Auswahl mit Icons */
@@ -1653,12 +3027,14 @@ textarea.input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html,
+  .carousel-track { scroll-behavior: auto; }
   *, *::before, *::after {
     animation: none !important;
     transition: none !important;
   }
   .reveal { opacity: 1; transform: none; }
+  .zoom:hover img { transform: none; }
 }
 
 /* ==========================================================
@@ -1682,11 +3058,32 @@ textarea.input {
     height: 480px;
   }
 
-  .upperpart,
-  .middlepart {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .carousel-arrow,
+  .lightbox-btn {
+    width: 40px;
+    height: 40px;
   }
+  .carousel-arrow,
+  .lightbox-arrow {
+    margin-top: -20px;
+  }
+  .lightbox-close {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+  .lightbox-arrow--prev {
+    left: 0.75rem;
+  }
+  .lightbox-arrow--next {
+    right: 0.75rem;
+  }
+  /* Schmale Bildschirme: Bild über die ganze Breite, die Pfeile liegen darüber (wie im Karussell) */
+  .lightbox-image {
+    max-width: calc(100vw - 1.5rem);
+    max-height: calc(100vh - 9rem);
+    max-height: calc(100dvh - 9rem);
+  }
+
   .upperpart {
     padding-top: 7rem;
   }

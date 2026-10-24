@@ -1,0 +1,32 @@
+<%#
+  Bilder eines Bausteins. Parameter: key (Baustein-Schlüssel), images (vorhandene Bilder), multiple (Karussell)
+  Vorhandene Bilder: Häkchen = behalten, beim Karussell mit Pfeilen sortierbar.
+  Neue Bilder werden per JavaScript gesammelt (mehrmals hinzufügen, einzeln wieder entfernen) – siehe admin.js
+%>
+<div class="uploader" data-uploader>
+    <div class="uploader-list">
+        <% images.forEach((image) => { %>
+        <div class="image-keep">
+            <label title="Abwählen, um das Bild beim Speichern zu entfernen">
+                <input type="checkbox" name="block_<%= key %>_images" value="<%= image %>" checked>
+                <img src="<%= image %>" alt="">
+                <span>behalten</span>
+            </label>
+            <% if (multiple) { %>
+            <div class="image-keep-move">
+                <button type="button" data-image-move="left" aria-label="Bild nach vorne">&larr;</button>
+                <button type="button" data-image-move="right" aria-label="Bild nach hinten">&rarr;</button>
+            </div>
+            <% } %>
+        </div>
+        <% }); %>
+        <div class="uploader-new" data-uploader-new></div>
+    </div>
+    <label class="btn btn-outline btn-small uploader-add">
+        <%= multiple ? '+ Bilder hinzufügen' : (images.length > 0 ? 'Bild ersetzen' : 'Bild auswählen') %>
+        <input class="sr-only" type="file" name="block_<%= key %>_files" accept="image/jpeg,image/png,image/webp,image/gif"<%= multiple ? ' multiple' : '' %> data-collect="<%= multiple ? 'multi' : 'single' %>">
+    </label>
+    <small class="uploader-hint"><%= multiple
+        ? 'Beliebig oft hinzufügen oder mehrere Dateien auf einmal markieren. Neue Bilder kommen hinten dazu.'
+        : 'Ein neues Bild ersetzt das bisherige.' %></small>
+</div>

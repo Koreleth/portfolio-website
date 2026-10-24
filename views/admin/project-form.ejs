@@ -1,78 +1,138 @@
 <%- include('../parts/head') %>
+<%#
+  Bearbeitungsmodus: die Projektseite selbst ist das Formular. Aufbau und Klassen wie in parts/productpage.ejs,
+  nur sind Titel, Texte, Bilder, Tools und Abschnitte direkt an ihrer Stelle bearbeitbar. Logik in public/js/admin.js
+%>
+<%
+  const images = project.images || [];
+  const projectTools = project.tools || [];
+  const categorie = categories.find(element => parseInt(element.id) === parseInt(project.categoryID));
+  const title = project.title || 'Neues Projekt';
+%>
+<div class="edit-topbar">
+    <a href="/admin#projekte">&larr; Alle Projekte</a>
+    <strong><%= isNew ? 'Neues Projekt' : 'Bearbeitungsmodus' %></strong>
+    <% if (!isNew && categorie) { %><a href="/portfolio/<%= categorie.slug %>/<%= project.slug %>">Ansehen</a><% } %>
+</div>
 
-<main class="admin">
-    <%- include('parts/header') %>
+<main>
+<form class="admin-form page-editor" method="post" action="<%= isNew ? '/admin/projekte' : '/admin/projekte/' + project.id %>" enctype="multipart/form-data">
 
-    <p class="admin-back"><a href="/admin">&larr; Alle Projekte</a></p>
-    <h1><%= isNew ? 'Neues Projekt' : 'Projekt bearbeiten' %></h1>
-
-    <% if (error) { %>
-    <p class="alert alert--error" role="alert"><%= error %></p>
-    <% } %>
-
-    <form class="admin-form" method="post" action="<%= isNew ? '/admin/projekte' : '/admin/projekte/' + project.id %>" enctype="multipart/form-data">
-        <div class="form-grid">
-            <div class="form-field">
-                <label for="title">Titel</label>
-                <input class="input" id="title" name="title" required value="<%= project.title || '' %>">
-            </div>
-            <div class="form-field">
-                <label for="categoryID">Kategorie</label>
-                <select class="input" id="categoryID" name="categoryID" required>
-                    <option value="">Bitte wählen …</option>
-                    <% categories.forEach((categorie) => { %>
-                    <option value="<%= categorie.id %>"<%= parseInt(categorie.id) === parseInt(project.categoryID) ? ' selected' : '' %>><%= categorie.name %></option>
-                    <% }); %>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-field">
-            <label for="slug">URL-Name <small>(optional)</small></label>
-            <input class="input" id="slug" name="slug" value="<%= project.slug || '' %>" placeholder="wird aus dem Titel erzeugt">
-            <small>Erscheint in der Adresse: /portfolio/kategorie/<strong>url-name</strong></small>
-        </div>
-
-        <div class="form-field">
-            <label for="description">Kurzbeschreibung</label>
-            <input class="input" id="description" name="description" required maxlength="160" value="<%= project.description || '' %>">
-            <small>Steht auf der Projektkarte und oben auf der Projektseite.</small>
-        </div>
-
-        <div class="form-field">
-            <label for="text">Text</label>
-            <textarea class="input" id="text" name="text" rows="8"><%= project.text || '' %></textarea>
-        </div>
-
-        <fieldset class="form-field">
-            <legend>Verwendete Tools</legend>
-            <div class="tool-picker">
-                <% tools.forEach((tool) => { %>
-                <label class="tool-option">
-                    <input type="checkbox" name="tools" value="<%= tool.id %>"<%= (project.tools || []).includes(tool.id) ? ' checked' : '' %>>
-                    <%- include('../parts/tool-icon', { tool: tool }) %>
-                    <span><%= tool.name %></span>
-                </label>
-                <% }); %>
-            </div>
-        </fieldset>
-
-        <%# Das Bild steht bewusst am Ende: so kommen alle Textfelder auch bei einem Upload-Fehler an %>
-        <div class="form-field">
-            <label for="image">Bild<% if (!isNew) { %> <small>(leer lassen = aktuelles Bild behalten)</small><% } %></label>
-            <% if (project.images && project.images[0]) { %>
-            <img class="form-preview" src="<%= project.images[0] %>" alt="Aktuelles Bild">
+    <div class="upperpart">
+        <div class="titletext">
+            <% if (error) { %>
+            <div class="alert alert--error" role="alert"><%= error %></div>
             <% } %>
-            <input class="input" id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif"<%= isNew ? ' required' : '' %>>
-            <small>JPG, PNG, WebP oder GIF, höchstens 5 MB.</small>
+            <%# Seitenpfad wie in parts/breadcrumb.ejs; die Kategorie wird direkt hier gewählt %>
+            <div class="breadcrumb" role="navigation" aria-label="Seitenpfad">
+                <ol>
+                    <li>Start</li>
+                    <li>Portfolio</li>
+                    <li>
+                        <select class="inline-select" name="categoryID" required aria-label="Kategorie">
+                            <option value="">Kategorie wählen …</option>
+                            <% categories.forEach((element) => { %>
+                            <option value="<%= element.id %>"<%= categorie && element.id === categorie.id ? ' selected' : '' %>><%= element.name %></option>
+                            <% }); %>
+                        </select>
+                    </li>
+                    <li><span aria-current="page" data-mirror="title"><%= title %></span></li>
+                </ol>
+            </div>
+            <p class="eyebrow">Projekt</p>
+            <h1><textarea class="inline-field" name="title" rows="1" required data-autosize data-single-line placeholder="Titel des Projekts" aria-label="Titel"><%= project.title || '' %></textarea></h1>
+            <div class="inline-slug">
+                <span>Adresse: /portfolio/…/</span>
+                <input class="inline-field" name="slug" value="<%= project.slug || '' %>" placeholder="wird aus dem Titel erzeugt" aria-label="URL-Name">
+            </div>
+            <p><textarea class="inline-field" name="description" rows="2" required maxlength="160" data-autosize placeholder="Kurzbeschreibung – steht auch auf der Projektkarte" aria-label="Kurzbeschreibung"><%= project.description || '' %></textarea></p>
+
+            <p class="eyebrow tools-label">Verwendete Tools</p>
+            <ul class="tools" data-tools-selected><% tools.filter(tool => projectTools.includes(tool.id)).forEach((tool) => { %><li class="tool"><%- include('../parts/tool-icon', { tool: tool }) %><%= tool.name %></li><% }); %></ul>
+            <details class="inline-tools">
+                <summary>Tools auswählen</summary>
+                <div class="tool-picker">
+                    <% tools.forEach((tool) => { %>
+                    <label class="tool-option">
+                        <input type="checkbox" name="tools" value="<%= tool.id %>" data-name="<%= tool.name %>"<%= projectTools.includes(tool.id) ? ' checked' : '' %>>
+                        <%- include('../parts/tool-icon', { tool: tool }) %>
+                        <span><%= tool.name %></span>
+                    </label>
+                    <% }); %>
+                </div>
+                <div class="form-note">Fehlt ein Programm? <a href="/admin/tools/neu">Neues Tool anlegen</a></div>
+            </details>
         </div>
 
-        <div class="form-actions">
-            <button class="btn btn-dark" type="submit">Speichern</button>
-            <a class="btn btn-outline" href="/admin">Abbrechen</a>
+        <%# Titelbild: ein Klick auf „Titelbild ändern“ tauscht es direkt hier aus %>
+        <div class="titleimg">
+            <div class="zoom inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image<%= images[0] ? '' : ' data-required-image' %>>
+                <img src="<%= images[0] || '' %>" alt="">
+                <label class="inline-image-btn"><span><%= images[0] ? 'Titelbild ändern' : 'Titelbild wählen' %></span><input class="sr-only" type="file" name="cover" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+            </div>
         </div>
-    </form>
+    </div>
+
+    <div class="middlepart">
+        <%# Zweites Bild; ohne eigenes zweites Bild steht auf der Seite das Titelbild %>
+        <div class="middleimg">
+            <div class="zoom inline-image<%= images[1] ? '' : ' is-fallback' %><%= images[0] || images[1] ? '' : ' is-empty' %>" data-inline-image>
+                <img src="<%= images[1] || images[0] || '' %>" alt="">
+                <span class="inline-image-note">Ohne zweites Bild steht hier das Titelbild</span>
+                <label class="inline-image-btn"><span><%= images[1] ? 'Bild ändern' : 'Zweites Bild wählen' %></span><input class="sr-only" type="file" name="second" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+                <% if (images[1]) { %>
+                <label class="inline-image-remove"><input type="checkbox" name="removeSecond" value="1"> Entfernen</label>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="middletext">
+            <h2 data-mirror="title"><%= title %></h2>
+            <div class="inline-text"><textarea class="inline-field" name="text" rows="5" data-autosize placeholder="Projekttext – eine Leerzeile beginnt einen neuen Absatz" aria-label="Projekttext"><%= project.text || '' %></textarea></div>
+        </div>
+    </div>
+
+    <%# Weitere Abschnitte: Layout und Reihenfolge in der Leiste über jedem Abschnitt, Bausteine direkt in den Spalten %>
+    <div class="project-sections">
+        <div class="repeat-list" data-repeat-list="section" data-remove-title="Abschnitt entfernen?" data-remove-confirm="Der Abschnitt wird mit allen Bausteinen entfernt. Endgültig ist das erst nach dem Speichern.">
+            <% (project.sections || []).forEach((section, index) => { %>
+            <%- include('parts/inline-section', { key: 's' + index, section: section }) %>
+            <% }); %>
+        </div>
+        <button class="edit-add-section" type="button" data-repeat-add="section">+ Abschnitt hinzufügen</button>
+    </div>
+
+    <%# Mitwirkende: auf der Seite nach dem letzten Abschnitt, mit Strich darüber; links die Namen, rechts ein freier Text.
+        Beide leer = der Bereich erscheint nicht %>
+    <div class="project-credits">
+        <section class="credits">
+            <div>
+                <h2 class="block-title">Mitwirkende</h2>
+                <div class="block-text credits-names"><textarea class="inline-field" name="contributors" rows="3" data-autosize placeholder="Namen, eine Zeile pro Person – z. B. Kamera: Name" aria-label="Namen der Mitwirkenden"><%= project.contributors || '' %></textarea></div>
+            </div>
+            <div class="block-text credits-text"><textarea class="inline-field" name="contributorsText" rows="3" data-autosize placeholder="Text daneben, z. B. eine Danksagung (optional). Sind beide Felder leer, erscheint dieser Bereich nicht." aria-label="Text neben den Mitwirkenden, z. B. Danksagung"><%= project.contributorsText || '' %></textarea></div>
+        </section>
+    </div>
+
+    <%# Ganz unten: Speichern (bleibt beim Scrollen am unteren Rand sichtbar) %>
+    <div class="edit-savebar">
+        <span>Bilder bis 20 MB · Änderungen gelten erst nach dem Speichern.</span>
+        <a class="btn btn-outline" href="/admin#projekte">Abbrechen</a>
+        <button class="btn btn-dark" type="submit">Speichern</button>
+    </div>
+</form>
 </main>
 
+<%# Vorlagen: neuer Abschnitt (__KEY__) und neue Bausteine je Typ (__BLOCK__) – per JavaScript eingesetzt %>
+<template data-repeat-template="section">
+    <%- include('parts/inline-section', { key: '__KEY__', section: { layout: '1', valign: 'top', columns: [[]] } }) %>
+</template>
+<% ['title', 'text', 'image', 'carousel'].forEach((type) => { %>
+<template data-block-template="<%= type %>">
+    <%- include('parts/inline-block', { key: '__BLOCK__', block: { type: type, images: [] }, refName: '' }) %>
+</template>
+<% }); %>
+
+<script src="/js/admin.js"></script>
 </body>
 </html>

@@ -1,0 +1,7 @@
+<%#
+  Projektbild im festen Format (zugeschnitten, siehe .zoom in style.css). Ein Klick zeigt das ganze Foto
+  in der Bildansicht (lightbox.ejs); ohne JavaScript öffnet der Link einfach das Bild.
+  Parameter: src, alt, caption (steht in der Bildansicht), lazy (erst beim Hineinscrollen laden),
+             focusable (false = nicht per Tab erreichbar, z. B. Folien im Karussell)
+%>
+<a class="zoom" href="<%= src %>" data-zoom data-caption="<%= caption %>"<%- focusable ? '' : ' tabindex="-1"' %> draggable="false"><img src="<%= src %>" alt="<%= alt %>"<%- lazy ? ' loading="lazy"' : '' %> draggable="false"><span class="sr-only"> – ganzes Bild anzeigen</span></a>

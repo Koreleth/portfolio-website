@@ -6,7 +6,9 @@ var path = require('path');
  * Jeder Aufruf liest frisch von der Platte, damit Änderungen (z. B. aus dem
  * späteren Admin-Bereich) ohne Neustart sichtbar sind.
  */
-const filePath = (name) => path.join(__dirname, name + '.json');
+// Datenordner: dieser Ordner – oder per DATA_DIR ein anderer (z. B. für Tests oder dauerhaften Speicher beim Hoster)
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const filePath = (name) => path.join(DATA_DIR, name + '.json');
 
 /**
  * @param {string} name - Dateiname ohne Endung, z. B. 'portfoliowork'.

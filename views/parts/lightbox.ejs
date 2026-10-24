@@ -1,0 +1,16 @@
+<%#
+  Bildansicht: zeigt ein Projektbild ganz, ohne Zuschnitt. Öffnet sich per Klick auf ein Bild (zoom-image.ejs).
+  Pfeile, ←/→ und Wischen blättern durch alle Bilder der Seite; ×, Esc oder ein Klick neben das Bild schließt (script.js).
+%>
+<dialog class="lightbox" data-lightbox aria-label="Bildansicht">
+    <button class="lightbox-btn lightbox-close" type="button" data-lightbox-close aria-label="Bildansicht schließen" autofocus>&times;</button>
+    <figure class="lightbox-figure">
+        <img class="lightbox-image" data-lightbox-image alt="">
+        <figcaption class="lightbox-bar" aria-live="polite">
+            <span class="lightbox-count" data-lightbox-count></span>
+            <span class="lightbox-caption" data-lightbox-caption></span>
+        </figcaption>
+    </figure>
+    <button class="lightbox-btn lightbox-arrow lightbox-arrow--prev" type="button" data-lightbox-prev aria-label="Vorheriges Bild">&larr;</button>
+    <button class="lightbox-btn lightbox-arrow lightbox-arrow--next" type="button" data-lightbox-next aria-label="Nächstes Bild">&rarr;</button>
+</dialog>

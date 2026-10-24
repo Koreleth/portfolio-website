@@ -1,32 +1,26 @@
 [
     {
         "id": 1,
-        "title": "Grundschule",
-        "time": "2000-2006",
-        "description": "Die Grundschule war eine prägende Zeit in meinem Leben. Ich habe viele Freunde gefunden und viel über die Welt gelernt. Es war eine Zeit des Spielens und Lernens." 
+        "title": "Fachoberschulreife",
+        "time": "2015 - 2018",
+        "description": "Im Bereich Maschinenbau. Dort habe ich Physikalische Sachen und ähnliches erfahren."
     },
     {
         "id": 2,
-        "title": "Realschule",
-        "time": "2000-2006",
-        "description": "Die Grundschule war eine prägende Zeit in meinem Leben. Ich habe viele Freunde gefunden und viel über die Welt gelernt. Es war eine Zeit des Spielens und Lernens." 
+        "title": "Studium",
+        "time": "2018 - 2019",
+        "description": "Beginn des Studiums Mechatronik. Ein neuer Teil war Elektrotechnik. Aufrgrund fehlenden Interesses vorzeitig abgebrochen."
     },
     {
         "id": 3,
-        "title": "Realschule",
-        "time": "2000-2006",
-        "description": "Die Grundschule war eine prägende Zeit in meinem Leben. Ich habe viele Freunde gefunden und viel über die Welt gelernt. Es war eine Zeit des Spielens und Lernens." 
+        "title": "Kundenbetreuer",
+        "time": "2019 - Heute",
+        "description": "Nach Abgeschlosser Fortbildung und Ausbildungen betreue und berat ich weiterhin Kunden bezüglich Versicherungen und Finanzen."
     },
     {
         "id": 4,
-        "title": "Realschule",
-        "time": "2000-2006",
-        "description": "Die Grundschule war eine prägende Zeit in meinem Leben. Ich habe viele Freunde gefunden und viel über die Welt gelernt. Es war eine Zeit des Spielens und Lernens." 
-    },
-    {
-        "id": 5,
-        "title": "Realschule",
-        "time": "2000-2006",
-        "description": "Die Grundschule war eine prägende Zeit in meinem Leben. Ich habe viele Freunde gefunden und viel über die Welt gelernt. Es war eine Zeit des Spielens und Lernens." 
+        "title": "Studium",
+        "time": "2023 - 2027",
+        "description": "Neben meiner Beruflichen Tätigkeit habe ich das Studium \"Digitale Medien\" an der Hochschule Fulda begonnen. Ich habe mich für eine spezialisierung für Medieninformatik entschieden."
     }
 ]

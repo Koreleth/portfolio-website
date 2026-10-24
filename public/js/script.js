@@ -1,8 +1,8 @@
 function animateText(textElement) {
     const printText = textElement.dataset.text;
 
-    // Nachlaufende Leerzeichen/Umbrüche aus dem Template entfernen
-    const contentArray = printText.split('/n').map(line => line.replace(/\s+$/, ''));
+    // Eine Zeile pro Zeilenumbruch (Inhalt aus models/about.json), Leerraum am Zeilenende entfernen
+    const contentArray = printText.split(/\r?\n/).map(line => line.replace(/\s+$/, ''));
 
     contentArray.forEach((line, lineIndex) => {
       const lineContainer = document.createElement('span');
@@ -176,6 +176,18 @@ document.addEventListener("DOMContentLoaded", function() {
     activateLink(); // Initial call to set the active link on page load
 });
 
+// Kurze Hinweise (z. B. „Projekt gespeichert“) nach ein paar Sekunden ausblenden;
+// ?gespeichert verschwindet aus der Adresse, damit der Hinweis beim Neuladen nicht wiederkommt
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('[data-toast]').forEach(toast => {
+        setTimeout(() => toast.classList.add('is-leaving'), 3200);
+        setTimeout(() => toast.remove(), 3600);
+    });
+    if (new URLSearchParams(location.search).has('gespeichert')) {
+        history.replaceState(null, '', location.pathname + location.hash);
+    }
+});
+
 // Sanftes Einblenden der Inhalte beim Scrollen
 document.addEventListener("DOMContentLoaded", function() {
     const items = document.querySelectorAll('section > h2, .card-link, .about-grid > *, .upperpart > *, .middlepart > *');
@@ -286,4 +298,142 @@ document.addEventListener("DOMContentLoaded", function() {
             setTimeout(tick, 2400);
         }
     }
+});
+
+// KARUSSELL (Projektseite): Pfeile, Punkte und Pfeiltasten; Wischen und Trackpad laufen über natives Scrollen
+document.addEventListener("DOMContentLoaded", function() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.querySelectorAll('[data-carousel]').forEach(carousel => {
+        const track = carousel.querySelector('.carousel-track');
+        const slides = [...track.children];
+        const prev = carousel.querySelector('[data-carousel-prev]');
+        const next = carousel.querySelector('[data-carousel-next]');
+        const dots = [...carousel.querySelectorAll('[data-carousel-dot]')];
+        const current = carousel.querySelector('[data-carousel-current]');
+        if (slides.length < 2) return;
+
+        const currentIndex = () => Math.round(track.scrollLeft / track.clientWidth);
+
+        const goTo = (index) => {
+            const target = Math.max(0, Math.min(slides.length - 1, index));
+            track.scrollTo({ left: target * track.clientWidth, behavior: reduceMotion ? 'auto' : 'smooth' });
+        };
+
+        // Zähler, Punkte und Pfeile an die sichtbare Folie anpassen
+        const update = () => {
+            const index = currentIndex();
+            current.textContent = String(index + 1).padStart(2, '0');
+            dots.forEach((dot, i) => dot.setAttribute('aria-current', i === index ? 'true' : 'false'));
+            prev.disabled = index === 0;
+            next.disabled = index === slides.length - 1;
+        };
+
+        prev.addEventListener('click', () => goTo(currentIndex() - 1));
+        next.addEventListener('click', () => goTo(currentIndex() + 1));
+        dots.forEach(dot => dot.addEventListener('click', () => goTo(parseInt(dot.dataset.carouselDot))));
+
+        track.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                goTo(currentIndex() + (e.key === 'ArrowRight' ? 1 : -1));
+            } else if (e.key === 'Enter') {
+                // Enter zeigt die sichtbare Folie in der Bildansicht
+                const zoom = slides[currentIndex()].querySelector('[data-zoom]');
+                if (zoom) zoom.click();
+            }
+        });
+
+        let frame = null;
+        track.addEventListener('scroll', () => {
+            if (frame) return;
+            frame = requestAnimationFrame(() => {
+                update();
+                frame = null;
+            });
+        }, { passive: true });
+        window.addEventListener('resize', update);
+        update();
+    });
+});
+
+// BILDANSICHT (Projektseite): Klick auf ein Bild zeigt das ganze Foto; Pfeile, ←/→ und Wischen blättern durch alle Bilder
+document.addEventListener("DOMContentLoaded", function() {
+    const lightbox = document.querySelector('[data-lightbox]');
+    if (!lightbox || typeof lightbox.showModal !== 'function') return;
+
+    const links = [...document.querySelectorAll('[data-zoom]')];
+    // Jedes Foto nur einmal (ohne zweites Bild steht das Titelbild zweimal auf der Seite)
+    const sources = [...new Set(links.map(link => link.getAttribute('href')))];
+    const image = lightbox.querySelector('[data-lightbox-image]');
+    const count = lightbox.querySelector('[data-lightbox-count]');
+    const caption = lightbox.querySelector('[data-lightbox-caption]');
+    const prev = lightbox.querySelector('[data-lightbox-prev]');
+    const next = lightbox.querySelector('[data-lightbox-next]');
+    const total = String(sources.length).padStart(2, '0');
+    let index = 0;
+
+    const linkAt = (i) => links.find(link => link.getAttribute('href') === sources[i]);
+
+    const show = (i) => {
+        index = Math.max(0, Math.min(sources.length - 1, i));
+        const link = linkAt(index);
+        image.src = sources[index];
+        image.alt = link.querySelector('img').alt;
+        caption.textContent = link.dataset.caption || '';
+        count.textContent = String(index + 1).padStart(2, '0') + ' / ' + total;
+        count.hidden = sources.length < 2;
+        prev.disabled = index === 0;
+        next.disabled = index === sources.length - 1;
+        // Nachbarbilder vorladen, damit das Blättern ohne Wartezeit geht
+        [index - 1, index + 1].forEach(n => { if (sources[n]) new Image().src = sources[n]; });
+    };
+
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('[data-zoom]');
+        // Strg-/Cmd-/Shift-Klick öffnet das Bild wie gewohnt in einem neuen Tab bzw. Fenster
+        if (!link || e.ctrlKey || e.metaKey || e.shiftKey) return;
+        e.preventDefault();
+        show(sources.indexOf(link.getAttribute('href')));
+        lightbox.showModal();
+    });
+
+    prev.addEventListener('click', () => show(index - 1));
+    next.addEventListener('click', () => show(index + 1));
+    lightbox.querySelector('[data-lightbox-close]').addEventListener('click', () => lightbox.close());
+
+    // Klick neben das Bild schließt (Esc schließt von selbst)
+    lightbox.addEventListener('click', (e) => {
+        if (!e.target.closest('img, button')) lightbox.close();
+    });
+
+    lightbox.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            e.preventDefault();
+            show(index + (e.key === 'ArrowRight' ? 1 : -1));
+        }
+    });
+
+    // Wischen auf dem Handy – nicht, solange die Seite mit zwei Fingern vergrößert ist
+    let touchStart = null;
+    lightbox.addEventListener('touchstart', (e) => {
+        touchStart = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    }, { passive: true });
+    lightbox.addEventListener('touchend', (e) => {
+        const zoomed = window.visualViewport && window.visualViewport.scale > 1.01;
+        if (!touchStart || zoomed) return;
+        const dx = e.changedTouches[0].clientX - touchStart.x;
+        const dy = e.changedTouches[0].clientY - touchStart.y;
+        touchStart = null;
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(index + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+
+    // Beim Schließen steht ein Karussell auf dem zuletzt gezeigten Bild
+    lightbox.addEventListener('close', () => {
+        const slide = linkAt(index).closest('.carousel-slide');
+        if (slide) {
+            const track = slide.parentElement;
+            track.scrollTo({ left: [...track.children].indexOf(slide) * track.clientWidth });
+        }
+    });
 });

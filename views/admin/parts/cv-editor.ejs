@@ -1,0 +1,28 @@
+<%#
+  Eine Station im Lebenslauf. Parameter: key (eindeutiger Schlüssel), entry ({ time, title, description })
+  Die Reihenfolge ergibt sich aus der Reihenfolge der versteckten cvKeys-Felder.
+%>
+<div class="repeat-item" data-repeat-item>
+    <input type="hidden" name="cvKeys" value="<%= key %>">
+
+    <div class="repeat-item-head">
+        <strong class="repeat-label">Station</strong>
+        <%- include('repeat-actions') %>
+    </div>
+
+    <div class="form-grid form-grid--cv">
+        <div class="form-field">
+            <label for="cv_<%= key %>_time">Zeitraum</label>
+            <input class="input" id="cv_<%= key %>_time" name="cv_<%= key %>_time" value="<%= entry.time || '' %>" placeholder="z. B. 2016 – 2020">
+        </div>
+        <div class="form-field">
+            <label for="cv_<%= key %>_title">Titel</label>
+            <input class="input" id="cv_<%= key %>_title" name="cv_<%= key %>_title" value="<%= entry.title || '' %>" placeholder="z. B. Realschule">
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label for="cv_<%= key %>_description">Beschreibung <small>(Leerzeile = neuer Absatz)</small></label>
+        <textarea class="input" id="cv_<%= key %>_description" name="cv_<%= key %>_description" rows="3"><%= entry.description || '' %></textarea>
+    </div>
+</div>

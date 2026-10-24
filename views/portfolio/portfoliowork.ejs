@@ -1,5 +1,9 @@
 <%- include('../parts/head') %>
 <%- include('../parts/navbar') %>
+<% if (locals.saved) { %>
+<%# Hinweis nach dem Speichern im Bearbeitungsmodus; script.js blendet ihn nach ein paar Sekunden aus %>
+<p class="toast" role="status" data-toast>Projekt gespeichert</p>
+<% } %>
 
 
 <%- include('../parts/productpage', {data: data} ) %>

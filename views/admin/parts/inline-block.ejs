@@ -1,0 +1,38 @@
+<%#
+  Ein Baustein im Bearbeitungsmodus, dargestellt wie auf der Projektseite; die Inhalte sind direkt bearbeitbar.
+  Parameter: key (Baustein-Schlüssel), block ({ type, text, images, caption }),
+  refName (Feldname der Spalte, wird bei jeder Verschiebung per JavaScript angepasst)
+%>
+<% const images = block.images || []; %>
+<div class="edit-block" data-block>
+    <input type="hidden" data-block-ref name="<%= refName %>" value="<%= key %>">
+    <input type="hidden" name="block_<%= key %>_type" value="<%= block.type %>">
+
+    <div class="edit-block-tools">
+        <button type="button" data-block-move="up" title="Nach oben" aria-label="Baustein nach oben">&uarr;</button>
+        <button type="button" data-block-move="down" title="Nach unten" aria-label="Baustein nach unten">&darr;</button>
+        <button class="block-move-side" type="button" data-block-move="left" title="In die linke Spalte" aria-label="In die linke Spalte">&larr;</button>
+        <button class="block-move-side" type="button" data-block-move="right" title="In die rechte Spalte" aria-label="In die rechte Spalte">&rarr;</button>
+        <button class="block-remove" type="button" data-block-remove title="Entfernen" aria-label="Baustein entfernen">&times;</button>
+    </div>
+
+    <% if (block.type === 'title') { %>
+    <h2 class="block-title"><textarea class="inline-field" name="block_<%= key %>_text" rows="1" data-autosize data-single-line placeholder="Zwischenüberschrift" aria-label="Zwischenüberschrift"><%= block.text || '' %></textarea></h2>
+    <% } else if (block.type === 'text') { %>
+    <div class="block-text"><textarea class="inline-field" name="block_<%= key %>_text" rows="3" data-autosize placeholder="Text – eine Leerzeile beginnt einen neuen Absatz" aria-label="Text"><%= block.text || '' %></textarea></div>
+    <% } else if (block.type === 'image') { %>
+    <figure class="block-image">
+        <div class="zoom inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image>
+            <% if (images[0]) { %><input type="hidden" name="block_<%= key %>_images" value="<%= images[0] %>"><% } %>
+            <img src="<%= images[0] || '' %>" alt="">
+            <label class="inline-image-btn"><span><%= images[0] ? 'Bild ändern' : 'Bild wählen' %></span><input class="sr-only" type="file" name="block_<%= key %>_files" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+        </div>
+        <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Bildunterschrift (optional)" aria-label="Bildunterschrift">
+    </figure>
+    <% } else if (block.type === 'carousel') { %>
+    <figure class="carousel edit-carousel">
+        <%- include('uploader', { key: key, images: images, multiple: true }) %>
+        <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Bildunterschrift zum Karussell (optional)" aria-label="Bildunterschrift">
+    </figure>
+    <% } %>
+</div>

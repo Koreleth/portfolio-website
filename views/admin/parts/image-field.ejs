@@ -1,0 +1,20 @@
+<%#
+  Bildfeld mit Vorschau des aktuellen Bildes.
+  Parameter: name, label, current (Pfad oder leer), required, hint,
+             removable + removeName (Checkbox "Bild entfernen")
+%>
+<div class="form-field image-field">
+    <label for="<%= name %>"><%= label %></label>
+    <div class="image-field-preview">
+        <% if (locals.current) { %>
+        <img src="<%= locals.current %>" alt="Aktuelles Bild">
+        <% } else { %>
+        <span>Noch kein Bild</span>
+        <% } %>
+    </div>
+    <input class="input" id="<%= name %>" name="<%= name %>" type="file" accept="image/jpeg,image/png,image/webp,image/gif"<%= locals.required ? ' required' : '' %>>
+    <% if (locals.removable && locals.current) { %>
+    <label class="checkbox"><input type="checkbox" name="<%= locals.removeName %>" value="1"> Bild entfernen</label>
+    <% } %>
+    <% if (locals.hint) { %><small><%= locals.hint %></small><% } %>
+</div>

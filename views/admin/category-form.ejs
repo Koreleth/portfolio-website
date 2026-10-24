@@ -1,0 +1,51 @@
+<%- include('../parts/head') %>
+
+<main class="admin">
+    <%- include('parts/header') %>
+
+    <p class="admin-back"><a href="/admin#kategorien">&larr; Alle Kategorien</a></p>
+    <h1><%= isNew ? 'Neue Kategorie' : 'Kategorie bearbeiten' %></h1>
+
+    <% if (error) { %>
+    <p class="alert alert--error" role="alert"><%= error %></p>
+    <% } %>
+
+    <form class="admin-form" method="post" action="<%= isNew ? '/admin/kategorien' : '/admin/kategorien/' + categorie.id %>" enctype="multipart/form-data">
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="name">Name</label>
+                <input class="input" id="name" name="name" required value="<%= categorie.name || '' %>">
+            </div>
+            <div class="form-field">
+                <label for="slug">URL-Name <small>(optional)</small></label>
+                <input class="input" id="slug" name="slug" value="<%= categorie.slug || '' %>" placeholder="wird aus dem Namen erzeugt">
+                <small>Erscheint in der Adresse: /portfolio/<strong>url-name</strong></small>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label for="description">Kurzbeschreibung</label>
+            <input class="input" id="description" name="description" required maxlength="120" value="<%= categorie.description || '' %>">
+            <small>Steht auf der Kachel und oben auf der Kategorieseite.</small>
+        </div>
+
+        <%- include('parts/image-field', {
+            name: 'image',
+            label: 'Bild der Kachel',
+            current: (categorie.images || [])[0],
+            required: isNew,
+            hint: 'JPG, PNG, WebP oder GIF, höchstens 20 MB (große Fotos werden automatisch verkleinert).' + (isNew ? '' : ' Leer lassen = behalten.'),
+            removable: false,
+            removeName: ''
+        }) %>
+
+        <div class="form-actions">
+            <button class="btn btn-dark" type="submit">Speichern</button>
+            <a class="btn btn-outline" href="/admin#kategorien">Abbrechen</a>
+        </div>
+    </form>
+</main>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

@@ -10,7 +10,7 @@
                 <span class="cv-icon" aria-hidden="true"></span>
             </button>
             <div class="cv-body" id="cv-<%= item.id %>">
-                <div><p><%= item.description %></p></div>
+                <div><%- include('rich-text', { text: item.description }) %></div>
             </div>
         </li>
     <% }); %>
