@@ -45,10 +45,11 @@
 <% } %>
 
 <% if (data.sections && data.sections.length > 0) { %>
-<%# Weitere Abschnitte aus dem Admin-Bereich: je Abschnitt ein Spalten-Layout, pro Spalte Bausteine untereinander %>
+<%# Weitere Abschnitte aus dem Admin-Bereich: je Abschnitt ein Spalten-Layout, pro Spalte Bausteine untereinander.
+    Vor dem ersten Abschnitt steht immer ein Trennstrich, vor weiteren nur mit „divider“ %>
 <div class="project-sections">
     <% data.sections.forEach((section) => { %>
-    <section class="psection psection--<%= section.layout %><%= section.valign === 'center' ? ' psection--center' : '' %>">
+    <section class="psection psection--<%= section.layout %><%= section.valign === 'center' ? ' psection--center' : '' %><%= section.divider ? ' psection--divider' : '' %>">
         <% section.columns.forEach((column) => { %>
         <div class="psection-col">
             <% column.forEach((block) => { %>

@@ -96,17 +96,84 @@
         "id": 5,
         "title": "Bomberman",
         "description": "Abgabe im 1. Semester - Videospiel",
-        "text": "Wir sollten ein Videospiel abgeben. Das ist daraus geworden",
+        "text": "Wir sollten ein Videospiel abgeben. Das ist daraus geworden.\r\nHier könnt ihr es Spielen:\r\nhttps://koreleth.github.io/arcade-game/\r\n\r\nEs wurde auch eine zweite Version mit Claude und einigen mehr Möglichkeiten erstellt:\r\nhttps://koreleth.github.io/bomberman-2/",
         "images": [
-            "/img/uploads/1792675362447-jil1-bbm.png",
-            "/img/uploads/1792675362449-49ku-gameplay.png"
+            "/img/uploads/1793013321555-0zdw-bbm-home.jpg",
+            "/img/uploads/1793013321558-j85k-bbm-home.jpg"
         ],
         "categoryID": 2,
         "slug": "bomberman",
         "tools": [
             "vscode"
         ],
-        "sections": [],
+        "sections": [
+            {
+                "layout": "2-1",
+                "valign": "top",
+                "columns": [
+                    [
+                        {
+                            "type": "title",
+                            "text": "Case-Study"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Ich möchte eine ziemlich ähnliche Abbildung des Spiels Programmieren. (Begrenzt auf 3 Items)\nDas bedeutet:\n- Multiplayer (in meinem Fall erstmal ein 2 Spieler System)\n- Jeder Spieler kann mittels Tastendruckes eine Bombe platzieren. Bevor diese nicht hochgegangen ist, kann er keine weitere platzieren.\n- Der Explosionsradius einer Bombe ist genau ein Feld einer Mauer in jede Achse.\n- Karte auf 15x15 Blöcke aufgebaut:\n    o Unzerstörbare Wände\n    o Zerstörbare Wände, dahinter kann sich ein Item verbergen\nItems können folgendes bewirken:\n    o Ein Explosionsverstärker = Diese erhöht den Explosionsradius um ein weiteres Feld in jede Achse. (Häufigkeit = Gewöhnlich)\n    o Ein Bombenslot = dieser lässt eine weitere Bombe zeitgleich zu dem anderen Platzieren. (Häufigkeit = Gewöhnlich)\n    o Ein Rollschuh = mit diesem kann man schneller laufen (Häufigkeit = Sehr selten)"
+                        }
+                    ],
+                    [
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793013478877-9pr0-original-bbm.jpeg"
+                            ],
+                            "caption": "Quelle: https://www.maniac.de/wp-content/uploads/2017/03/08-14-640.jpg"
+                        },
+                        {
+                            "type": "carousel",
+                            "images": [
+                                "/img/uploads/1793013667683-0a29-karte2.jpeg",
+                                "/img/uploads/1793013667683-xxot-karte1.jpeg"
+                            ],
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1",
+                "valign": "top",
+                "columns": [
+                    [
+                        {
+                            "type": "title",
+                            "text": "Weitere Coding Snippets"
+                        },
+                        {
+                            "type": "text",
+                            "text": "class Karte {\n\n\n}"
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1",
+                "valign": "top",
+                "columns": [
+                    [
+                        {
+                            "type": "carousel",
+                            "images": [
+                                "/img/uploads/1793018544444-702l-gameplay-1.png",
+                                "/img/uploads/1793018544451-yark-gameplay-2.png",
+                                "/img/uploads/1793018544462-xagf-gameplay-3.png"
+                            ],
+                            "caption": ""
+                        }
+                    ]
+                ]
+            }
+        ],
         "contributors": "Leiter: Manuel Nachname",
         "contributorsText": ""
     },

@@ -1,8 +1,9 @@
 <%#
   Ein Abschnitt im Bearbeitungsmodus, im selben Raster wie auf der Projektseite.
-  Parameter: key (Abschnitts-Schlüssel), section ({ layout, valign, columns })
+  Parameter: key (Abschnitts-Schlüssel), section ({ layout, valign, divider, columns })
   Es gibt immer drei Spalten; das Layout blendet die nicht benötigten aus (CSS + admin.js).
   Die Reihenfolge der Abschnitte ergibt sich aus der Reihenfolge der versteckten sectionKeys-Felder.
+  Über dem Abschnitt sitzt der Knopf für den Trennstrich; beim ersten Abschnitt steht der Strich immer (nur CSS).
 %>
 <%
   const layouts = [['1', 'Ganze Breite'], ['2-1', '⅔ + ⅓'], ['1-2', '⅓ + ⅔'], ['1-1-1', '3 × ⅓']];
@@ -11,6 +12,12 @@
 %>
 <div class="edit-section" data-repeat-item>
     <input type="hidden" name="sectionKeys" value="<%= key %>">
+
+    <label class="edit-divider">
+        <input class="sr-only" type="checkbox" name="section_<%= key %>_divider" value="1"<%= section.divider ? ' checked' : '' %> aria-label="Trennstrich über diesem Abschnitt">
+        <span class="edit-divider-add" aria-hidden="true">+ Trennstrich</span>
+        <span class="edit-divider-remove" aria-hidden="true">Trennstrich entfernen</span>
+    </label>
 
     <div class="edit-section-bar">
         <strong class="edit-section-label">Abschnitt</strong>
@@ -44,6 +51,7 @@
                 <button type="button" data-add-block="text">+ Text</button>
                 <button type="button" data-add-block="image">+ Bild</button>
                 <button type="button" data-add-block="carousel">+ Karussell</button>
+                <button type="button" data-add-block="code">+ Codesample</button>
             </div>
         </div>
         <% }); %>

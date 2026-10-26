@@ -1051,10 +1051,14 @@ nav.nav-on-dark .logo img {
 .cv-body > div {
   overflow: hidden;
 }
-.cv-body p {
-  padding: 0 0 1.1rem;
+.cv-body p,
+.cv-body > div > .rich-list {
+  padding-bottom: 1.1rem;
   color: var(--muted);
   font-size: 0.95rem;
+}
+.cv-body > div > .rich-list {
+  margin-top: 0;
 }
 
 /* ==========================================================
@@ -1204,12 +1208,12 @@ footer.footer--screen .copyright {
   max-width: 34ch;
 }
 
+/* Ohne Trennstrich direkt unter dem Kopf; der Abstand kommt vom Kopf darüber */
 .middlepart {
   max-width: var(--content);
   margin: 0 auto;
-  padding: 4rem var(--gutter);
+  padding: 0 var(--gutter) 4rem;
   align-items: center;
-  border-top: 1px solid var(--border);
 }
 
 .middletext h2 {
@@ -1233,16 +1237,16 @@ footer.footer--screen .copyright {
   align-items: start;
   max-width: none;
   margin: 0;
-  padding: 3.5rem 0;
-  border-top: 1px solid var(--border);
+  padding: 0 0 3.5rem;
 }
 .psection--center {
   align-items: center;
 }
-/* Direkt nach dem Projekttext beginnt der erste Abschnitt ohne Trennstrich */
-.middlepart + .project-sections > .psection:first-child {
-  padding-top: 0;
-  border-top: 0;
+/* Trennstrich: vor dem ersten Abschnitt immer, vor weiteren nur, wenn er im Bearbeitungsmodus gesetzt ist */
+.psection:first-child,
+.psection--divider {
+  padding-top: 3.5rem;
+  border-top: 1px solid var(--border);
 }
 
 /* Mitwirkende: nach dem letzten Abschnitt, wieder mit Strich darüber; Überschrift ⅓, Text ⅔ */
@@ -1266,15 +1270,17 @@ footer.footer--screen .copyright {
 .credits-names {
   margin-top: 0.75rem;
 }
-/* Bausteine in einer Spalte stehen untereinander */
+/* Bausteine in einer Spalte stehen untereinander, immer mit gleichem Abstand
+   (als Lücke statt Außenabstand, damit kein Baustein ihn mit margin: 0 aufhebt) */
 .psection-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   min-width: 0;
 }
-.psection-col > * + * {
-  margin-top: 1.25rem;
-}
-.psection-col > .block-title + * {
-  margin-top: 0.75rem;
+/* Eine Zwischenüberschrift rückt näher an den Baustein darunter */
+.psection-col > .block-title:not(:last-child) {
+  margin-bottom: -0.5rem;
 }
 
 /* Bausteine */
@@ -1294,12 +1300,158 @@ footer.footer--screen .copyright {
 .block-text p + p {
   margin-top: 1rem;
 }
+
+/* Aufzählungen und Links im Text (rich-text.ejs); Unterpunkte mit Kreis, wie das „o“ aus Word */
+.rich-list {
+  margin-top: 0.5rem;
+  padding-left: 1.25rem;
+}
+:not(li) > .rich-list:first-child {
+  margin-top: 0;
+}
+ul.rich-list {
+  list-style: disc;
+}
+ul.rich-list ul.rich-list {
+  list-style: circle;
+}
+ol.rich-list {
+  list-style: decimal;
+}
+.rich-list li {
+  padding-left: 0.25rem;
+}
+.rich-list li + li,
+.rich-list .rich-list {
+  margin-top: 0.3rem;
+}
+.rich-list li::marker {
+  color: var(--text-strong);
+}
+.rich-list + p {
+  margin-top: 1rem;
+}
+.middletext .rich-list {
+  color: var(--muted);
+}
+.rich-link {
+  color: var(--text-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.rich-link:hover {
+  text-decoration-thickness: 2px;
+}
 .block-image figcaption,
+.block-code figcaption,
 .carousel-caption {
   margin-top: 0.75rem;
   font-size: 0.9rem;
   text-align: center;
   color: var(--muted);
+}
+
+/* Codesample: Code im dunklen Editor-Fenster wie bei „Über mich“, mit Zeilennummern und Farben
+   (utils/code.js). Lange Zeilen scrollen seitlich, die Nummern bleiben dabei stehen */
+.code-window {
+  overflow: hidden;
+  background: var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+.code-body {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  max-height: 36rem;
+  overflow: auto;
+  padding: 1rem 0 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: #f0f0f0;
+  tab-size: 4;
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+.code-body:focus-visible {
+  outline: 2px solid #8a8a8a;
+  outline-offset: -2px;
+}
+.code-gutter {
+  position: sticky;
+  left: 0;
+  min-width: 3rem;
+  padding: 0 1rem 0 0.5rem;
+  background: var(--ink);
+  text-align: right;
+  white-space: pre;
+  color: #4d4d4d;
+  user-select: none;
+}
+.code-body pre {
+  padding-right: 1.25rem;
+  font: inherit;
+  white-space: pre;
+}
+.code-body code {
+  font: inherit;
+}
+/* Farben der Code-Bestandteile (Klassen von highlight.js), gedämpft auf dunklem Grund */
+.code-body .hljs-comment,
+.code-body .hljs-quote {
+  color: #6f7680;
+  font-style: italic;
+}
+.code-body .hljs-keyword,
+.code-body .hljs-selector-tag,
+.code-body .hljs-literal,
+.code-body .hljs-doctag {
+  color: #c4a7f5;
+}
+.code-body .hljs-string,
+.code-body .hljs-regexp,
+.code-body .hljs-addition {
+  color: #a9d49c;
+}
+.code-body .hljs-number,
+.code-body .hljs-symbol,
+.code-body .hljs-bullet,
+.code-body .hljs-link {
+  color: #f0c08a;
+}
+.code-body .hljs-title,
+.code-body .hljs-section,
+.code-body .hljs-selector-id,
+.code-body .hljs-selector-class {
+  color: #8db8f2;
+}
+.code-body .hljs-title.class_,
+.code-body .hljs-type,
+.code-body .hljs-built_in {
+  color: #edd27e;
+}
+.code-body .hljs-attr,
+.code-body .hljs-attribute,
+.code-body .hljs-variable,
+.code-body .hljs-template-variable,
+.code-body .hljs-property {
+  color: #f2a285;
+}
+.code-body .hljs-meta,
+.code-body .hljs-tag {
+  color: #8fcfdf;
+}
+.code-body .hljs-name,
+.code-body .hljs-deletion {
+  color: #f08f8f;
+}
+.code-body .hljs-emphasis {
+  font-style: italic;
+}
+.code-body .hljs-strong {
+  font-weight: 700;
 }
 
 /* Projektbilder im festen Format: auf --media-ratio zugeschnitten, ein Klick zeigt das ganze Foto (Bildansicht) */
@@ -2607,10 +2759,62 @@ textarea.input {
 .edit-section {
   counter-increment: eintrag;
   position: relative;
-  margin: 1.5rem -1rem;
+  margin: 3.5rem -1rem 0;
   padding: 0 1rem;
   border: 1.5px dashed #d4d4d4;
   border-radius: var(--radius);
+}
+/* Trennstrich über dem Abschnitt, mittig in der Lücke darüber: per Knopf an und aus,
+   beim ersten Abschnitt immer da (wie auf der Projektseite) */
+.edit-divider {
+  position: absolute;
+  top: -2.5rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 1.5rem;
+}
+.edit-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--border);
+  opacity: 0;
+}
+.edit-divider:has(:checked)::before,
+.edit-section:first-child > .edit-divider::before {
+  opacity: 1;
+}
+.edit-divider span {
+  position: relative;
+  padding: 0.2rem 0.75rem;
+  border: 1px dashed #c4c4c4;
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 0.78rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.edit-divider span:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.edit-divider:focus-within span {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.edit-divider-remove,
+.edit-divider:has(:checked) .edit-divider-add,
+.edit-section:first-child > .edit-divider span {
+  display: none;
+}
+.edit-divider:has(:checked) .edit-divider-remove {
+  display: inline-block;
 }
 .edit-section-bar {
   display: flex;
@@ -2755,6 +2959,45 @@ textarea.input {
 /* Zwischen „+ Abschnitt hinzufügen“ und dem Strich über den Mitwirkenden etwas Luft lassen */
 .page-editor .project-sections:has(+ .project-credits) {
   padding-bottom: 2.5rem;
+}
+
+/* Codesample: dasselbe Fenster, oben der Dateiname, darunter der Code als Textfeld (ohne Farben) */
+.page-editor .code-window:focus-within {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.code-file {
+  flex: 1;
+  min-width: 0;
+  margin-left: 0.6rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #d4d4d4;
+  outline: none;
+}
+.code-input {
+  display: block;
+  width: 100%;
+  min-height: 8rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: #f0f0f0;
+  tab-size: 4;
+  resize: none;
+  outline: none;
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+.code-file::placeholder,
+.code-input::placeholder {
+  color: #6a6a6a;
 }
 
 /* Karussell: alle Bilder als Kacheln auf dunklem Grund, zum Sortieren, Entfernen und Hinzufügen */

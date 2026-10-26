@@ -1,6 +1,6 @@
 <%#
   Ein Baustein im Bearbeitungsmodus, dargestellt wie auf der Projektseite; die Inhalte sind direkt bearbeitbar.
-  Parameter: key (Baustein-Schlüssel), block ({ type, text, images, caption }),
+  Parameter: key (Baustein-Schlüssel), block ({ type, text, file, images, caption }),
   refName (Feldname der Spalte, wird bei jeder Verschiebung per JavaScript angepasst)
 %>
 <% const images = block.images || []; %>
@@ -33,6 +33,17 @@
     <figure class="carousel edit-carousel">
         <%- include('uploader', { key: key, images: images, multiple: true }) %>
         <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Bildunterschrift zum Karussell (optional)" aria-label="Bildunterschrift">
+    </figure>
+    <% } else if (block.type === 'code') { %>
+    <%# Codesample: dasselbe Fenster wie auf der Seite; die Farben kommen erst auf der Seite dazu %>
+    <figure class="block-code">
+        <div class="code-window">
+            <div class="editor-bar"><i></i><i></i><i></i><input class="code-file" name="block_<%= key %>_file" value="<%= block.file || '' %>" maxlength="60" placeholder="Dateiname, z. B. karte.js" aria-label="Dateiname – die Endung bestimmt die Farben"></div>
+            <%# Der Zeilenumbruch nach dem öffnenden Tag ist Absicht: der Browser verschluckt ihn, eine leere erste Zeile bleibt so erhalten %>
+            <textarea class="code-input" name="block_<%= key %>_text" rows="6" wrap="off" spellcheck="false" autocapitalize="off" data-autosize placeholder="Code einfügen – er wird nur angezeigt, nie ausgeführt" aria-label="Code">
+<%= block.text || '' %></textarea>
+        </div>
+        <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Beschreibung (optional)" aria-label="Beschreibung zum Code">
     </figure>
     <% } %>
 </div>

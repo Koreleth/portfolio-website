@@ -1,4 +1,4 @@
-<%# Ein Baustein in einer Spalte. Parameter: block ({ type, text, images, caption }), fallbackAlt %>
+<%# Ein Baustein in einer Spalte. Parameter: block ({ type, text, file, images, caption }), fallbackAlt %>
 <% if (block.type === 'title') { %>
 <h2 class="block-title"><%= block.text %></h2>
 <% } else if (block.type === 'text') { %>
@@ -10,4 +10,17 @@
 </figure>
 <% } else if (block.type === 'carousel') { %>
 <%- include('carousel', { images: block.images, caption: block.caption, label: block.caption || fallbackAlt }) %>
+<% } else if (block.type === 'code') { %>
+<%# Codesample im Editor-Fenster wie bei „Über mich“: nur zum Ansehen, eingefärbt in utils/code.js (html ist maskiert) %>
+<% const code = highlightCode(block.text, block.file); %>
+<figure class="block-code">
+    <div class="code-window">
+        <div class="editor-bar"><i></i><i></i><i></i><em><%= block.file || 'Code' %></em></div>
+        <div class="code-body" tabindex="0" role="region" aria-label="Codesample<%= block.file ? ' ' + block.file : '' %>">
+            <span class="code-gutter" aria-hidden="true"><%= Array.from({ length: code.lines }, (_, index) => index + 1).join('\n') %></span>
+            <pre><code><%- code.html %></code></pre>
+        </div>
+    </div>
+    <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
+</figure>
 <% } %>

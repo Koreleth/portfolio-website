@@ -6,18 +6,20 @@ let { isImagePath, collectImages, removeUnusedUploads } = require('../utils/uplo
  * Aufbau eines Projekts in models/portfoliowork.json:
  *   images:   [Titelbild, zweites Bild (optional)]
  *   sections: beliebig viele Abschnitte untereinander. Jeder Abschnitt hat ein Spalten-Layout
- *             und pro Spalte beliebig viele Bausteine untereinander:
- *     { layout: '2-1', valign: 'center', columns: [[baustein, …], [baustein, …]] }
+ *             und pro Spalte beliebig viele Bausteine untereinander; divider = Trennstrich darüber
+ *             (vor dem ersten Abschnitt steht immer einer):
+ *     { layout: '2-1', valign: 'center', divider: false, columns: [[baustein, …], [baustein, …]] }
  *   Bausteine:
  *     { type: 'title', text }                  – Zwischenüberschrift
- *     { type: 'text', text }                   – Fließtext (Leerzeile = neuer Absatz)
+ *     { type: 'text', text }                   – Fließtext (Leerzeile = neuer Absatz, „- “ = Aufzählung)
  *     { type: 'image', images: [bild], caption }
  *     { type: 'carousel', images: [...], caption }
+ *     { type: 'code', text, file, caption }    – Codesample, nur angezeigt; die Endung von file bestimmt die Farben
  *   contributors:     Namen der Mitwirkenden (nach den Abschnitten, links unter der Überschrift „Mitwirkende“)
  *   contributorsText: freier Text rechts daneben, z. B. eine Danksagung
  *   (beide leer = der Bereich wird nicht angezeigt)
  */
-const BLOCK_TYPES = ['title', 'text', 'image', 'carousel'];
+const BLOCK_TYPES = ['title', 'text', 'image', 'carousel', 'code'];
 
 // Spalten-Layouts im Drittel-Raster und ihre Spaltenanzahl, z. B. '2-1' = ⅔ + ⅓
 const LAYOUTS = { '1': 1, '2-1': 2, '1-2': 2, '1-1-1': 3 };
@@ -75,6 +77,12 @@ const cleanBlock = (block) => {
             return images.length > 0 ? { type: 'image', images: images.slice(0, 1), caption } : null;
         case 'carousel':
             return images.length > 0 ? { type: 'carousel', images, caption } : null;
+        case 'code': {
+            // Code behält seine Einrückung: nur leere Zeilen am Anfang und Leerraum am Ende fallen weg
+            const code = String(block.text || '').replace(/\r\n/g, '\n').replace(/^(?:[ \t]*\n)+/, '').trimEnd();
+            const file = String(block.file || '').trim().slice(0, 60);
+            return code ? { type: 'code', text: code, file, caption } : null;
+        }
         default:
             return null;
     }
@@ -86,7 +94,7 @@ const cleanSections = (sections) => (sections || [])
         const layout = toLayout(section.layout);
         const columns = Array.from({ length: LAYOUTS[layout] }, (_, index) =>
             ((section.columns || [])[index] || []).map(cleanBlock).filter(Boolean));
-        return { layout, valign: section.valign === 'center' ? 'center' : 'top', columns };
+        return { layout, valign: section.valign === 'center' ? 'center' : 'top', divider: Boolean(section.divider), columns };
     })
     .filter(section => section.columns.some(column => column.length > 0));
 

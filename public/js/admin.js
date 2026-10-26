@@ -174,7 +174,7 @@ document.addEventListener('click', (e) => {
 });
 
 // Name der Bausteine im Dialog, z. B. „Bild entfernen?“
-const BLOCK_NAMES = { title: 'Zwischenüberschrift', text: 'Text', image: 'Bild', carousel: 'Karussell' };
+const BLOCK_NAMES = { title: 'Zwischenüberschrift', text: 'Text', image: 'Bild', carousel: 'Karussell', code: 'Codesample' };
 
 // Baustein verschieben (hoch/runter in der Spalte, links/rechts in die Nachbarspalte) oder entfernen
 document.addEventListener('click', (e) => {
@@ -270,7 +270,8 @@ document.addEventListener('change', (e) => {
 // Textfelder wachsen mit ihrem Inhalt, wie der Text auf der Seite
 const autosize = (field) => {
     field.style.height = 'auto';
-    field.style.height = field.scrollHeight + 'px';
+    // Inhalt plus Rahmen und waagerechte Scrollleiste (Code bricht nicht um und scrollt seitlich)
+    field.style.height = field.scrollHeight + field.offsetHeight - field.clientHeight + 'px';
 };
 const autosizeAll = () => document.querySelectorAll('textarea[data-autosize]').forEach(autosize);
 autosizeAll();

@@ -1,4 +1,4 @@
-<%# Mehrzeiliger Text: eine Leerzeile beginnt einen neuen Absatz, einfache Zeilenumbrüche bleiben erhalten %>
-<% String(locals.text || '').split(/\r?\n\s*\r?\n/).filter((paragraph) => paragraph.trim()).forEach((paragraph) => { %>
-<p><% paragraph.trim().split(/\r?\n/).forEach((line, index) => { %><% if (index > 0) { %><br><% } %><%= line %><% }); %></p>
+<%# Mehrzeiliger Text (zerlegt in utils/rich-text.js): Absätze mit Zeilenumbrüchen, Aufzählungen mit Unterpunkten, Links %>
+<% parseRichText(locals.text).forEach((node) => { %>
+<% if (node.type === 'list') { %><%- include('rich-list', { list: node }) %><% } else { %><p><%- include('rich-lines', { lines: node.lines }) %></p><% } %>
 <% }); %>

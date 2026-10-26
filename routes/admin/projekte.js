@@ -15,7 +15,7 @@ const isKey = (key) => /^[a-z0-9]{1,20}$/.test(key);
 
 /**
  * Einen Baustein aus den Formularfeldern lesen: block_<key>_type, _text, _caption,
- * _images (behaltene Bilder, in Reihenfolge) und _files (neue Bilder).
+ * _file (Dateiname beim Codesample), _images (behaltene Bilder, in Reihenfolge) und _files (neue Bilder).
  */
 const readBlock = (body, filesByField, key) => {
   const field = (name) => body['block_' + key + '_' + name];
@@ -25,6 +25,7 @@ const readBlock = (body, filesByField, key) => {
   return {
     type,
     text: field('text'),
+    file: field('file'),
     caption: field('caption'),
     // Bild: ein neues ersetzt das bisherige; Karussell: neue Bilder kommen hinten dazu
     images: type === 'image' ? (uploaded.length > 0 ? uploaded : kept).slice(0, 1) : [...kept, ...uploaded]
@@ -33,7 +34,8 @@ const readBlock = (body, filesByField, key) => {
 
 /**
  * Abschnitte aus den Formularfeldern lesen. Pro Abschnitt: sectionKeys (Reihenfolge),
- * section_<key>_layout, _valign und je Spalte section_<key>_col<n>_blocks (Bausteine in Reihenfolge).
+ * section_<key>_layout, _valign, _divider (Trennstrich darüber) und je Spalte
+ * section_<key>_col<n>_blocks (Bausteine in Reihenfolge).
  */
 const readSections = (body, filesByField) => [].concat(body.sectionKeys || [])
   .filter(isKey)
@@ -43,6 +45,7 @@ const readSections = (body, filesByField) => [].concat(body.sectionKeys || [])
     return {
       layout,
       valign: body['section_' + key + '_valign'],
+      divider: body['section_' + key + '_divider'] === '1',
       columns: Array.from({ length: columnCount }, (_, index) =>
         [].concat(body['section_' + key + '_col' + index + '_blocks'] || [])
           .filter(isKey)

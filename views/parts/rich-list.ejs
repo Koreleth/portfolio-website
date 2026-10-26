@@ -1,0 +1,7 @@
+<%# Eine Aufzählung aus rich-text.ejs; Unterpunkte stehen als eigene Liste im Punkt darüber %>
+<% const tag = list.ordered ? 'ol' : 'ul'; %>
+<<%= tag %> class="rich-list"<% if (list.start !== 1) { %> start="<%= list.start %>"<% } %>>
+<% list.items.forEach((item) => { %>
+    <li><%- include('rich-lines', { lines: item.lines }) %><% item.children.forEach((child) => { %><%- include('rich-list', { list: child }) %><% }); %></li>
+<% }); %>
+</<%= tag %>>

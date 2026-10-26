@@ -1,0 +1,2 @@
+<%# Zeilen eines Absatzes oder Listenpunkts: Umbrüche bleiben erhalten, Adressen werden zu Links (neuer Tab) -%>
+<% lines.forEach((parts, index) => { %><% if (index > 0) { %><br><% } %><% parts.forEach((part) => { %><% if (part.href) { %><a class="rich-link" href="<%= part.href %>" target="_blank" rel="noopener"><%= part.text %></a><% } else { %><%= part.text %><% } %><% }); %><% }); %>
