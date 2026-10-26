@@ -1194,10 +1194,54 @@ footer.footer--screen .copyright {
   }
 }
 
+/* Kopf und Projekttext: dahinter ein Farbverlauf aus dem Titelbild – dasselbe Bild, stark
+   weichgezeichnet und hell überdeckt; nach unten läuft er in den weißen Seitenhintergrund aus */
+.project-top {
+  /* Grauer Text etwas dunkler, damit er auch auf getöntem Grund gut lesbar bleibt */
+  --muted: #4f4f4f;
+  position: relative;
+  isolation: isolate;
+  /* Kopf und Projekttext füllen zusammen einen Bildschirm, beide stehen gemeinsam in der Mitte
+     (oben bleibt Platz für die Navigation); mehr Inhalt darf darüber hinauswachsen */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 6.5rem 0 3rem;
+  overflow: hidden;
+}
+.project-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  filter: blur(90px) saturate(1.4);
+  opacity: 0.4;
+  /* Die weichgezeichneten Ränder werden durchsichtig – größer gezogen liegen sie außerhalb */
+  transform: scale(1.3);
+  pointer-events: none;
+  user-select: none;
+}
+.project-glow[src=""] {
+  display: none;
+}
+.project-top::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.3) 50%, var(--bg) 100%);
+  pointer-events: none;
+}
+
 .upperpart {
+  width: 100%;
   max-width: var(--content);
   margin: 0 auto;
-  padding: 9rem var(--gutter) 4rem;
+  padding: 0 var(--gutter);
   align-items: center;
 }
 
@@ -1208,11 +1252,12 @@ footer.footer--screen .copyright {
   max-width: 34ch;
 }
 
-/* Ohne Trennstrich direkt unter dem Kopf; der Abstand kommt vom Kopf darüber */
+/* Ohne Trennstrich direkt unter dem Kopf */
 .middlepart {
+  width: 100%;
   max-width: var(--content);
   margin: 0 auto;
-  padding: 0 var(--gutter) 4rem;
+  padding: 3rem var(--gutter) 0;
   align-items: center;
 }
 
@@ -3325,10 +3370,6 @@ textarea.input {
     max-width: calc(100vw - 1.5rem);
     max-height: calc(100vh - 9rem);
     max-height: calc(100dvh - 9rem);
-  }
-
-  .upperpart {
-    padding-top: 7rem;
   }
 }
 

@@ -18,77 +18,83 @@
 <main>
 <form class="admin-form page-editor" method="post" action="<%= isNew ? '/admin/projekte' : '/admin/projekte/' + project.id %>" enctype="multipart/form-data">
 
-    <div class="upperpart">
-        <div class="titletext">
-            <% if (error) { %>
-            <div class="alert alert--error" role="alert"><%= error %></div>
-            <% } %>
-            <%# Seitenpfad wie in parts/breadcrumb.ejs; die Kategorie wird direkt hier gewählt %>
-            <div class="breadcrumb" role="navigation" aria-label="Seitenpfad">
-                <ol>
-                    <li>Start</li>
-                    <li>Portfolio</li>
-                    <li>
-                        <select class="inline-select" name="categoryID" required aria-label="Kategorie">
-                            <option value="">Kategorie wählen …</option>
-                            <% categories.forEach((element) => { %>
-                            <option value="<%= element.id %>"<%= categorie && element.id === categorie.id ? ' selected' : '' %>><%= element.name %></option>
-                            <% }); %>
-                        </select>
-                    </li>
-                    <li><span aria-current="page" data-mirror="title"><%= title %></span></li>
-                </ol>
-            </div>
-            <p class="eyebrow">Projekt</p>
-            <h1><textarea class="inline-field" name="title" rows="1" required data-autosize data-single-line placeholder="Titel des Projekts" aria-label="Titel"><%= project.title || '' %></textarea></h1>
-            <div class="inline-slug">
-                <span>Adresse: /portfolio/…/</span>
-                <input class="inline-field" name="slug" value="<%= project.slug || '' %>" placeholder="wird aus dem Titel erzeugt" aria-label="URL-Name">
-            </div>
-            <p><textarea class="inline-field" name="description" rows="2" required maxlength="160" data-autosize placeholder="Kurzbeschreibung – steht auch auf der Projektkarte" aria-label="Kurzbeschreibung"><%= project.description || '' %></textarea></p>
+    <%# Kopf und Projekttext wie auf der Seite: zusammen ein Bildschirm hoch, dahinter der Farbverlauf aus dem Titelbild %>
+    <div class="project-top">
+        <img class="project-glow" src="<%= images[0] || '' %>" alt="" data-cover-glow>
 
-            <p class="eyebrow tools-label">Verwendete Tools</p>
-            <ul class="tools" data-tools-selected><% tools.filter(tool => projectTools.includes(tool.id)).forEach((tool) => { %><li class="tool"><%- include('../parts/tool-icon', { tool: tool }) %><%= tool.name %></li><% }); %></ul>
-            <details class="inline-tools">
-                <summary>Tools auswählen</summary>
-                <div class="tool-picker">
-                    <% tools.forEach((tool) => { %>
-                    <label class="tool-option">
-                        <input type="checkbox" name="tools" value="<%= tool.id %>" data-name="<%= tool.name %>"<%= projectTools.includes(tool.id) ? ' checked' : '' %>>
-                        <%- include('../parts/tool-icon', { tool: tool }) %>
-                        <span><%= tool.name %></span>
-                    </label>
-                    <% }); %>
-                </div>
-                <div class="form-note">Fehlt ein Programm? <a href="/admin/tools/neu">Neues Tool anlegen</a></div>
-            </details>
-        </div>
-
-        <%# Titelbild: ein Klick auf „Titelbild ändern“ tauscht es direkt hier aus %>
-        <div class="titleimg">
-            <div class="zoom inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image<%= images[0] ? '' : ' data-required-image' %>>
-                <img src="<%= images[0] || '' %>" alt="">
-                <label class="inline-image-btn"><span><%= images[0] ? 'Titelbild ändern' : 'Titelbild wählen' %></span><input class="sr-only" type="file" name="cover" accept="image/jpeg,image/png,image/webp,image/gif"></label>
-            </div>
-        </div>
-    </div>
-
-    <div class="middlepart">
-        <%# Zweites Bild; ohne eigenes zweites Bild steht auf der Seite das Titelbild %>
-        <div class="middleimg">
-            <div class="zoom inline-image<%= images[1] ? '' : ' is-fallback' %><%= images[0] || images[1] ? '' : ' is-empty' %>" data-inline-image>
-                <img src="<%= images[1] || images[0] || '' %>" alt="">
-                <span class="inline-image-note">Ohne zweites Bild steht hier das Titelbild</span>
-                <label class="inline-image-btn"><span><%= images[1] ? 'Bild ändern' : 'Zweites Bild wählen' %></span><input class="sr-only" type="file" name="second" accept="image/jpeg,image/png,image/webp,image/gif"></label>
-                <% if (images[1]) { %>
-                <label class="inline-image-remove"><input type="checkbox" name="removeSecond" value="1"> Entfernen</label>
+        <div class="upperpart">
+            <div class="titletext">
+                <% if (error) { %>
+                <div class="alert alert--error" role="alert"><%= error %></div>
                 <% } %>
+                <%# Seitenpfad wie in parts/breadcrumb.ejs; die Kategorie wird direkt hier gewählt %>
+                <div class="breadcrumb" role="navigation" aria-label="Seitenpfad">
+                    <ol>
+                        <li>Start</li>
+                        <li>Portfolio</li>
+                        <li>
+                            <select class="inline-select" name="categoryID" required aria-label="Kategorie">
+                                <option value="">Kategorie wählen …</option>
+                                <% categories.forEach((element) => { %>
+                                <option value="<%= element.id %>"<%= categorie && element.id === categorie.id ? ' selected' : '' %>><%= element.name %></option>
+                                <% }); %>
+                            </select>
+                        </li>
+                        <li><span aria-current="page" data-mirror="title"><%= title %></span></li>
+                    </ol>
+                </div>
+                <p class="eyebrow">Projekt</p>
+                <h1><textarea class="inline-field" name="title" rows="1" required data-autosize data-single-line placeholder="Titel des Projekts" aria-label="Titel"><%= project.title || '' %></textarea></h1>
+                <div class="inline-slug">
+                    <span>Adresse: /portfolio/…/</span>
+                    <input class="inline-field" name="slug" value="<%= project.slug || '' %>" placeholder="wird aus dem Titel erzeugt" aria-label="URL-Name">
+                </div>
+                <p><textarea class="inline-field" name="description" rows="2" required maxlength="160" data-autosize placeholder="Kurzbeschreibung – steht auch auf der Projektkarte" aria-label="Kurzbeschreibung"><%= project.description || '' %></textarea></p>
+
+                <p class="eyebrow tools-label">Verwendete Tools</p>
+                <ul class="tools" data-tools-selected><% tools.filter(tool => projectTools.includes(tool.id)).forEach((tool) => { %><li class="tool"><%- include('../parts/tool-icon', { tool: tool }) %><%= tool.name %></li><% }); %></ul>
+                <details class="inline-tools">
+                    <summary>Tools auswählen</summary>
+                    <div class="tool-picker">
+                        <% tools.forEach((tool) => { %>
+                        <label class="tool-option">
+                            <input type="checkbox" name="tools" value="<%= tool.id %>" data-name="<%= tool.name %>"<%= projectTools.includes(tool.id) ? ' checked' : '' %>>
+                            <%- include('../parts/tool-icon', { tool: tool }) %>
+                            <span><%= tool.name %></span>
+                        </label>
+                        <% }); %>
+                    </div>
+                    <div class="form-note">Fehlt ein Programm? <a href="/admin/tools/neu">Neues Tool anlegen</a></div>
+                </details>
+            </div>
+
+            <%# Titelbild: ein Klick auf „Titelbild ändern“ tauscht es direkt hier aus %>
+            <div class="titleimg">
+                <div class="zoom inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image<%= images[0] ? '' : ' data-required-image' %>>
+                    <img src="<%= images[0] || '' %>" alt="">
+                    <label class="inline-image-btn"><span><%= images[0] ? 'Titelbild ändern' : 'Titelbild wählen' %></span><input class="sr-only" type="file" name="cover" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+                </div>
             </div>
         </div>
 
-        <div class="middletext">
-            <h2 data-mirror="title"><%= title %></h2>
-            <div class="inline-text"><textarea class="inline-field" name="text" rows="5" data-autosize placeholder="Projekttext – eine Leerzeile beginnt einen neuen Absatz" aria-label="Projekttext"><%= project.text || '' %></textarea></div>
+        <div class="middlepart">
+            <%# Zweites Bild; ohne eigenes zweites Bild steht auf der Seite das Titelbild %>
+            <div class="middleimg">
+                <div class="zoom inline-image<%= images[1] ? '' : ' is-fallback' %><%= images[0] || images[1] ? '' : ' is-empty' %>" data-inline-image>
+                    <img src="<%= images[1] || images[0] || '' %>" alt="">
+                    <span class="inline-image-note">Ohne zweites Bild steht hier das Titelbild</span>
+                    <label class="inline-image-btn"><span><%= images[1] ? 'Bild ändern' : 'Zweites Bild wählen' %></span><input class="sr-only" type="file" name="second" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+                    <% if (images[1]) { %>
+                    <label class="inline-image-remove"><input type="checkbox" name="removeSecond" value="1"> Entfernen</label>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="middletext">
+                <%# Eigene Überschrift über dem Projekttext; leer gilt der Titel des Projekts (steht grau als Platzhalter da) %>
+                <h2><textarea class="inline-field" name="textTitle" rows="1" data-autosize data-single-line placeholder="<%= title %>" data-mirror-placeholder="title" aria-label="Überschrift über dem Projekttext – leer steht hier der Titel"><%= project.textTitle || '' %></textarea></h2>
+                <div class="inline-text"><textarea class="inline-field" name="text" rows="5" data-autosize placeholder="Projekttext – eine Leerzeile beginnt einen neuen Absatz" aria-label="Projekttext"><%= project.text || '' %></textarea></div>
+            </div>
         </div>
     </div>
 

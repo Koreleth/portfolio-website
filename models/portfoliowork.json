@@ -110,6 +110,7 @@
             {
                 "layout": "2-1",
                 "valign": "top",
+                "divider": false,
                 "columns": [
                     [
                         {
@@ -143,6 +144,7 @@
             {
                 "layout": "1",
                 "valign": "top",
+                "divider": false,
                 "columns": [
                     [
                         {
@@ -151,7 +153,30 @@
                         },
                         {
                             "type": "text",
-                            "text": "class Karte {\n\n\n}"
+                            "text": "Die Karte wurde als Zweidimensionales Array eingeführt. Jedes Feld hat dabei eine Zahl zugewiesen bekommen."
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1-2",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "code",
+                            "text": "int [][] map = {\n   {0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0},\n   {0,1,1,1,2,  2,1,2,1,2,  2,2,2,2,0},\n   {0,1,0,1,0,  2,0,2,0,2,  0,2,0,2,0},\n   {0,1,1,1,2,  2,1,2,1,2,  2,2,2,2,0},\n   {0,2,0,2,0,  2,0,2,0,2,  0,2,0,2,0},\n\n   {0,2,2,2,2,  2,1,2,1,2,  2,2,2,2,0},\n   {0,1,0,1,0,  1,0,2,0,1,  0,1,0,1,0},\n   {0,2,2,2,2,  2,2,2,2,2,  2,2,2,2,0},\n   {0,1,0,1,0,  1,0,2,0,1,  0,1,0,1,0},\n   {0,2,2,2,2,  2,1,2,1,2,  2,2,2,2,0},\n\n   {0,2,0,2,0,  2,0,2,0,2,  0,2,0,2,0},\n   {0,2,2,2,2,  2,1,2,1,2,  2,1,1,1,0},\n   {0,2,0,2,0,  2,0,2,0,2,  0,1,0,1,0},\n   {0,2,2,2,2,  2,1,2,1,2,  2,1,1,1,0},\n   {0,0,0,0,0,  0,0,0,0,0,  0,0,0,0,0}\n  };",
+                            "file": "karte.js",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "code",
+                            "text": "imageMode(CORNER);\nfor (int i = 0; i < map.length; i++) {\n  for (int j = 0; j < map[i].length; j++) {\n    if (map[i][j] == 0) {\n      image (wall0, j * block, i * block, block, block);\n    } else if (map[i][j] == 1) {\n      image (wall1, j * block, i * block, block, block);\n    } else if (map[i][j] == 2) {\n      image (wall2, j * block, i * block, block, block);\n    } else if (map [i][j] == 3) {\n      image (wall1, j * block, i * block, block, block);\n    }\n    //rect(j * block, i * block, block, block);\n  }\n}",
+                            "file": "karte.js",
+                            "caption": ""
                         }
                     ]
                 ]
@@ -159,6 +184,117 @@
             {
                 "layout": "1",
                 "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "text",
+                            "text": "Hier wurde eine Kollisionsdetektion eingeführt. Es wurde geprüft ob der Nächste Schritt der machbar ist in einen Block führt welche das Feld \"2\" hat. Also eine Wand ist."
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "code",
+                            "text": "if (keys[0]) {\n  if (map [int(((pos.y-speed)-(pHeight/2))/block)][int((pos.x+(pWidth/2))/block)] == 1 &&\n      map [int(((pos.y-speed)-(pHeight/2))/block)][int((pos.x-(pWidth/2))/block)] == 1 ){\n    pos.y -= speed;\n    imageMode (CENTER);\n    PImage currentPic = playerPic.get(24 + (24 * ((frameCount/10)%2)),64,24,32);\n    image (currentPic, pos.x, pos.y - correcture,imageFactor * pWidth, imageFactor * pHeight);\n    lastDirection = 2;\n  } else {\n    imageMode (CENTER);\n    PImage currentPic = playerPic.get(24 + (24 * ((frameCount/10)%2)),64,24,32);\n    image (currentPic, pos.x, pos.y - correcture, imageFactor * pWidth, imageFactor * pHeight);\n    lastDirection = 2;\n  }\n}",
+                            "file": "move.js",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "text",
+                            "text": "Ein Problem war das Spieler auch nicht durch Bomben durchlaufen sollen. Jedoch wird die Bombe dort Platziert wo der Spieler sich befindet. Das heißt: Platziert ein Spieler eine Bombe, steckt er fest. Das soll aber so nicht sein. Um das Problem zu lösen habe ich einen Switch eingebaut."
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "2-1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "code",
+                            "text": "void checkBomb (PVector bombPos, boolean bombActive) {\n  if ( ( ((pos.x) > (bombPos.x - 40) && (pos.x) < (bombPos.x + 40) )  &&  ( (pos.y) > (bombPos.y - 40) && (pos.y) < (bombPos.y + 40) ) )  ) {\n    playerInBomb = true;\n\n  } else {\n    playerInBomb = false;\n\n  }\n}",
+                            "file": "bomb.js",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "code",
+                            "text": "void checkBomb (PVector bombPos, boolean bombActive) {\n  if ( ( ((pos.x) > (bombPos.x - 40) && (pos.x) < (bombPos.x + 40) )  &&  ( (pos.y) > (bombPos.y - 40) && (pos.y) < (bombPos.y + 40) ) )  ) {\n    playerInBomb = true;\n\n  } else {\n    playerInBomb = false;\n\n  }\n}",
+                            "file": "bomb.js",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1-1-1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793023323179-evvk-wall0.jpeg"
+                            ],
+                            "caption": "Unzerstörbare Wand"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Diese Wand wurde mit der Zahl 0 deklariert und ist unzerstörbar."
+                        }
+                    ],
+                    [
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793023323182-tb9r-wall1.jpeg"
+                            ],
+                            "caption": "Durchlaufbare Wand"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Diese Wand wurde mit der Zahl1 deklariert und kann passiert werden (untergrund)."
+                        }
+                    ],
+                    [
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793023323182-4g3v-wall2.jpeg"
+                            ],
+                            "caption": "Zerstörbare Wand"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Diese Wand wurde mit der Zahl 2 deklariert und wird nach Zerstörung zur Zahl 1."
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1",
+                "valign": "top",
+                "divider": false,
                 "columns": [
                     [
                         {
@@ -175,7 +311,8 @@
             }
         ],
         "contributors": "Leiter: Manuel Nachname",
-        "contributorsText": ""
+        "contributorsText": "Vielen Dank :)",
+        "textTitle": "Let´s Play"
     },
     {
         "id": 6,
@@ -268,7 +405,10 @@
         "tools": [
             "illustrator"
         ],
-        "sections": []
+        "sections": [],
+        "textTitle": "Weitere Logos",
+        "contributors": "",
+        "contributorsText": ""
     },
     {
         "id": 9,

@@ -4,7 +4,8 @@ let { isImagePath, collectImages, removeUnusedUploads } = require('../utils/uplo
 
 /*
  * Aufbau eines Projekts in models/portfoliowork.json:
- *   images:   [Titelbild, zweites Bild (optional)]
+ *   images:    [Titelbild, zweites Bild (optional)]
+ *   textTitle: Überschrift über dem Projekttext neben dem zweiten Bild (leer = Titel des Projekts)
  *   sections: beliebig viele Abschnitte untereinander. Jeder Abschnitt hat ein Spalten-Layout
  *             und pro Spalte beliebig viele Bausteine untereinander; divider = Trennstrich darüber
  *             (vor dem ersten Abschnitt steht immer einer):
@@ -171,6 +172,7 @@ const validatePortfolio = (input, portfolios, current) => {
     const title = String(input.title || '').trim();
     const description = String(input.description || '').trim();
     const text = String(input.text || '').trim();
+    const textTitle = String(input.textTitle || '').trim();
     const contributors = String(input.contributors || '').replace(/\r\n/g, '\n').trim();
     const contributorsText = String(input.contributorsText || '').replace(/\r\n/g, '\n').trim();
     const categoryID = parseInt(input.categoryID);
@@ -197,7 +199,7 @@ const validatePortfolio = (input, portfolios, current) => {
     const slug = uniqueSlug(baseSlug, candidate => portfolios.some(element =>
         element.id !== (current && current.id) && element.categoryID === categoryID && element.slug === candidate));
 
-    return { values: { title, description, text, images: [cover, second].filter(Boolean), categoryID, slug, tools, sections, contributors, contributorsText } };
+    return { values: { title, description, textTitle, text, images: [cover, second].filter(Boolean), categoryID, slug, tools, sections, contributors, contributorsText } };
 };
 
 const createPortfolio = (input) => {

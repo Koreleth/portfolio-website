@@ -286,12 +286,17 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.target.matches('[data-single-line]')) e.preventDefault();
 });
 
-// Der Titel steht auch im Seitenpfad und über dem Projekttext
+// Der Titel steht auch im Seitenpfad und – solange dort keine eigene Überschrift steht – über dem Projekttext
 const titleField = document.querySelector('.page-editor [name="title"]');
 if (titleField) {
     titleField.addEventListener('input', () => {
+        const title = titleField.value.trim() || 'Neues Projekt';
         document.querySelectorAll('[data-mirror="title"]').forEach(element => {
-            element.textContent = titleField.value.trim() || 'Neues Projekt';
+            element.textContent = title;
+        });
+        document.querySelectorAll('[data-mirror-placeholder="title"]').forEach(field => {
+            field.placeholder = title;
+            autosize(field);
         });
     });
 }
@@ -332,6 +337,10 @@ document.addEventListener('change', (e) => {
     box.querySelector('img').src = URL.createObjectURL(file);
     box.classList.remove('is-empty', 'is-fallback', 'is-missing');
     box.querySelector('.inline-image-btn span').textContent = 'Bild ändern';
+    // Der Farbverlauf hinter Kopf und Projekttext folgt dem Titelbild
+    if (input.name === 'cover') {
+        document.querySelectorAll('[data-cover-glow]').forEach(glow => { glow.src = box.querySelector('img').src; });
+    }
 });
 
 // Zweites Bild entfernen: auf der Seite steht dann wieder das Titelbild

@@ -2,47 +2,54 @@
   Projektseite. Kopf, Projekttext und alle Abschnitte liegen im selben Raster aus drei gleich breiten
   Spalten (⅓, ⅔ oder ganze Breite, siehe style.css). Alle Bilder haben ein festes Format;
   ein Klick zeigt das ganze Foto (zoom-image.ejs, lightbox.ejs).
+  Kopf und Projekttext füllen zusammen einen Bildschirm; dahinter liegt ein Farbverlauf aus dem Titelbild.
 %>
-<div class="upperpart">
-    <div class="titletext">
-    <%- include('breadcrumb', { items: [
-        { label: 'Start', href: '/' },
-        { label: 'Portfolio', href: '/portfolio' },
-        { label: data.categorie.name, href: '/portfolio/' + data.categorie.slug },
-        { label: data.title }
-    ] }) %>
-    <p class="eyebrow">Projekt</p>
-    <h1><%= data.title %></h1>
-    <p><%= data.description %></p>
+<div class="project-top">
+    <%# Farbverlauf: das Titelbild, stark weichgezeichnet und hell überdeckt (nur Deko, siehe .project-glow) %>
+    <img class="project-glow" src="<%= data.images[0] %>" alt="">
 
-    <% if (data.tools && data.tools.length > 0) { %>
-    <p class="eyebrow tools-label">Verwendete Tools</p>
-    <ul class="tools">
-        <% data.tools.forEach((tool) => { %>
-        <li class="tool"><%- include('tool-icon', { tool: tool }) %><%= tool.name %></li>
-        <% }); %>
-    </ul>
-    <% } %>
+    <div class="upperpart">
+        <div class="titletext">
+        <%- include('breadcrumb', { items: [
+            { label: 'Start', href: '/' },
+            { label: 'Portfolio', href: '/portfolio' },
+            { label: data.categorie.name, href: '/portfolio/' + data.categorie.slug },
+            { label: data.title }
+        ] }) %>
+        <p class="eyebrow">Projekt</p>
+        <h1><%= data.title %></h1>
+        <p><%= data.description %></p>
 
-    <% if (locals.isAdmin) { %>
-    <a class="btn btn-dark btn-small edit-link" href="/admin/projekte/<%= data.id %>/bearbeiten">Projekt bearbeiten</a>
-    <% } %>
+        <% if (data.tools && data.tools.length > 0) { %>
+        <p class="eyebrow tools-label">Verwendete Tools</p>
+        <ul class="tools">
+            <% data.tools.forEach((tool) => { %>
+            <li class="tool"><%- include('tool-icon', { tool: tool }) %><%= tool.name %></li>
+            <% }); %>
+        </ul>
+        <% } %>
+
+        <% if (locals.isAdmin) { %>
+        <a class="btn btn-dark btn-small edit-link" href="/admin/projekte/<%= data.id %>/bearbeiten">Projekt bearbeiten</a>
+        <% } %>
+        </div>
+
+        <div class="titleimg"><%- include('zoom-image', { src: data.images[0], alt: data.title, caption: '', lazy: false, focusable: true }) %></div>
     </div>
 
-    <div class="titleimg"><%- include('zoom-image', { src: data.images[0], alt: data.title, caption: '', lazy: false, focusable: true }) %></div>
-</div>
+    <% if (data.text || data.images[1]) { %>
+    <div class="middlepart">
+        <%# Zweites Bild; ohne eigenes zweites Bild wird das Titelbild verwendet %>
+        <div class="middleimg"><%- include('zoom-image', { src: data.images[1] || data.images[0], alt: data.title, caption: '', lazy: true, focusable: true }) %></div>
 
-<% if (data.text || data.images[1]) { %>
-<div class="middlepart">
-    <%# Zweites Bild; ohne eigenes zweites Bild wird das Titelbild verwendet %>
-    <div class="middleimg"><%- include('zoom-image', { src: data.images[1] || data.images[0], alt: data.title, caption: '', lazy: true, focusable: true }) %></div>
-
-    <div class="middletext">
-        <h2><%= data.title %></h2>
-        <%- include('rich-text', { text: data.text }) %>
+        <div class="middletext">
+            <%# Eigene Überschrift über dem Projekttext; ohne steht hier der Titel des Projekts %>
+            <h2><%= data.textTitle || data.title %></h2>
+            <%- include('rich-text', { text: data.text }) %>
+        </div>
     </div>
+    <% } %>
 </div>
-<% } %>
 
 <% if (data.sections && data.sections.length > 0) { %>
 <%# Weitere Abschnitte aus dem Admin-Bereich: je Abschnitt ein Spalten-Layout, pro Spalte Bausteine untereinander.

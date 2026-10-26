@@ -72,6 +72,7 @@ const formProject = (req, current) => ({
   slug: req.body.slug,
   categoryID: parseInt(req.body.categoryID),
   description: req.body.description,
+  textTitle: req.body.textTitle,
   text: req.body.text,
   contributors: req.body.contributors,
   contributorsText: req.body.contributorsText,
