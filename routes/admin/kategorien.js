@@ -65,7 +65,7 @@ router.route('/:id')
 
   if (result.status !== 200) {
     discardUploads(req);
-    return renderForm(res.status(result.status), { isNew: false, categorie: { ...current.data, ...req.body }, error: result.data });
+    return renderForm(res.status(result.status), { isNew: false, categorie: { ...current.data, ...req.body, featured: req.body.featured === '1' }, error: result.data });
   }
   res.redirect('/admin?hinweis=kategorie-gespeichert#kategorien');
 })

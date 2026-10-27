@@ -20,11 +20,13 @@ let { isImagePath, collectImages, removeUnusedUploads } = require('../utils/uplo
  *     { type: 'compare', images: [vorher, nachher], labels: [links, rechts], caption }
  *                                              – Vorher/Nachher mit Regler; ein noch fehlendes Bild ist null
  *     { type: 'demo', url, format, caption }  – Live-Demo: Website oder Spiel zum Ausprobieren (format '16-9', '4-3', '1-1')
+ *     { type: 'youtube', video, start, format, caption }
+ *                                              – YouTube-Video: video = ID, start = Sekunden, format '9-16' bei Shorts
  *   contributors:     Namen der Mitwirkenden (nach den Abschnitten, links unter der Überschrift „Mitwirkende“)
  *   contributorsText: freier Text rechts daneben, z. B. eine Danksagung
  *   (beide leer = der Bereich wird nicht angezeigt)
  */
-const BLOCK_TYPES = ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo'];
+const BLOCK_TYPES = ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo', 'youtube'];
 const DEMO_FORMATS = ['16-9', '4-3', '1-1'];
 
 // Adresse einer Live-Demo: nur http(s); ohne Angabe wird https:// ergänzt (z. B. „koreleth.github.io/spiel“)
@@ -37,6 +39,40 @@ const toDemoUrl = (value) => {
     } catch (err) {
         return null;
     }
+};
+
+// Startzeit aus einer YouTube-Adresse (t=90, t=90s oder t=1m30s) in Sekunden
+const toSeconds = (value) => {
+    const match = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/.exec(String(value || '').trim());
+    return match ? (parseInt(match[1] || 0) * 3600) + (parseInt(match[2] || 0) * 60) + parseInt(match[3] || 0) : 0;
+};
+
+// YouTube-Video aus einer Adresse: youtube.com/watch?v=…, youtu.be/…, /shorts/…, /embed/…, /live/… oder nur die ID.
+// Shorts sind hochkant (format '9-16'); keine YouTube-Adresse = null
+const toYouTube = (value) => {
+    const text = String(value || '').trim();
+    const isId = (id) => /^[\w-]{11}$/.test(id || '');
+    if (isId(text)) return { video: text, start: 0, format: '16-9' };
+    let url;
+    try {
+        url = new URL(/^[a-z][a-z0-9+.-]*:/i.test(text) ? text : 'https://' + text);
+    } catch (err) {
+        return null;
+    }
+    const host = url.hostname.replace(/^(www|m|music)\./, '');
+    const [kind, id] = url.pathname.split('/').filter(Boolean);
+    let video = null;
+    if (host === 'youtu.be') {
+        video = kind;
+    } else if (['youtube.com', 'youtube-nocookie.com'].includes(host)) {
+        video = kind === 'watch' ? url.searchParams.get('v') : ['embed', 'shorts', 'live', 'v'].includes(kind) ? id : null;
+    }
+    if (!isId(video)) return null;
+    return {
+        video,
+        start: toSeconds(url.searchParams.get('t') || url.searchParams.get('start')),
+        format: kind === 'shorts' ? '9-16' : '16-9'
+    };
 };
 
 // Spalten-Layouts im Drittel-Raster und ihre Spaltenanzahl, z. B. '2-1' = ⅔ + ⅓
@@ -111,6 +147,10 @@ const cleanBlock = (block) => {
             const url = toDemoUrl(block.url);
             const format = DEMO_FORMATS.includes(block.format) ? block.format : '16-9';
             return url ? { type: 'demo', url, format, caption } : null;
+        }
+        case 'youtube': {
+            const video = toYouTube(block.url);
+            return video ? { type: 'youtube', ...video, caption } : null;
         }
         default:
             return null;

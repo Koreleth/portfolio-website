@@ -1,4 +1,4 @@
-<%# Ein Baustein in einer Spalte. Parameter: block ({ type, text, file, url, format, images, labels, caption }), fallbackAlt %>
+<%# Ein Baustein in einer Spalte. Parameter: block ({ type, text, file, url, format, images, labels, video, start, caption }), fallbackAlt %>
 <% if (block.type === 'title') { %>
 <h2 class="block-title"><%= block.text %></h2>
 <% } else if (block.type === 'text') { %>
@@ -59,6 +59,20 @@
         <div class="demo-stage" data-format="<%= block.format %>">
             <button class="demo-start" type="button" data-demo-start data-src="<%= block.url %>"><span class="demo-play" aria-hidden="true"></span>Live-Demo starten</button>
         </div>
+    </div>
+    <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
+</figure>
+<% } else if (block.type === 'youtube') { %>
+<%# YouTube-Video: zuerst nur das Vorschaubild; der Player (youtube-nocookie.com) lädt erst nach Klick (script.js).
+    Shorts stehen hochkant %>
+<% const about = block.caption ? ': ' + block.caption : ''; %>
+<figure class="block-youtube">
+    <div class="youtube" data-youtube="<%= block.video %>" data-start="<%= block.start || 0 %>" data-format="<%= block.format %>" data-title="YouTube-Video<%= about %>">
+        <a class="youtube-trigger" href="https://www.youtube.com/watch?v=<%= block.video %><%= block.start ? '&t=' + block.start + 's' : '' %>" aria-label="Video abspielen<%= about %>">
+            <img src="https://i.ytimg.com/vi/<%= block.video %>/maxresdefault.jpg" alt="" loading="lazy">
+            <span class="play-btn" aria-hidden="true"></span>
+            <span class="youtube-label" aria-hidden="true">YouTube</span>
+        </a>
     </div>
     <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
 </figure>

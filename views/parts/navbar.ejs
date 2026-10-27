@@ -1,9 +1,29 @@
+<% const menuCategories = navCategories(); %>
 <nav>
       <div class="logo"><a href="/#home"> <img src="/img/1Korel-Logo.png" alt="Korel Logo"> </a></div>
       <div class="nav-links">
         <a href="/#home">Home</a>
-        <%# Auf den Unterseiten unter /portfolio ist "Portfolio" fest markiert (activeNav) %>
-        <a href="/#portfolio"<% if (locals.activeNav === 'portfolio') { %> class="nav-active"<% } %>>Portfolio</a>
+        <%# „Portfolio“ führt zur Übersicht aller Kategorien; beim Darüberfahren oder mit der Tab-Taste klappt die Liste
+            der Kategorien auf (nicht auf Touch-Geräten, script.js lädt die Bilder erst dann). Auf den Unterseiten unter
+            /portfolio ist der Punkt fest markiert (activeNav), auf der Startseite beim Bereich #portfolio %>
+        <div class="nav-item">
+          <a href="/portfolio" data-section="portfolio"<% if (locals.activeNav === 'portfolio') { %> class="nav-active"<% } %>>Portfolio<% if (menuCategories.length > 0) { %><span class="nav-caret" aria-hidden="true"></span><% } %></a>
+          <% if (menuCategories.length > 0) { %>
+          <div class="nav-dropdown">
+            <ul>
+              <% menuCategories.forEach((categorie) => { %>
+              <li>
+                <a href="/portfolio/<%= categorie.slug %>">
+                  <img data-src="<%= categorie.images[0] %>" alt="">
+                  <span><strong><%= categorie.name %></strong><small><%= categorie.description %></small></span>
+                </a>
+              </li>
+              <% }); %>
+            </ul>
+            <a class="nav-dropdown-all" href="/portfolio">Alle Kategorien <span aria-hidden="true">&rarr;</span></a>
+          </div>
+          <% } %>
+        </div>
         <a href="/#ueber-mich">Über mich</a>
         <a href="/#kontakt">Kontakt</a>
         <% if (locals.isAdmin) { %><a href="/admin">Admin</a><% } %>

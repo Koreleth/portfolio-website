@@ -19,6 +19,7 @@ var apiRouter = require('./routes/api');
 var adminRouter = require('./routes/admin');
 var richText = require('./utils/rich-text');
 var code = require('./utils/code');
+var categorieController = require('./controllers/categorieController');
 
 var app = express();
 
@@ -31,9 +32,11 @@ if (app.get('env') === 'production') {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// Hilfen für alle Templates: Text in Absätze und Aufzählungen zerlegen, Codesamples einfärben
+// Hilfen für alle Templates: Text in Absätze und Aufzählungen zerlegen, Codesamples einfärben,
+// Kategorien für die Liste unter „Portfolio“ in der Navigation (erst beim Anzeigen gelesen)
 app.locals.parseRichText = richText.parse;
 app.locals.highlightCode = code.highlight;
+app.locals.navCategories = () => categorieController.getCategorieData().data;
 
 app.use(logger('dev'));
 app.use(express.json());

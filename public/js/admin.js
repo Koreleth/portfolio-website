@@ -174,7 +174,7 @@ document.addEventListener('click', (e) => {
 });
 
 // Name der Bausteine im Dialog, z. B. „Bild entfernen?“
-const BLOCK_NAMES = { title: 'Zwischenüberschrift', text: 'Text', image: 'Bild', carousel: 'Karussell', code: 'Codesample', compare: 'Vorher/Nachher', demo: 'Live-Demo' };
+const BLOCK_NAMES = { title: 'Zwischenüberschrift', text: 'Text', image: 'Bild', carousel: 'Karussell', code: 'Codesample', compare: 'Vorher/Nachher', demo: 'Live-Demo', youtube: 'YouTube-Video' };
 
 // Baustein verschieben (hoch/runter in der Spalte, links/rechts in die Nachbarspalte) oder entfernen
 document.addEventListener('click', (e) => {
@@ -355,6 +355,30 @@ document.addEventListener('change', (e) => {
         e.target.closest('[data-format]').dataset.format = e.target.value;
     }
 });
+
+// YouTube-Baustein: Vorschaubild und Format (Shorts hochkant) gleich beim Einfügen der Adresse zeigen.
+// Geprüft wird die Adresse beim Speichern (portfolioController.js); das hier ist nur die Vorschau
+const youtubeId = (text) => {
+    const value = text.trim();
+    if (/^[\w-]{11}$/.test(value)) return value;
+    if (!/(^|\/\/|\.)(youtube(-nocookie)?\.com|youtu\.be)\//i.test(value)) return null;
+    const match = /(?:youtu\.be\/|[?&]v=|\/(?:embed|shorts|live|v)\/)([\w-]{11})(?![\w-])/.exec(value);
+    return match ? match[1] : null;
+};
+const updateYoutube = (input) => {
+    const box = input.closest('[data-youtube-edit]');
+    const id = youtubeId(input.value);
+    const img = box.querySelector('img');
+    const src = id ? 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg' : '';
+    if (img.getAttribute('src') !== src) img.setAttribute('src', src);
+    box.classList.toggle('is-empty', !id);
+    box.classList.toggle('is-invalid', !id && input.value.trim() !== '');
+    box.dataset.format = id && /\/shorts\//i.test(input.value) ? '9-16' : '16-9';
+};
+document.addEventListener('input', (e) => {
+    if (e.target.matches('[data-youtube-edit] .youtube-url')) updateYoutube(e.target);
+});
+document.querySelectorAll('[data-youtube-edit] .youtube-url').forEach(updateYoutube);
 
 // Ausrichtung eines Abschnitts sofort im Raster zeigen
 document.addEventListener('change', (e) => {

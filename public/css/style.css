@@ -266,6 +266,154 @@ nav.nav-on-dark .logo img {
   filter: invert(1);
 }
 
+/* „Portfolio“ mit der Liste der Kategorien: klappt beim Darüberfahren oder mit der Tab-Taste auf (script.js lädt
+   die Bilder erst dann, Esc schließt). Auf Touch-Geräten führt „Portfolio“ direkt zur Übersicht.
+   Die Liste hängt an der Navigation, damit die waagerecht scrollbare Leiste sie nicht abschneidet; auf breiten
+   Bildschirmen steht sie mittig unter dem Menüpunkt */
+.nav-item {
+  display: flex;
+}
+.nav-caret,
+.nav-dropdown {
+  display: none;
+}
+@media (hover: hover) {
+  .nav-caret {
+    display: inline-block;
+    width: 0.38rem;
+    height: 0.38rem;
+    margin-left: 0.45rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    opacity: 0.7;
+    transform: translateY(-0.2em) rotate(45deg);
+    transition: transform 0.3s var(--ease);
+  }
+  .nav-dropdown {
+    display: block;
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: 0;
+    right: 0;
+    padding: 0.45rem;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.3s var(--ease), visibility 0s linear 0.3s;
+  }
+  /* Brücke über den Abstand: beim Hinüberfahren bleibt die Liste offen */
+  .nav-dropdown::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 1rem;
+  }
+  .nav-item:is(:hover, :focus-within) .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  .nav-item:is(:hover, :focus-within) .nav-caret {
+    transform: translateY(0.05em) rotate(225deg);
+  }
+  .nav-item.is-dismissed .nav-dropdown {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@media (hover: hover) and (min-width: 861px) {
+  .nav-links {
+    overflow: visible;
+  }
+  .nav-item {
+    position: relative;
+  }
+  .nav-dropdown {
+    top: calc(100% + 1rem);
+    left: 50%;
+    right: auto;
+    width: 21rem;
+    translate: -50% 0;
+  }
+}
+.nav-dropdown ul {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+nav .nav-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 12px;
+  white-space: normal;
+  font-size: 0.9rem;
+}
+.nav-dropdown img {
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--surface-2);
+  transition: transform 0.4s var(--ease);
+}
+.nav-dropdown a:hover img {
+  transform: scale(1.08);
+}
+.nav-dropdown span {
+  min-width: 0;
+}
+.nav-dropdown strong {
+  display: block;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.nav-dropdown small {
+  display: block;
+  overflow: hidden;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+nav .nav-dropdown .nav-dropdown-all {
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.75rem 0.5rem;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 12px 12px;
+  font-weight: 600;
+}
+/* Über dem Hero und dem Footer dunkel wie die Navigation */
+nav.nav-on-dark .nav-dropdown {
+  background: rgba(24, 24, 24, 0.97);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+nav.nav-on-dark .nav-dropdown strong {
+  color: #fff;
+}
+nav.nav-on-dark .nav-dropdown small {
+  color: rgba(255, 255, 255, 0.6);
+}
+nav.nav-on-dark .nav-dropdown img {
+  background: rgba(255, 255, 255, 0.1);
+}
+nav.nav-on-dark .nav-dropdown .nav-dropdown-all {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
 /* ==========================================================
    Buttons
    ========================================================== */
@@ -704,85 +852,247 @@ nav.nav-on-dark .logo img {
   transform: rotate(-45deg);
 }
 
-/* Startseite: Kategorien als Bild-Kacheln, die zusammen einen Bildschirm füllen */
-.card-index {
-  display: none;
+/* ==========================================================
+   Startseite: drei Kategorien als breite Bänder untereinander, die mit der Überschrift einen Bildschirm füllen.
+   Das Kachelbild liegt abgedunkelt dahinter (links kräftiger für die Schrift); beim Hineinscrollen fliegen die
+   Bänder abwechselnd von links und rechts herein (script.js)
+   ========================================================== */
+.home-work {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr;
+  column-gap: 1.5rem;
+  max-width: calc(var(--content) + 10rem);
+  /* Die hereinfliegenden Bänder schieben die Seite nicht zur Seite */
+  overflow-x: clip;
 }
-.card-grid--fill .card-link {
-  aspect-ratio: 4 / 5;
+.home-work > h2 {
+  grid-column: 1;
 }
-.card-grid--fill .card {
-  justify-content: flex-end;
-  border: 0;
+.home-work-all {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-strong);
+  white-space: nowrap;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+.home-work-all span {
+  transition: transform 0.35s var(--ease);
+}
+.home-work-all:hover {
   background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
 }
-.card-grid--fill .card-img {
+.home-work-all:hover span {
+  transform: translateX(3px);
+}
+.home-work-all:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.home-work > .empty-state {
+  grid-column: 1 / -1;
+}
+
+.home-cats {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-cats > li {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 7rem;
+  max-height: 17rem;
+}
+
+.home-cat {
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas: "index text count arrow";
+  align-items: center;
+  gap: 1.25rem clamp(1rem, 2.5vw, 2rem);
+  padding: clamp(1rem, 2.6vh, 1.75rem) clamp(1.25rem, 3vw, 2.5rem);
+  overflow: hidden;
+  overflow: clip;
+  border-radius: var(--radius-lg);
+  background: var(--ink);
+  color: #fff;
+  box-shadow: var(--shadow);
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+.home-cat-img {
   position: absolute;
   inset: 0;
-  aspect-ratio: auto;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.2);
+  transition: transform 1.2s var(--ease), filter 0.8s ease;
+  user-select: none;
 }
-.card-grid--fill .card-img::after {
+/* Abdunklung: links kräftig, damit die Schrift lesbar bleibt, nach rechts heller */
+.home-cat::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.25));
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(10, 10, 10, 0.86) 0%, rgba(10, 10, 10, 0.6) 40%, rgba(10, 10, 10, 0.38) 70%, rgba(10, 10, 10, 0.64) 100%);
 }
-.card-grid--fill .card-index {
-  display: block;
-  position: absolute;
-  top: 1.1rem;
-  left: 1.25rem;
+.home-cat-index {
+  grid-area: index;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.8);
+}
+.home-cat-text {
+  grid-area: text;
+  min-width: 0;
+}
+.home-cat-text h3 {
+  font-size: clamp(1.6rem, 3.4vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #fff;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  transition: transform 0.5s var(--ease);
+}
+.home-cat-text p {
+  max-width: 46ch;
+  margin-top: 0.45rem;
+  font-size: clamp(0.9rem, 1.1vw, 1.02rem);
+  color: rgba(255, 255, 255, 0.78);
+}
+.home-cat-count {
+  grid-area: count;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
   color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
-.card-grid--fill .card-body {
-  position: relative;
-  padding: 1.25rem 1.4rem 1.35rem;
+.home-cat-arrow {
+  grid-area: arrow;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  font-size: 1.25rem;
+  transition: transform 0.5s var(--ease), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
-.card-grid--fill .card h3 {
-  color: #fff;
-  font-size: clamp(1.1rem, 1.6vw, 1.45rem);
+.home-cat:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
-.card-grid--fill .card p {
-  color: rgba(255, 255, 255, 0.72);
+.home-cat:hover .home-cat-img {
+  transform: scale(1.06);
+  filter: none;
 }
-.card-grid--fill .card-arrow {
-  top: 1rem;
-  bottom: auto;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--ink);
+.home-cat:hover .home-cat-text h3 {
+  transform: translateX(6px);
 }
-.card-grid--fill .card-link:hover .card-arrow {
+.home-cat:hover .home-cat-arrow {
+  border-color: #fff;
   background: #fff;
   color: var(--ink);
+  transform: rotate(-45deg);
+}
+.home-cat:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
 }
 
-/* Letzte Kachel „Alle Kategorien“: dunkel mit Punkteraster wie im Hero */
-.card-link--all .card {
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.16) 1px, transparent 1.6px) 0 0 / 22px 22px,
-    var(--ink);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), var(--shadow-sm);
+/* Hereinfliegen (script.js setzt fly-in, beim Hineinscrollen is-visible und je Band --delay): schräg aus der
+   Tiefe von links bzw. rechts; das Bild zoomt beim Landen heraus, danach erscheint die Schrift */
+.fly-in {
+  opacity: 0;
+  transform: perspective(1400px) translateX(-14vw) rotateY(16deg) scale(0.94);
+  transition: opacity 0.9s ease var(--delay, 0s), transform 1.3s var(--ease) var(--delay, 0s);
 }
-.card-link--all .card-body h3 {
-  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+.fly-in--right {
+  transform: perspective(1400px) translateX(14vw) rotateY(-16deg) scale(0.94);
+}
+.fly-in .home-cat-img {
+  transform: scale(1.25);
+  transition: transform 1.8s var(--ease) var(--delay, 0s);
+}
+.fly-in :is(.home-cat-index, .home-cat-text, .home-cat-count, .home-cat-arrow) {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s ease calc(var(--delay, 0s) + 0.45s), transform 0.9s var(--ease) calc(var(--delay, 0s) + 0.45s);
+}
+.fly-in.is-visible,
+.fly-in.is-visible :is(.home-cat-img, .home-cat-index, .home-cat-text, .home-cat-count, .home-cat-arrow) {
+  opacity: 1;
+  transform: none;
+}
+/* Kurz beim Vorbereiten (script.js): die Ausgangslage gilt sofort, ohne Übergang */
+.fly-in-setup,
+.fly-in-setup * {
+  transition: none !important;
 }
 
-@media (min-width: 861px) {
-  .card-grid--fill {
-    flex: 1 1 auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: stretch;
-    gap: 1.25rem;
+/* Handy und Tablet hoch: der Link zu allen Kategorien unter den Bändern; in den Bändern oben Nummer und Anzahl,
+   unten Name und Pfeil */
+@media (max-width: 860px) {
+  .home-work {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
   }
-  .card-grid--fill .card-link {
-    flex: 0 0 calc((100% - (var(--per-row) - 1) * 1.25rem) / var(--per-row));
-    min-height: 190px;
-    aspect-ratio: auto;
+  .home-work-all {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+    margin-top: 1.5rem;
+  }
+  .home-cats > li {
+    min-height: 10.5rem;
+  }
+  .home-cat {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "index count" "text arrow";
+    align-content: space-between;
+    align-items: end;
+    justify-items: start;
+  }
+  .home-cat-count {
+    justify-self: end;
+    align-self: start;
+  }
+  .home-cat-arrow {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .home-cat::before {
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.88), rgba(10, 10, 10, 0.45) 70%, rgba(10, 10, 10, 0.55));
   }
 }
 
@@ -1640,6 +1950,7 @@ ol.rich-list {
 .block-code figcaption,
 .block-compare figcaption,
 .block-demo figcaption,
+.block-youtube figcaption,
 .carousel-caption {
   margin-top: 0.75rem;
   font-size: 0.9rem;
@@ -1931,6 +2242,76 @@ ol.rich-list {
   border-top: 7px solid transparent;
   border-bottom: 7px solid transparent;
   border-left: 11px solid currentColor;
+}
+
+/* YouTube-Video: Vorschaubild mit Play-Knopf wie bei der Vorstellung auf der Startseite; der Player
+   (youtube-nocookie.com) lädt erst nach Klick (script.js). Shorts stehen hochkant und schmaler */
+.youtube {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+.youtube[data-format="9-16"] {
+  aspect-ratio: 9 / 16;
+  width: min(100%, 22rem);
+  margin-inline: auto;
+}
+.youtube-trigger {
+  position: absolute;
+  inset: 0;
+  display: block;
+  color: #fff;
+}
+.youtube-trigger:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: -6px;
+}
+.youtube img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.82);
+  transition: transform 1s var(--ease), filter 0.6s ease;
+}
+.youtube-trigger::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent 45%);
+}
+.youtube-trigger:hover img {
+  transform: scale(1.04);
+  filter: none;
+}
+.youtube .play-btn {
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+}
+.youtube-trigger:hover .play-btn {
+  transform: scale(1.1);
+}
+.youtube-label {
+  position: absolute;
+  z-index: 1;
+  left: 1.1rem;
+  bottom: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.youtube iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* Übergang zum nächsten Projekt: wie dessen Eyecatcher, als große Karte über dem Footer */
@@ -2728,6 +3109,21 @@ section > h1.section-title {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Kennzeichen in der Liste, z. B. „Startseite“ bei den Kategorien auf der Startseite */
+.admin-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: 0.15em;
+  color: #fff;
+}
 .admin-item-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2759,6 +3155,30 @@ section > h1.section-title {
   margin-bottom: 0.6rem;
 }
 .form-field small {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+/* Einzelnes Kästchen mit Erklärung darunter, z. B. „Auf der Startseite zeigen“ */
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 1.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+.form-check input {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.2rem;
+  accent-color: var(--ink);
+}
+.form-check small {
+  display: block;
   font-size: 0.8rem;
   font-weight: 400;
   color: var(--muted);
@@ -3665,6 +4085,54 @@ textarea.input {
   cursor: default;
 }
 
+/* YouTube-Video im Bearbeitungsmodus: die Adresse unten auf dem Vorschaubild; ohne Video ein dunkles Feld
+   mit dem Eingabefeld in der Mitte (admin.js zeigt das Vorschaubild gleich beim Einfügen) */
+.youtube-url {
+  position: absolute;
+  z-index: 2;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #fff;
+}
+.youtube-url::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+.youtube-url:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.youtube.is-empty {
+  background: radial-gradient(circle at 50% 40%, #2b2b2b, var(--ink) 70%);
+}
+.youtube.is-empty img,
+.youtube.is-empty .play-btn {
+  display: none;
+}
+.youtube.is-empty .youtube-url {
+  top: 50%;
+  bottom: auto;
+  translate: 0 -50%;
+}
+.youtube.is-invalid::after {
+  content: 'Keine YouTube-Adresse erkannt';
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  top: calc(50% + 1.9rem);
+  font-size: 0.8rem;
+  text-align: center;
+  color: #ffb4b4;
+}
+
 /* Codesample: dasselbe Fenster, oben der Dateiname, darunter der Code als Textfeld (ohne Farben) */
 .page-editor .code-window:focus-within {
   outline: 2px solid var(--ink);
@@ -3986,11 +4454,11 @@ textarea.input {
 .reveal-mask.is-done {
   clip-path: none;
 }
-.reveal-mask :is(.zoom, .code-window, .compare, .demo-window) {
+.reveal-mask :is(.zoom, .code-window, .compare, .demo-window, .youtube) {
   transition: box-shadow 0.6s ease;
 }
 .reveal-mask:not(.is-done),
-.reveal-mask:not(.is-done) :is(.zoom, .code-window, .compare, .demo-window) {
+.reveal-mask:not(.is-done) :is(.zoom, .code-window, .compare, .demo-window, .youtube) {
   box-shadow: none;
 }
 .reveal-slide {
@@ -4012,6 +4480,8 @@ textarea.input {
   }
   .reveal { opacity: 1; transform: none; }
   .reveal-mask, .reveal-slide { opacity: 1; transform: none; clip-path: none; }
+  .fly-in,
+  .fly-in :is(.home-cat-img, .home-cat-index, .home-cat-text, .home-cat-count, .home-cat-arrow) { opacity: 1; transform: none; }
   .project-top .project-hero-image { transform: none; translate: none; }
   .zoom:hover img { transform: none; }
 }
@@ -4097,12 +4567,8 @@ textarea.input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.9rem;
   }
-  .card-body,
-  .card-grid--fill .card-body {
+  .card-body {
     padding: 0.8rem 0.9rem 1rem;
-  }
-  .card-grid--fill .card h3 {
-    font-size: 1rem;
   }
   .card h3 {
     font-size: 1rem;

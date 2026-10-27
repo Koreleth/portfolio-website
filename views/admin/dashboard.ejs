@@ -78,7 +78,7 @@
             <li class="admin-item">
                 <img src="<%= categorie.images[0] %>" alt="">
                 <div class="admin-item-text">
-                    <strong><%= categorie.name %></strong>
+                    <strong><%= categorie.name %><% if (categorie.onHome) { %> <span class="admin-badge" title="Eine der drei Kategorien auf der Startseite">Startseite</span><% } %></strong>
                     <small>/portfolio/<%= categorie.slug %> · <%= categorie.projectCount %> Projekt(e)</small>
                 </div>
                 <div class="admin-item-actions">

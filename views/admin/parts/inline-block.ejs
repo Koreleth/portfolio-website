@@ -1,6 +1,6 @@
 <%#
   Ein Baustein im Bearbeitungsmodus, dargestellt wie auf der Projektseite; die Inhalte sind direkt bearbeitbar.
-  Parameter: key (Baustein-Schlüssel), block ({ type, text, file, url, format, images, labels, caption }),
+  Parameter: key (Baustein-Schlüssel), block ({ type, text, file, url, format, images, labels, video, start, caption }),
   refName (Feldname der Spalte, wird bei jeder Verschiebung per JavaScript angepasst)
 %>
 <% const images = block.images || []; %>
@@ -79,6 +79,20 @@
             </div>
         </div>
         <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Beschreibung (optional)" aria-label="Beschreibung zur Live-Demo">
+    </figure>
+    <% } else if (block.type === 'youtube') { %>
+    <%# YouTube-Video: Vorschaubild wie auf der Seite, die Adresse unten darauf (admin.js zeigt das Bild gleich beim Einfügen).
+        Gespeichert ist nur die ID; nach einem Fehler beim Speichern steht hier noch die eingegebene Adresse %>
+    <% const youtubeUrl = !block.video ? (block.url || '')
+        : block.format === '9-16' ? 'https://www.youtube.com/shorts/' + block.video
+        : 'https://www.youtube.com/watch?v=' + block.video + (block.start ? '&t=' + block.start + 's' : ''); %>
+    <figure class="block-youtube">
+        <div class="youtube<%= block.video ? '' : ' is-empty' %>" data-format="<%= block.format || '16-9' %>" data-youtube-edit>
+            <img src="<%= block.video ? 'https://i.ytimg.com/vi/' + block.video + '/hqdefault.jpg' : '' %>" alt="">
+            <span class="play-btn" aria-hidden="true"></span>
+            <input class="youtube-url" name="block_<%= key %>_url" value="<%= youtubeUrl %>" placeholder="YouTube-Adresse einfügen, z. B. https://youtu.be/…" aria-label="Adresse des YouTube-Videos" spellcheck="false" autocomplete="off">
+        </div>
+        <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Beschreibung (optional)" aria-label="Beschreibung zum Video">
     </figure>
     <% } %>
 </div>

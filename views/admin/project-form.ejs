@@ -141,7 +141,7 @@
 <template data-repeat-template="section">
     <%- include('parts/inline-section', { key: '__KEY__', section: { layout: '1', valign: 'top', columns: [[]] } }) %>
 </template>
-<% ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo'].forEach((type) => { %>
+<% ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo', 'youtube'].forEach((type) => { %>
 <template data-block-template="<%= type %>">
     <%- include('parts/inline-block', { key: '__BLOCK__', block: { type: type, images: [] }, refName: '' }) %>
 </template>

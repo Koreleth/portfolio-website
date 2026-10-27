@@ -76,23 +76,6 @@
         "contributorsText": "Vielen Dank an die sehr gute grandiose Volesung etc."
     },
     {
-        "id": 2,
-        "title": "Café Eisberg",
-        "description": "Neugründigung Café Eisberg",
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        "images": [
-            "/img/uploads/1792675447380-9hfb-logo.png",
-            "/img/uploads/1792675447380-6z3e-web-1920-a-1.png"
-        ],
-        "categoryID": 2,
-        "slug": "cafe-eisberg",
-        "tools": [
-            "figma",
-            "vscode"
-        ],
-        "sections": []
-    },
-    {
         "id": 5,
         "title": "Bomberman",
         "description": "Abgabe im 1. Semester - Videospiel",
@@ -334,43 +317,38 @@
         "id": 6,
         "title": "Voices",
         "description": "Ein Kurzfilm in der Kategorie Horror.",
-        "text": "",
+        "text": "Das Modul bestand daraus mit Kamera und Ton umzugehen. Hierfür sollten verscheidene gelernte Kameratechniken benutzt werden welche wir uns im Verlauf unseres Studiums angeeignet haben.",
         "images": [
-            "/img/uploads/1792590962372-qswj-logo.png",
-            "/img/uploads/1792590718783-pd7m-sami.png"
+            "/img/uploads/1793099353082-v41d-voices.png",
+            "/img/uploads/1793105466356-ma1x-voices-text.png"
         ],
         "categoryID": 3,
         "slug": "voices",
-        "tools": [],
+        "tools": [
+            "premiere-pro"
+        ],
         "sections": [
             {
-                "layout": "1-2",
+                "layout": "1",
                 "valign": "top",
+                "divider": false,
                 "columns": [
                     [
                         {
-                            "type": "title",
-                            "text": "Projekt Brot"
-                        },
-                        {
-                            "type": "text",
-                            "text": "Das ist Projekt Brot und Brötchen"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "carousel",
+                            "type": "image",
                             "images": [
-                                "/img/uploads/1792594256318-mr2l-bomberman.png",
-                                "/img/uploads/1792594256321-90z0-bomberman2.png",
-                                "/img/uploads/1792594256324-df91-kill.png"
+                                "/img/uploads/1793099353093-a42w-voices-credits.png"
                             ],
                             "caption": ""
                         }
                     ]
                 ]
             }
-        ]
+        ],
+        "textTitle": "Audio & Videoproduktion",
+        "coverFit": "cover",
+        "contributors": "",
+        "contributorsText": ""
     },
     {
         "id": 7,

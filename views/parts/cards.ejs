@@ -1,20 +1,17 @@
 <%
-  // Startseite: alle Kacheln (inkl. "Alle Kategorien") passen auf einen Bildschirm, die Reihen werden gleichmäßig gefüllt
-  const tiles = data.length + (locals.showAll ? 1 : 0);
-  const rows = tiles <= 3 ? 1 : (tiles <= 8 ? 2 : 3);
-  const perRow = Math.max(1, Math.ceil(tiles / rows));
+  // Kacheln auf /portfolio (Kategorien) und den Kategorieseiten (Projekte); die Startseite hat eigene Bänder (home-categories.ejs).
   // Auf /portfolio ist die Überschrift die Hauptüberschrift der Seite (h1)
   const headingTag = locals.headingTag === 'h1' ? 'h1' : 'h2';
 %>
-<section class="grid<%= locals.fullscreen ? ' screen' : '' %>" id="portfolio">
+<section class="grid" id="portfolio">
   <!-- Render CardItems -->
     <<%= headingTag %> class="section-title"><%= locals.heading || 'Mein Portfolio' %></<%= headingTag %>>
 
-    <% if (tiles === 0) { %>
+    <% if (data.length === 0) { %>
     <p class="empty-state">Hier entstehen gerade neue Projekte – schau bald wieder vorbei.</p>
     <% } else { %>
-    <div class="card-grid<%= locals.fullscreen ? ' card-grid--fill' : '' %>"<% if (locals.fullscreen) { %> style="--per-row: <%= perRow %>"<% } %>>
-      <% data.forEach((element, index)=> { %>
+    <div class="card-grid">
+      <% data.forEach((element)=> { %>
       <%
         // Kategorien führen zu /portfolio/:kategorie, Projekte zu /portfolio/:kategorie/:projekt
         const href = element.type === 'categorie'
@@ -24,7 +21,6 @@
       <a href="<%= href %>" class="card-link">
         <div class="card">
           <div class="card-img"><img src="<%= element.images[0] %>" alt="<%= element.title || element.name %>"></div>
-          <% if (locals.fullscreen) { %><span class="card-index"><%= String(index + 1).padStart(2, '0') %></span><% } %>
           <div class="card-body">
             <h3><%= element.title || element.name %></h3>
             <p><%= element.description%></p>
@@ -40,24 +36,9 @@
         </div>
       </a>
       <% }); %>
-
-      <% if (locals.showAll) { %>
-      <!-- Letzte Kachel: zur Übersicht aller Kategorien -->
-      <a href="/portfolio" class="card-link card-link--all">
-        <div class="card">
-          <div class="card-body">
-            <h3>Alle Kategorien</h3>
-            <p><%= locals.total ? locals.total + ' Kategorien im Überblick' : 'Zur Übersicht' %></p>
-          </div>
-          <span class="card-arrow" aria-hidden="true">&rarr;</span>
-        </div>
-      </a>
-      <% } %>
     </div>
     <% } %>
 
-    <% if (!locals.fullscreen) { %>
     <div class="line"></div>
-    <% } %>
 
   </section>

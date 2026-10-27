@@ -6,14 +6,35 @@ const getCategorieData = () => {
     return { status: 200, data: store.read('categorie') };
 }
 
+// Die Startseite zeigt drei Kategorien: zuerst die mit „Auf der Startseite zeigen“ (featured), dann die übrigen in ihrer Reihenfolge
+const HOME_COUNT = 3;
+const pickHomeCategories = (categories) =>
+    [...categories.filter(categorie => categorie.featured), ...categories.filter(categorie => !categorie.featured)].slice(0, HOME_COUNT);
+
+const countProjects = (portfolios, categorie) =>
+    portfolios.filter(portfolio => portfolio.categoryID === parseInt(categorie.id)).length;
+
+// Kategorien der Startseite mit der Anzahl ihrer Projekte
+const getHomeCategories = () => {
+    const portfolios = store.read('portfoliowork');
+    const categories = pickHomeCategories(store.read('categorie')).map(categorie => ({
+        ...categorie,
+        projectCount: countProjects(portfolios, categorie)
+    }));
+    return { status: 200, data: categories };
+}
+
 /* ---------- Admin: Kategorien verwalten ---------- */
 
-// Alle Kategorien mit der Anzahl ihrer Projekte (für die Admin-Übersicht)
+// Alle Kategorien mit der Anzahl ihrer Projekte und ob sie auf der Startseite stehen (für die Admin-Übersicht)
 const getCategoriesForAdmin = () => {
     const portfolios = store.read('portfoliowork');
-    const categories = store.read('categorie').map(categorie => ({
+    const all = store.read('categorie');
+    const onHome = pickHomeCategories(all);
+    const categories = all.map(categorie => ({
         ...categorie,
-        projectCount: portfolios.filter(portfolio => portfolio.categoryID === parseInt(categorie.id)).length
+        projectCount: countProjects(portfolios, categorie),
+        onHome: onHome.includes(categorie)
     }));
     return { status: 200, data: categories };
 }
@@ -28,7 +49,7 @@ const getCategorieById = (id) => {
 
 /**
  * Prüft die Formulardaten einer Kategorie.
- * @param {Object} input - name, slug, description, image (neu hochgeladenes Bild)
+ * @param {Object} input - name, slug, description, image (neu hochgeladenes Bild), featured ('1' = auf der Startseite zeigen)
  * @param {Array} categories - alle vorhandenen Kategorien
  * @param {Object|null} current - die bearbeitete Kategorie (null beim Anlegen)
  * @returns {Object} - { values } oder { error }
@@ -48,7 +69,7 @@ const validateCategorie = (input, categories, current) => {
     const slug = uniqueSlug(baseSlug, candidate => categories.some(element =>
         element !== current && element.slug === candidate));
 
-    return { values: { type: 'categorie', name, description, images: [image], slug } };
+    return { values: { type: 'categorie', name, description, images: [image], slug, featured: input.featured === '1' } };
 }
 
 const createCategorie = (input) => {
@@ -104,6 +125,7 @@ const deleteCategorie = (id) => {
 
 module.exports = {
     getCategorieData,
+    getHomeCategories,
     getCategoriesForAdmin,
     getCategorieById,
     createCategorie,

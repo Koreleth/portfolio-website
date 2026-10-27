@@ -43,8 +43,8 @@
     </section>
 
 
-<%# Startseite: bis zu 5 Kategorien + Kachel "Alle Kategorien" (→ /portfolio) %>
-<%- include('parts/cards', {data: data.categories.slice(0, 5), fullscreen: true, showAll: true, total: data.categories.length} ) %>
+<%# Startseite: drei Kategorien als breite Bänder (Auswahl im Admin-Bereich), daneben der Weg zu allen (→ /portfolio) %>
+<%- include('parts/home-categories', { data: data.homeCategories, total: data.categories.length }) %>
 
 
     <section class="about screen" id="ueber-mich">

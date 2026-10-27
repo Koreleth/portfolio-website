@@ -1,0 +1,31 @@
+<%#
+  Startseite: drei Kategorien als breite Bänder untereinander, das Kachelbild abgedunkelt im Hintergrund.
+  Welche drei, bestimmt „Auf der Startseite zeigen“ im Admin-Bereich (categorieController.js).
+  Beim Hineinscrollen fliegen die Bänder abwechselnd von links und rechts herein (script.js).
+  Parameter: data (Kategorien mit projectCount), total (Anzahl aller Kategorien)
+%>
+<section class="screen home-work" id="portfolio">
+    <h2>Mein Portfolio</h2>
+    <a class="home-work-all" href="/portfolio"><%= total > data.length ? 'Alle ' + total + ' Kategorien' : 'Zur Übersicht' %> <span aria-hidden="true">&rarr;</span></a>
+
+    <% if (data.length === 0) { %>
+    <p class="empty-state">Hier entstehen gerade neue Projekte – schau bald wieder vorbei.</p>
+    <% } else { %>
+    <ul class="home-cats">
+        <% data.forEach((categorie, index) => { %>
+        <li>
+            <a class="home-cat" href="/portfolio/<%= categorie.slug %>">
+                <img class="home-cat-img" src="<%= categorie.images[0] %>" alt="" loading="lazy" draggable="false">
+                <span class="home-cat-index" aria-hidden="true"><%= String(index + 1).padStart(2, '0') %></span>
+                <div class="home-cat-text">
+                    <h3><%= categorie.name %></h3>
+                    <p><%= categorie.description %></p>
+                </div>
+                <span class="home-cat-count"><%= categorie.projectCount === 0 ? 'Bald mehr' : categorie.projectCount + (categorie.projectCount === 1 ? ' Projekt' : ' Projekte') %></span>
+                <span class="home-cat-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+        <% }); %>
+    </ul>
+    <% } %>
+</section>

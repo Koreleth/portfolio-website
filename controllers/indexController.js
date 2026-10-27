@@ -12,6 +12,7 @@ const getIndex = () => {
         status: 200,
         data: {
             categories: categorieController.getCategorieData().data,
+            homeCategories: categorieController.getHomeCategories().data,
             lifeline: personaldataController.getLifeline().data,
             about: aboutController.getAboutData().data
         },

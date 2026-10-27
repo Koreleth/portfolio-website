@@ -39,6 +39,13 @@
             removeName: ''
         }) %>
 
+        <label class="form-check">
+            <input type="checkbox" name="featured" value="1"<%= categorie.featured ? ' checked' : '' %>>
+            <span>Auf der Startseite zeigen
+                <small>Die Startseite zeigt drei Kategorien: zuerst die ausgewählten, die übrigen Plätze füllen die ersten Kategorien der Liste.</small>
+            </span>
+        </label>
+
         <div class="form-actions">
             <button class="btn btn-dark" type="submit">Speichern</button>
             <a class="btn btn-outline" href="/admin#kategorien">Abbrechen</a>

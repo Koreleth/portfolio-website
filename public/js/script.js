@@ -151,7 +151,9 @@ document.addEventListener("DOMContentLoaded", function() {
  //Elemente active in navbar (über die IDs der Sektionen)
 document.addEventListener("DOMContentLoaded", function() {
     const sections = document.querySelectorAll('section[id], footer[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    // Nur die Menüpunkte selbst (nicht die Kategorien im Dropdown); „Portfolio“ führt zu /portfolio und
+    // nennt seinen Bereich der Startseite in data-section
+    const navLinks = document.querySelectorAll('.nav-links > a, .nav-item > a');
     // Nur auf der Startseite; Unterseiten markieren den Menüpunkt serverseitig (activeNav)
     if (!document.querySelector('.hero')) return;
 
@@ -167,7 +169,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         navLinks.forEach((link) => {
-            link.classList.toggle('nav-active', link.hash === '#' + current.id);
+            const target = link.dataset.section ? '#' + link.dataset.section : link.hash;
+            link.classList.toggle('nav-active', target === '#' + current.id);
         });
     }
 
@@ -209,6 +212,66 @@ document.addEventListener("DOMContentLoaded", function() {
         item.style.transitionDelay = (i % 4) * 80 + 'ms';
       }
       observer.observe(item);
+    });
+});
+
+// STARTSEITE: die Kategorie-Bänder fliegen beim Hineinscrollen herein – abwechselnd von links und rechts,
+// die zugleich sichtbaren kurz nacheinander (Aussehen in style.css unter .fly-in)
+document.addEventListener("DOMContentLoaded", function() {
+    const bands = [...document.querySelectorAll('.home-cats > li')];
+    if (bands.length === 0 || !('IntersectionObserver' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.filter(entry => entry.isIntersecting).forEach((entry, index) => {
+            entry.target.style.setProperty('--delay', index * 0.14 + 's');
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.3 });
+
+    // Ausgangslage ohne Übergang setzen – sonst blenden die Bänder erst aus, bevor sie hereinfliegen
+    const list = bands[0].parentElement;
+    list.classList.add('fly-in-setup');
+    bands.forEach((band, index) => {
+        band.classList.add('fly-in');
+        if (index % 2 === 1) band.classList.add('fly-in--right');
+    });
+    void list.offsetWidth;
+    list.classList.remove('fly-in-setup');
+    bands.forEach(band => observer.observe(band));
+
+    // Nach der Landung ohne die Klassen, damit Hover und Übergänge wieder wie gewohnt laufen
+    document.addEventListener('transitionend', (e) => {
+        if (e.propertyName === 'transform' && e.target.matches('.fly-in.is-visible')) {
+            e.target.classList.remove('fly-in', 'fly-in--right', 'is-visible');
+            e.target.style.removeProperty('--delay');
+        }
+    });
+});
+
+// NAVIGATION: unter „Portfolio“ klappt die Liste der Kategorien auf (style.css); die Bilder laden erst beim ersten
+// Aufklappen, Esc schließt die Liste wieder
+document.addEventListener("DOMContentLoaded", function() {
+    const item = document.querySelector('.nav-item');
+    if (!item) return;
+
+    const loadImages = () => item.querySelectorAll('img[data-src]').forEach(img => {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+    });
+    item.addEventListener('pointerenter', loadImages, { once: true });
+    item.addEventListener('focusin', loadImages, { once: true });
+
+    // Zu bleibt sie, bis Maus oder Fokus den Menüpunkt verlassen
+    item.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        item.classList.add('is-dismissed');
+        item.querySelector('a').focus();
+    });
+    item.addEventListener('pointerleave', () => item.classList.remove('is-dismissed'));
+    item.addEventListener('focusout', (e) => {
+        if (!item.contains(e.relatedTarget)) item.classList.remove('is-dismissed');
     });
 });
 
@@ -473,7 +536,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // von links, Texte von unten herein – die Bausteine einer Spalte nacheinander
     if (!('IntersectionObserver' in window)) return;
     const effects = [
-        ['.psection-col > :is(.block-image, .carousel, .block-code, .block-compare, .block-demo), .next-project', 'reveal-mask'],
+        ['.psection-col > :is(.block-image, .carousel, .block-code, .block-compare, .block-demo, .block-youtube), .next-project', 'reveal-mask'],
         ['.psection-col > .block-title, .credits .block-title', 'reveal-slide'],
         ['.psection-col > .block-text, .credits .block-text', 'reveal']
     ];
@@ -639,5 +702,36 @@ document.addEventListener("DOMContentLoaded", function() {
             fullscreen.hidden = !stage.requestFullscreen;
         });
         fullscreen.addEventListener('click', () => stage.requestFullscreen());
+    });
+});
+
+// YOUTUBE (Projektseite): zuerst nur das Vorschaubild, der Player (youtube-nocookie.com) lädt erst beim Klick
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('[data-youtube]').forEach(box => {
+        const trigger = box.querySelector('.youtube-trigger');
+        const img = trigger.querySelector('img');
+
+        // Ohne Vorschaubild in hoher Auflösung liefert YouTube ein winziges Ersatzbild – dann die mittlere Auflösung
+        const fallback = () => {
+            if (img.naturalWidth <= 120 && !img.src.endsWith('/hqdefault.jpg')) img.src = img.src.replace(/[^/]+$/, 'hqdefault.jpg');
+        };
+        img.addEventListener('load', fallback);
+        img.addEventListener('error', fallback);
+        if (img.complete) fallback();
+
+        trigger.addEventListener('click', (e) => {
+            // Strg-/Cmd-/Shift-Klick öffnet das Video wie gewohnt auf YouTube
+            if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+            e.preventDefault();
+            const start = parseInt(box.dataset.start) || 0;
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://www.youtube-nocookie.com/embed/' + box.dataset.youtube + '?autoplay=1&rel=0' + (start ? '&start=' + start : '');
+            iframe.title = box.dataset.title;
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.allowFullscreen = true;
+            trigger.replaceWith(iframe);
+            iframe.focus();
+        });
     });
 });
