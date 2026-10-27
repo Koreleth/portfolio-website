@@ -18,62 +18,67 @@
 <main>
 <form class="admin-form page-editor" method="post" action="<%= isNew ? '/admin/projekte' : '/admin/projekte/' + project.id %>" enctype="multipart/form-data">
 
-    <%# Kopf und Projekttext wie auf der Seite: zusammen ein Bildschirm hoch, dahinter der Farbverlauf aus dem Titelbild %>
-    <div class="project-top">
-        <img class="project-glow" src="<%= images[0] || '' %>" alt="" data-cover-glow>
+    <%# Kopf und Projekttext wie auf der Seite: der Eyecatcher mit dem Titelbild füllt einen Bildschirm, der Projekttext
+        folgt darunter. Der ganze Bereich ist das Feld fürs Titelbild (das Bild muss das erste img darin sein) %>
+    <div class="project-top inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image<%= images[0] ? '' : ' data-required-image' %> data-fit="<%= project.coverFit === 'contain' ? 'contain' : 'cover' %>">
+        <%# Eyecatcher: Felder auf dem Bild; unten rechts Darstellung und „Titelbild ändern“ %>
+        <div class="project-hero">
+            <span class="project-hero-media">
+                <img class="project-hero-image" src="<%= images[0] || '' %>" alt="">
+                <img class="project-hero-backdrop" src="<%= images[0] || '' %>" alt="" data-cover-glow>
+            </span>
 
-        <div class="upperpart">
-            <div class="titletext">
-                <% if (error) { %>
-                <div class="alert alert--error" role="alert"><%= error %></div>
-                <% } %>
-                <%# Seitenpfad wie in parts/breadcrumb.ejs; die Kategorie wird direkt hier gewählt %>
-                <div class="breadcrumb" role="navigation" aria-label="Seitenpfad">
-                    <ol>
-                        <li>Start</li>
-                        <li>Portfolio</li>
-                        <li>
-                            <select class="inline-select" name="categoryID" required aria-label="Kategorie">
-                                <option value="">Kategorie wählen …</option>
-                                <% categories.forEach((element) => { %>
-                                <option value="<%= element.id %>"<%= categorie && element.id === categorie.id ? ' selected' : '' %>><%= element.name %></option>
-                                <% }); %>
-                            </select>
-                        </li>
-                        <li><span aria-current="page" data-mirror="title"><%= title %></span></li>
-                    </ol>
-                </div>
-                <p class="eyebrow">Projekt</p>
-                <h1><textarea class="inline-field" name="title" rows="1" required data-autosize data-single-line placeholder="Titel des Projekts" aria-label="Titel"><%= project.title || '' %></textarea></h1>
-                <div class="inline-slug">
-                    <span>Adresse: /portfolio/…/</span>
-                    <input class="inline-field" name="slug" value="<%= project.slug || '' %>" placeholder="wird aus dem Titel erzeugt" aria-label="URL-Name">
-                </div>
-                <p><textarea class="inline-field" name="description" rows="2" required maxlength="160" data-autosize placeholder="Kurzbeschreibung – steht auch auf der Projektkarte" aria-label="Kurzbeschreibung"><%= project.description || '' %></textarea></p>
-
-                <p class="eyebrow tools-label">Verwendete Tools</p>
-                <ul class="tools" data-tools-selected><% tools.filter(tool => projectTools.includes(tool.id)).forEach((tool) => { %><li class="tool"><%- include('../parts/tool-icon', { tool: tool }) %><%= tool.name %></li><% }); %></ul>
-                <details class="inline-tools">
-                    <summary>Tools auswählen</summary>
-                    <div class="tool-picker">
-                        <% tools.forEach((tool) => { %>
-                        <label class="tool-option">
-                            <input type="checkbox" name="tools" value="<%= tool.id %>" data-name="<%= tool.name %>"<%= projectTools.includes(tool.id) ? ' checked' : '' %>>
-                            <%- include('../parts/tool-icon', { tool: tool }) %>
-                            <span><%= tool.name %></span>
-                        </label>
-                        <% }); %>
+            <div class="upperpart">
+                <div class="titletext">
+                    <% if (error) { %>
+                    <div class="alert alert--error" role="alert"><%= error %></div>
+                    <% } %>
+                    <%# Seitenpfad als Überzeile wie auf der Seite; die Kategorie wird direkt hier gewählt %>
+                    <div class="breadcrumb hero-path" role="navigation" aria-label="Seitenpfad">
+                        <ol>
+                            <li>Portfolio</li>
+                            <li>
+                                <select class="inline-select" name="categoryID" required aria-label="Kategorie">
+                                    <option value="">Kategorie wählen …</option>
+                                    <% categories.forEach((element) => { %>
+                                    <option value="<%= element.id %>"<%= categorie && element.id === categorie.id ? ' selected' : '' %>><%= element.name %></option>
+                                    <% }); %>
+                                </select>
+                            </li>
+                        </ol>
                     </div>
-                    <div class="form-note">Fehlt ein Programm? <a href="/admin/tools/neu">Neues Tool anlegen</a></div>
-                </details>
+                    <h1><textarea class="inline-field" name="title" rows="1" required data-autosize data-single-line placeholder="Titel des Projekts" aria-label="Titel"><%= project.title || '' %></textarea></h1>
+                    <div class="inline-slug">
+                        <span>Adresse: /portfolio/…/</span>
+                        <input class="inline-field" name="slug" value="<%= project.slug || '' %>" placeholder="wird aus dem Titel erzeugt" aria-label="URL-Name">
+                    </div>
+                    <p><textarea class="inline-field" name="description" rows="2" required maxlength="160" data-autosize placeholder="Kurzbeschreibung – steht auch auf der Projektkarte" aria-label="Kurzbeschreibung"><%= project.description || '' %></textarea></p>
+
+                    <ul class="tools" data-tools-selected aria-label="Verwendete Tools"><% tools.filter(tool => projectTools.includes(tool.id)).forEach((tool) => { %><li class="tool"><%- include('../parts/tool-icon', { tool: tool }) %><%= tool.name %></li><% }); %></ul>
+                    <details class="inline-tools">
+                        <summary>Tools auswählen</summary>
+                        <div class="tool-picker">
+                            <% tools.forEach((tool) => { %>
+                            <label class="tool-option">
+                                <input type="checkbox" name="tools" value="<%= tool.id %>" data-name="<%= tool.name %>"<%= projectTools.includes(tool.id) ? ' checked' : '' %>>
+                                <%- include('../parts/tool-icon', { tool: tool }) %>
+                                <span><%= tool.name %></span>
+                            </label>
+                            <% }); %>
+                        </div>
+                        <div class="form-note">Fehlt ein Programm? <a href="/admin/tools/neu">Neues Tool anlegen</a></div>
+                    </details>
+                </div>
             </div>
 
-            <%# Titelbild: ein Klick auf „Titelbild ändern“ tauscht es direkt hier aus %>
-            <div class="titleimg">
-                <div class="zoom inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image<%= images[0] ? '' : ' data-required-image' %>>
-                    <img src="<%= images[0] || '' %>" alt="">
-                    <label class="inline-image-btn"><span><%= images[0] ? 'Titelbild ändern' : 'Titelbild wählen' %></span><input class="sr-only" type="file" name="cover" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+            <div class="hero-tools">
+                <%# Füllen: das Bild füllt die ganze Breite; Ganz zeigen: vollständig, z. B. für Logos %>
+                <div class="hero-fit" role="radiogroup" aria-label="Darstellung des Titelbilds">
+                    <% [['cover', 'Füllen'], ['contain', 'Ganz zeigen']].forEach(([value, label]) => { %>
+                    <label><input class="sr-only" type="radio" name="coverFit" value="<%= value %>"<%= (project.coverFit === 'contain' ? 'contain' : 'cover') === value ? ' checked' : '' %> data-fit-input><span><%= label %></span></label>
+                    <% }); %>
                 </div>
+                <label class="inline-image-btn"><span><%= images[0] ? 'Titelbild ändern' : 'Titelbild wählen' %></span><input class="sr-only" type="file" name="cover" accept="image/jpeg,image/png,image/webp,image/gif"></label>
             </div>
         </div>
 
@@ -96,6 +101,9 @@
                 <div class="inline-text"><textarea class="inline-field" name="text" rows="5" data-autosize placeholder="Projekttext – eine Leerzeile beginnt einen neuen Absatz" aria-label="Projekttext"><%= project.text || '' %></textarea></div>
             </div>
         </div>
+
+        <%# Farbverlauf hinter dem Projekttext; steht am Ende, damit das Titelbild das erste Bild im Feld bleibt %>
+        <img class="project-glow" src="<%= images[0] || '' %>" alt="" data-cover-glow>
     </div>
 
     <%# Weitere Abschnitte: Layout und Reihenfolge in der Leiste über jedem Abschnitt, Bausteine direkt in den Spalten %>
@@ -133,7 +141,7 @@
 <template data-repeat-template="section">
     <%- include('parts/inline-section', { key: '__KEY__', section: { layout: '1', valign: 'top', columns: [[]] } }) %>
 </template>
-<% ['title', 'text', 'image', 'carousel', 'code'].forEach((type) => { %>
+<% ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo'].forEach((type) => { %>
 <template data-block-template="<%= type %>">
     <%- include('parts/inline-block', { key: '__BLOCK__', block: { type: type, images: [] }, refName: '' }) %>
 </template>

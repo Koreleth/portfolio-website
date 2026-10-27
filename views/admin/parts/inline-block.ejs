@@ -1,6 +1,6 @@
 <%#
   Ein Baustein im Bearbeitungsmodus, dargestellt wie auf der Projektseite; die Inhalte sind direkt bearbeitbar.
-  Parameter: key (Baustein-Schlüssel), block ({ type, text, file, images, caption }),
+  Parameter: key (Baustein-Schlüssel), block ({ type, text, file, url, format, images, labels, caption }),
   refName (Feldname der Spalte, wird bei jeder Verschiebung per JavaScript angepasst)
 %>
 <% const images = block.images || []; %>
@@ -44,6 +44,41 @@
 <%= block.text || '' %></textarea>
         </div>
         <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Beschreibung (optional)" aria-label="Beschreibung zum Code">
+    </figure>
+    <% } else if (block.type === 'compare') { %>
+    <%# Vorher/Nachher: hier beide Bilder nebeneinander mit ihrer Beschriftung; auf der Seite liegen sie übereinander mit Regler %>
+    <figure class="block-compare">
+        <div class="edit-compare">
+            <% [['before', 'Vorher'], ['after', 'Nachher']].forEach(([side, label], index) => { %>
+            <div>
+                <input class="inline-field edit-compare-label" name="block_<%= key %>_<%= side %>Label" value="<%= (block.labels || [])[index] || '' %>" maxlength="40" placeholder="<%= label %>" aria-label="Beschriftung <%= label %>">
+                <div class="zoom inline-image<%= images[index] ? '' : ' is-empty' %>" data-inline-image>
+                    <% if (images[index]) { %><input type="hidden" name="block_<%= key %>_<%= side %>" value="<%= images[index] %>"><% } %>
+                    <img src="<%= images[index] || '' %>" alt="">
+                    <label class="inline-image-btn"><span><%= images[index] ? 'Bild ändern' : label + '-Bild wählen' %></span><input class="sr-only" type="file" name="block_<%= key %>_<%= side %>File" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Bildunterschrift (optional)" aria-label="Bildunterschrift">
+    </figure>
+    <% } else if (block.type === 'demo') { %>
+    <%# Live-Demo: Adresse in der Leiste, Format unten rechts; auf der Seite lädt die Demo erst nach Klick auf „Starten“ %>
+    <figure class="block-demo">
+        <div class="demo-window">
+            <div class="editor-bar"><i></i><i></i><i></i><input class="code-file" name="block_<%= key %>_url" value="<%= block.url || '' %>" placeholder="Adresse, z. B. https://koreleth.github.io/arcade-game/" aria-label="Adresse der Website oder des Spiels"></div>
+            <div class="demo-stage" data-format="<%= block.format || '16-9' %>">
+                <span class="demo-start" aria-hidden="true"><span class="demo-play"></span>Live-Demo starten</span>
+                <label class="edit-demo-format">Format
+                    <select name="block_<%= key %>_format" data-demo-format>
+                        <% [['16-9', 'Breit 16:9'], ['4-3', 'Klassisch 4:3'], ['1-1', 'Quadrat 1:1']].forEach(([value, label]) => { %>
+                        <option value="<%= value %>"<%= (block.format || '16-9') === value ? ' selected' : '' %>><%= label %></option>
+                        <% }); %>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Beschreibung (optional)" aria-label="Beschreibung zur Live-Demo">
     </figure>
     <% } %>
 </div>

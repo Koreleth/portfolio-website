@@ -78,6 +78,15 @@ function animateText(textElement) {
     });
 });
 
+// Kann ein Element unter dem Mauszeiger bzw. mit dem Fokus (z. B. das Code-Fenster) selbst noch weiterscrollen?
+function canScrollInside(target, direction) {
+    for (let el = target; el && el !== document.body; el = el.parentElement) {
+        if (!/(auto|scroll)/.test(getComputedStyle(el).overflowY) || el.scrollHeight <= el.clientHeight) continue;
+        if (direction > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0) return true;
+    }
+    return false;
+}
+
 // Startseite (Desktop): Mausrad/Touchpad springt immer genau einen Bereich weiter
 document.addEventListener("DOMContentLoaded", function() {
     const sections = [...document.querySelectorAll('.hero, .screen')];
@@ -88,15 +97,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let locked = false;
     let lastWheel = 0;
-
-    // Kann ein Element unter dem Mauszeiger (z. B. das Code-Fenster) selbst noch weiterscrollen?
-    const canScrollInside = (target, direction) => {
-        for (let el = target; el && el !== document.body; el = el.parentElement) {
-            if (!/(auto|scroll)/.test(getComputedStyle(el).overflowY) || el.scrollHeight <= el.clientHeight) continue;
-            if (direction > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0) return true;
-        }
-        return false;
-    };
 
     // Erst wieder freigeben, wenn das Rad kurz Ruhe gibt (Touchpads scrollen nach)
     const unlock = () => {
@@ -435,5 +435,209 @@ document.addEventListener("DOMContentLoaded", function() {
             const track = slide.parentElement;
             track.scrollTo({ left: [...track.children].indexOf(slide) * track.clientWidth });
         }
+    });
+});
+
+// PROJEKTSEITE: Bewegung – das Titelbild bekommt Tiefe (wandert beim Scrollen langsamer und folgt leicht der Maus),
+// Bilder in den Abschnitten öffnen sich aus einer Maske, Überschriften und Texte gleiten herein
+document.addEventListener("DOMContentLoaded", function() {
+    const top = document.querySelector('.project-top');
+    if (!top || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Scrollweite im Kopf als --shift: style.css bewegt Titelbild und Farbverlauf damit unterschiedlich schnell
+    let frame = null;
+    const update = () => {
+        frame = null;
+        top.style.setProperty('--shift', Math.min(window.scrollY, top.offsetHeight) + 'px');
+    };
+    window.addEventListener('scroll', () => {
+        if (!frame) frame = requestAnimationFrame(update);
+    }, { passive: true });
+    update();
+
+    // Das Titelbild verschiebt sich ein wenig entgegen der Maus – wie ein Blick durch ein Fenster
+    top.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        const rect = top.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        top.style.setProperty('--hero-x', (-x * 24) + 'px');
+        top.style.setProperty('--hero-y', (-y * 16) + 'px');
+    });
+    top.addEventListener('pointerleave', () => {
+        top.style.removeProperty('--hero-x');
+        top.style.removeProperty('--hero-y');
+    });
+
+    // Abschnitte und „Nächstes Projekt“: Bilder und Fenster öffnen sich aus einer Maske, Überschriften gleiten
+    // von links, Texte von unten herein – die Bausteine einer Spalte nacheinander
+    if (!('IntersectionObserver' in window)) return;
+    const effects = [
+        ['.psection-col > :is(.block-image, .carousel, .block-code, .block-compare, .block-demo), .next-project', 'reveal-mask'],
+        ['.psection-col > .block-title, .credits .block-title', 'reveal-slide'],
+        ['.psection-col > .block-text, .credits .block-text', 'reveal']
+    ];
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    effects.forEach(([selector, effect]) => {
+        document.querySelectorAll(selector).forEach(element => {
+            element.classList.add(effect);
+            element.style.transitionDelay = Math.min([...element.parentElement.children].indexOf(element), 4) * 90 + 'ms';
+            observer.observe(element);
+        });
+    });
+    // Nach dem Öffnen ohne Maske, damit die Schatten wieder zu sehen sind
+    document.addEventListener('transitionend', (e) => {
+        if (e.propertyName === 'clip-path' && e.target.classList.contains('reveal-mask')) {
+            e.target.classList.add('is-done');
+            e.target.style.transitionDelay = '';
+        }
+    });
+});
+
+// PROJEKTSEITE: aus dem Eyecatcher geht es mit einem Schritt direkt zum Projekt (#weiter, wie beim Pfeil) und von dort
+// ebenso zurück nach oben – mit Mausrad, Touchpad und Tasten sofort; bleibt die Seite nach dem Wischen oder Ziehen
+// mitten im Eyecatcher stehen, gleitet sie weiter
+document.addEventListener("DOMContentLoaded", function() {
+    const hero = document.querySelector('.project-top .project-hero');
+    const next = document.getElementById('weiter');
+    if (!hero || !next) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let locked = false;
+    let lastWheel = 0;
+    let lastY = window.scrollY;
+    let direction = 0;
+    let touches = 0;
+
+    // Anfang des Projekts – höchstens so weit, wie die Seite scrollen kann
+    const end = () => Math.min(
+        Math.round(next.getBoundingClientRect().top + window.scrollY),
+        document.documentElement.scrollHeight - document.documentElement.clientHeight
+    );
+
+    // Nur wenn der Eyecatcher ganz auf den Bildschirm passt, keine Bildansicht und kein Vollbild offen ist
+    // und die Seite nicht mit zwei Fingern vergrößert ist
+    const active = () => hero.offsetHeight <= window.innerHeight + 2
+        && !document.querySelector('dialog[open]')
+        && !document.fullscreenElement
+        && !(window.visualViewport && window.visualViewport.scale > 1.01);
+
+    // Wohin führt ein Schritt um delta Pixel? Nach unten aus dem Eyecatcher zum Projekt; nach oben ganz nach oben,
+    // sobald der Eyecatcher wieder ins Bild käme. null = normal scrollen
+    const targetFor = (delta) => {
+        const y = window.scrollY;
+        const stop = end();
+        if (delta > 0 && y < stop - 1) return stop;
+        if (delta < 0 && y > 1 && y + delta < stop - 1) return 0;
+        return null;
+    };
+
+    // Erst wieder freigeben, wenn das Rad kurz Ruhe gibt (Touchpads scrollen nach)
+    const unlock = () => {
+        if (Date.now() - lastWheel < 180) return setTimeout(unlock, 120);
+        locked = false;
+        settle();
+    };
+    const jump = (top) => {
+        locked = true;
+        window.scrollTo({ top: top, behavior: reduceMotion ? 'auto' : 'smooth' });
+        setTimeout(unlock, 700);
+    };
+
+    // Steht die Seite mitten im Eyecatcher, gleitet sie in die zuletzt gescrollte Richtung weiter;
+    // nach einer kleinen Bewegung springt sie zurück
+    const settle = () => {
+        if (locked || touches || !active()) return;
+        const y = window.scrollY;
+        const stop = end();
+        if (y <= 1 || y >= stop - 1) return;
+        jump(y < 60 ? 0 : y > stop - 60 ? stop : direction > 0 ? stop : 0);
+    };
+
+    window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX) || !active()) return;
+        if (canScrollInside(e.target, Math.sign(e.deltaY))) return;
+        if (!locked) {
+            // Firefox zählt teils in Zeilen oder Seiten
+            const top = targetFor(e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? window.innerHeight : 1));
+            if (top === null) return;
+            jump(top);
+        }
+        e.preventDefault();
+        lastWheel = Date.now();
+    }, { passive: false });
+
+    // Tasten wie gewohnt: ↓, Bild↓ und Leertaste nach unten; ↑, Bild↑ und Umschalt+Leertaste nach oben
+    window.addEventListener('keydown', (e) => {
+        const page = window.innerHeight * 0.875;
+        const delta = { ArrowDown: 40, ArrowUp: -40, PageDown: page, PageUp: -page, ' ': e.shiftKey ? -page : page }[e.key];
+        if (!delta || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !active()) return;
+        // Nicht in Feldern, Reglern und Knöpfen und nicht, solange ein Fenster mit dem Fokus selbst noch scrollen kann
+        if (e.target.isContentEditable || e.target.closest('input, textarea, select, button, summary, video, audio')) return;
+        if (canScrollInside(e.target, Math.sign(delta))) return;
+        if (!locked) {
+            const top = targetFor(delta);
+            if (top === null) return;
+            jump(top);
+        }
+        e.preventDefault();
+    });
+
+    // Wischen, Scrollleiste & Co.: erst prüfen, wenn der Finger los ist und die Seite ausgerollt ist
+    window.addEventListener('scroll', () => {
+        if (window.scrollY !== lastY) direction = Math.sign(window.scrollY - lastY);
+        lastY = window.scrollY;
+    }, { passive: true });
+    window.addEventListener('touchstart', (e) => { touches = e.touches.length; }, { passive: true });
+    ['touchend', 'touchcancel'].forEach(type => window.addEventListener(type, (e) => { touches = e.touches.length; }, { passive: true }));
+    if ('onscrollend' in window) {
+        window.addEventListener('scrollend', settle);
+    } else {
+        // Ohne scrollend: kurz nachdem sich nichts mehr bewegt
+        let timer = null;
+        const settleSoon = () => {
+            clearTimeout(timer);
+            timer = setTimeout(settle, 150);
+        };
+        window.addEventListener('scroll', settleSoon, { passive: true });
+        window.addEventListener('touchend', settleSoon, { passive: true });
+    }
+});
+
+// VORHER/NACHHER (Projektseite): der Regler bestimmt, wie viel vom Vorher-Bild zu sehen ist (--split)
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('[data-compare]').forEach(compare => {
+        const range = compare.querySelector('.compare-range');
+        const update = () => compare.style.setProperty('--split', range.value + '%');
+        range.addEventListener('input', update);
+        update();
+    });
+});
+
+// LIVE-DEMO (Projektseite): Website oder Spiel erst beim Klick laden (schneller und datensparsamer), danach auch im Vollbild
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('[data-demo]').forEach(demo => {
+        const start = demo.querySelector('[data-demo-start]');
+        const stage = demo.querySelector('.demo-stage');
+        const fullscreen = demo.querySelector('[data-demo-fullscreen]');
+        start.addEventListener('click', () => {
+            const iframe = document.createElement('iframe');
+            iframe.src = start.dataset.src;
+            iframe.title = 'Live-Demo: ' + demo.querySelector('.demo-address').textContent;
+            iframe.allow = 'fullscreen; autoplay';
+            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-modals');
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            start.replaceWith(iframe);
+            iframe.focus();
+            fullscreen.hidden = !stage.requestFullscreen;
+        });
+        fullscreen.addEventListener('click', () => stage.requestFullscreen());
     });
 });

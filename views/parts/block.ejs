@@ -1,4 +1,4 @@
-<%# Ein Baustein in einer Spalte. Parameter: block ({ type, text, file, images, caption }), fallbackAlt %>
+<%# Ein Baustein in einer Spalte. Parameter: block ({ type, text, file, url, format, images, labels, caption }), fallbackAlt %>
 <% if (block.type === 'title') { %>
 <h2 class="block-title"><%= block.text %></h2>
 <% } else if (block.type === 'text') { %>
@@ -19,6 +19,45 @@
         <div class="code-body" tabindex="0" role="region" aria-label="Codesample<%= block.file ? ' ' + block.file : '' %>">
             <span class="code-gutter" aria-hidden="true"><%= Array.from({ length: code.lines }, (_, index) => index + 1).join('\n') %></span>
             <pre><code><%- code.html %></code></pre>
+        </div>
+    </div>
+    <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
+</figure>
+<% } else if (block.type === 'compare') { %>
+<%# Vorher/Nachher: beide Bilder liegen übereinander, links vom Regler ist das Vorher-Bild zu sehen (script.js);
+    solange eins der Bilder fehlt, steht das vorhandene wie ein normales Bild da %>
+<% const pair = (block.images || []).filter(Boolean); %>
+<% const labels = [(block.labels || [])[0] || 'Vorher', (block.labels || [])[1] || 'Nachher']; %>
+<% const about = block.caption ? ': ' + block.caption : ''; %>
+<% if (pair.length === 2) { %>
+<figure class="block-compare">
+    <div class="compare" data-compare>
+        <img src="<%= pair[1] %>" alt="<%= labels[1] + about %>" loading="lazy" draggable="false">
+        <img class="compare-before" src="<%= pair[0] %>" alt="<%= labels[0] + about %>" loading="lazy" draggable="false">
+        <span class="compare-label compare-label--before" aria-hidden="true"><%= labels[0] %></span>
+        <span class="compare-label compare-label--after" aria-hidden="true"><%= labels[1] %></span>
+        <span class="compare-handle" aria-hidden="true"></span>
+        <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="<%= labels[0] %> und <%= labels[1] %> vergleichen">
+    </div>
+    <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
+</figure>
+<% } else { %>
+<figure class="block-image">
+    <%- include('zoom-image', { src: pair[0], alt: block.caption || fallbackAlt, caption: block.caption, lazy: true, focusable: true }) %>
+    <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
+</figure>
+<% } %>
+<% } else if (block.type === 'demo') { %>
+<%# Live-Demo: Website oder Spiel in einem Browserfenster; geladen wird erst nach Klick auf „Starten“ (script.js) %>
+<figure class="block-demo">
+    <div class="demo-window" data-demo>
+        <div class="editor-bar">
+            <i></i><i></i><i></i><em class="demo-address"><%= block.url.replace(/^https?:\/\//, '').replace(/\/$/, '') %></em>
+            <button class="demo-button" type="button" data-demo-fullscreen hidden aria-label="Live-Demo im Vollbild zeigen" title="Vollbild">&#x2922;</button>
+            <a class="demo-button" href="<%= block.url %>" target="_blank" rel="noopener" aria-label="Live-Demo in neuem Tab öffnen" title="In neuem Tab öffnen">&#x2197;</a>
+        </div>
+        <div class="demo-stage" data-format="<%= block.format %>">
+            <button class="demo-start" type="button" data-demo-start data-src="<%= block.url %>"><span class="demo-play" aria-hidden="true"></span>Live-Demo starten</button>
         </div>
     </div>
     <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>

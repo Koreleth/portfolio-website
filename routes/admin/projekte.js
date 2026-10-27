@@ -15,17 +15,32 @@ const isKey = (key) => /^[a-z0-9]{1,20}$/.test(key);
 
 /**
  * Einen Baustein aus den Formularfeldern lesen: block_<key>_type, _text, _caption,
- * _file (Dateiname beim Codesample), _images (behaltene Bilder, in Reihenfolge) und _files (neue Bilder).
+ * _file (Dateiname beim Codesample), _url und _format (Live-Demo), _images (behaltene Bilder, in Reihenfolge)
+ * und _files (neue Bilder). Vorher/Nachher hat je Seite eigene Felder: _before/_after (bisheriges Bild),
+ * _beforeFile/_afterFile (neues Bild) und _beforeLabel/_afterLabel.
  */
 const readBlock = (body, filesByField, key) => {
   const field = (name) => body['block_' + key + '_' + name];
   const type = field('type');
+  if (type === 'compare') {
+    // Je Seite ersetzt ein neues Bild das bisherige; die Reihenfolge bleibt vorher, nachher
+    const side = (name) => (filesByField['block_' + key + '_' + name + 'File'] || []).map(publicPath)[0]
+      || [].concat(field(name) || []).filter(isImagePath)[0] || null;
+    return {
+      type,
+      images: [side('before'), side('after')],
+      labels: [field('beforeLabel'), field('afterLabel')],
+      caption: field('caption')
+    };
+  }
   const kept = [].concat(field('images') || []).filter(isImagePath);
   const uploaded = (filesByField['block_' + key + '_files'] || []).map(publicPath);
   return {
     type,
     text: field('text'),
     file: field('file'),
+    url: field('url'),
+    format: field('format'),
     caption: field('caption'),
     // Bild: ein neues ersetzt das bisherige; Karussell: neue Bilder kommen hinten dazu
     images: type === 'image' ? (uploaded.length > 0 ? uploaded : kept).slice(0, 1) : [...kept, ...uploaded]
@@ -73,6 +88,7 @@ const formProject = (req, current) => ({
   categoryID: parseInt(req.body.categoryID),
   description: req.body.description,
   textTitle: req.body.textTitle,
+  coverFit: req.body.coverFit,
   text: req.body.text,
   contributors: req.body.contributors,
   contributorsText: req.body.contributorsText,

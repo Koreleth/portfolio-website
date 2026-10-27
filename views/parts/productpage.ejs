@@ -2,43 +2,59 @@
   Projektseite. Kopf, Projekttext und alle Abschnitte liegen im selben Raster aus drei gleich breiten
   Spalten (⅓, ⅔ oder ganze Breite, siehe style.css). Alle Bilder haben ein festes Format;
   ein Klick zeigt das ganze Foto (zoom-image.ejs, lightbox.ejs).
-  Kopf und Projekttext füllen zusammen einen Bildschirm; dahinter liegt ein Farbverlauf aus dem Titelbild.
+  Oben füllt der Eyecatcher mit dem Titelbild einen ganzen Bildschirm, der Projekttext folgt darunter.
 %>
-<div class="project-top">
-    <%# Farbverlauf: das Titelbild, stark weichgezeichnet und hell überdeckt (nur Deko, siehe .project-glow) %>
+<%# Danach geht es weiter: zum Projekttext oder – ohne ihn – zu den Abschnitten (Ziel des Pfeils im Eyecatcher
+    und des Sprungs beim Scrollen, siehe script.js) %>
+<% const hasText = data.text || data.images[1]; %>
+<% const hasSections = data.sections && data.sections.length > 0; %>
+<%# coverFit „contain“ zeigt das Titelbild vollständig (z. B. Logos) auf hellem Grund %>
+<div class="project-top" data-fit="<%= data.coverFit === 'contain' ? 'contain' : 'cover' %>">
+    <%# Farbverlauf hinter dem Projekttext: das Titelbild, stark weichgezeichnet und hell überdeckt (nur Deko) %>
     <img class="project-glow" src="<%= data.images[0] %>" alt="">
 
-    <div class="upperpart">
-        <div class="titletext">
-        <%- include('breadcrumb', { items: [
-            { label: 'Start', href: '/' },
-            { label: 'Portfolio', href: '/portfolio' },
-            { label: data.categorie.name, href: '/portfolio/' + data.categorie.slug },
-            { label: data.title }
-        ] }) %>
-        <p class="eyebrow">Projekt</p>
-        <h1><%= data.title %></h1>
-        <p><%= data.description %></p>
+    <%# Eyecatcher: ein ganzer Bildschirm mit dem Titelbild; Titel und Kurzbeschreibung stehen dezent unten links
+        darauf (auf dem Handy mittig). Ein Klick aufs Bild zeigt es ganz %>
+    <div class="project-hero">
+        <a class="project-hero-media" href="<%= data.images[0] %>" data-zoom data-caption="" draggable="false">
+            <img class="project-hero-image" src="<%= data.images[0] %>" alt="<%= data.title %>" draggable="false">
+            <img class="project-hero-backdrop" src="<%= data.images[0] %>" alt="" draggable="false">
+            <span class="sr-only"> – ganzes Bild anzeigen</span>
+        </a>
 
-        <% if (data.tools && data.tools.length > 0) { %>
-        <p class="eyebrow tools-label">Verwendete Tools</p>
-        <ul class="tools">
-            <% data.tools.forEach((tool) => { %>
-            <li class="tool"><%- include('tool-icon', { tool: tool }) %><%= tool.name %></li>
-            <% }); %>
-        </ul>
-        <% } %>
+        <div class="upperpart">
+            <div class="titletext">
+                <%# Seitenpfad als Überzeile; die aktuelle Seite ist der Titel darunter %>
+                <div class="breadcrumb hero-path" role="navigation" aria-label="Seitenpfad">
+                    <ol>
+                        <li><a href="/portfolio">Portfolio</a></li>
+                        <li><a href="/portfolio/<%= data.categorie.slug %>"><%= data.categorie.name %></a></li>
+                    </ol>
+                </div>
+                <h1><%= data.title %></h1>
+                <p><%= data.description %></p>
 
-        <% if (locals.isAdmin) { %>
-        <a class="btn btn-dark btn-small edit-link" href="/admin/projekte/<%= data.id %>/bearbeiten">Projekt bearbeiten</a>
-        <% } %>
+                <% if (data.tools && data.tools.length > 0) { %>
+                <ul class="tools" aria-label="Verwendete Tools">
+                    <% data.tools.forEach((tool) => { %>
+                    <li class="tool"><%- include('tool-icon', { tool: tool }) %><%= tool.name %></li>
+                    <% }); %>
+                </ul>
+                <% } %>
+
+                <% if (locals.isAdmin) { %>
+                <a class="btn btn-small edit-link" href="/admin/projekte/<%= data.id %>/bearbeiten">Projekt bearbeiten</a>
+                <% } %>
+            </div>
         </div>
 
-        <div class="titleimg"><%- include('zoom-image', { src: data.images[0], alt: data.title, caption: '', lazy: false, focusable: true }) %></div>
+        <% if (hasText || hasSections) { %>
+        <a class="hero-next" href="#weiter" aria-label="Weiter zum Projekt"><span aria-hidden="true"></span></a>
+        <% } %>
     </div>
 
-    <% if (data.text || data.images[1]) { %>
-    <div class="middlepart">
+    <% if (hasText) { %>
+    <div class="middlepart" id="weiter">
         <%# Zweites Bild; ohne eigenes zweites Bild wird das Titelbild verwendet %>
         <div class="middleimg"><%- include('zoom-image', { src: data.images[1] || data.images[0], alt: data.title, caption: '', lazy: true, focusable: true }) %></div>
 
@@ -51,10 +67,10 @@
     <% } %>
 </div>
 
-<% if (data.sections && data.sections.length > 0) { %>
+<% if (hasSections) { %>
 <%# Weitere Abschnitte aus dem Admin-Bereich: je Abschnitt ein Spalten-Layout, pro Spalte Bausteine untereinander.
     Vor dem ersten Abschnitt steht immer ein Trennstrich, vor weiteren nur mit „divider“ %>
-<div class="project-sections">
+<div class="project-sections"<%- hasText ? '' : ' id="weiter"' %>>
     <% data.sections.forEach((section) => { %>
     <section class="psection psection--<%= section.layout %><%= section.valign === 'center' ? ' psection--center' : '' %><%= section.divider ? ' psection--divider' : '' %>">
         <% section.columns.forEach((column) => { %>
@@ -79,6 +95,21 @@
         </div>
         <div class="block-text credits-text"><%- include('rich-text', { text: data.contributorsText }) %></div>
     </section>
+</div>
+<% } %>
+
+<% if (locals.nextProject) { %>
+<%# Übergang zum nächsten Projekt (Reihenfolge wie in der Portfolio-Übersicht): wie dessen Eyecatcher, als große Karte %>
+<div class="next-project-wrap">
+    <a class="next-project project-hero" href="<%= nextProject.url %>" data-fit="<%= nextProject.coverFit %>">
+        <img class="project-hero-backdrop" src="<%= nextProject.image %>" alt="" loading="lazy">
+        <img class="project-hero-image" src="<%= nextProject.image %>" alt="" loading="lazy">
+        <div class="next-project-text">
+            <p class="eyebrow">Nächstes Projekt <span class="next-project-count"><%= String(nextProject.number).padStart(2, '0') %> / <%= String(nextProject.total).padStart(2, '0') %></span></p>
+            <h2 class="next-project-title"><%= nextProject.title %><span class="next-project-arrow" aria-hidden="true">&rarr;</span></h2>
+            <p><%= nextProject.description %></p>
+        </div>
+    </a>
 </div>
 <% } %>
 

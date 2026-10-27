@@ -174,7 +174,7 @@ document.addEventListener('click', (e) => {
 });
 
 // Name der Bausteine im Dialog, z. B. „Bild entfernen?“
-const BLOCK_NAMES = { title: 'Zwischenüberschrift', text: 'Text', image: 'Bild', carousel: 'Karussell', code: 'Codesample' };
+const BLOCK_NAMES = { title: 'Zwischenüberschrift', text: 'Text', image: 'Bild', carousel: 'Karussell', code: 'Codesample', compare: 'Vorher/Nachher', demo: 'Live-Demo' };
 
 // Baustein verschieben (hoch/runter in der Spalte, links/rechts in die Nachbarspalte) oder entfernen
 document.addEventListener('click', (e) => {
@@ -286,14 +286,11 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.target.matches('[data-single-line]')) e.preventDefault();
 });
 
-// Der Titel steht auch im Seitenpfad und – solange dort keine eigene Überschrift steht – über dem Projekttext
+// Solange über dem Projekttext keine eigene Überschrift steht, zeigt das Feld dort den Titel als Platzhalter
 const titleField = document.querySelector('.page-editor [name="title"]');
 if (titleField) {
     titleField.addEventListener('input', () => {
         const title = titleField.value.trim() || 'Neues Projekt';
-        document.querySelectorAll('[data-mirror="title"]').forEach(element => {
-            element.textContent = title;
-        });
         document.querySelectorAll('[data-mirror-placeholder="title"]').forEach(field => {
             field.placeholder = title;
             autosize(field);
@@ -347,6 +344,15 @@ document.addEventListener('change', (e) => {
 document.addEventListener('change', (e) => {
     if (e.target.name === 'removeSecond') {
         e.target.closest('[data-inline-image]').classList.toggle('is-removed', e.target.checked);
+    }
+});
+
+// Titelbild „Füllen“ oder „Ganz zeigen“ und das Format einer Live-Demo sofort zeigen
+document.addEventListener('change', (e) => {
+    if (e.target.matches('[data-fit-input]')) {
+        e.target.closest('[data-fit]').dataset.fit = e.target.value;
+    } else if (e.target.matches('[data-demo-format]')) {
+        e.target.closest('[data-format]').dataset.format = e.target.value;
     }
 });
 

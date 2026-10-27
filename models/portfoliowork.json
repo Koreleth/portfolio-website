@@ -148,6 +148,21 @@
                 "columns": [
                     [
                         {
+                            "type": "demo",
+                            "url": "https://koreleth.github.io/arcade-game/",
+                            "format": "16-9",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
                             "type": "title",
                             "text": "Weitere Coding Snippets"
                         },
@@ -312,7 +327,8 @@
         ],
         "contributors": "Leiter: Manuel Nachname",
         "contributorsText": "Vielen Dank :)",
-        "textTitle": "Let´s Play"
+        "textTitle": "Let´s Play",
+        "coverFit": "contain"
     },
     {
         "id": 6,

@@ -1194,27 +1194,24 @@ footer.footer--screen .copyright {
   }
 }
 
-/* Kopf und Projekttext: dahinter ein Farbverlauf aus dem Titelbild – dasselbe Bild, stark
-   weichgezeichnet und hell überdeckt; nach unten läuft er in den weißen Seitenhintergrund aus */
+/* Eyecatcher und Projekttext. Der Eyecatcher füllt einen ganzen Bildschirm mit dem Titelbild über die ganze Breite;
+   Seitenpfad, Titel, Kurzbeschreibung und Tools stehen dezent unten links darauf (auf dem Handy mittig). Der
+   Projekttext folgt darunter auf einem Farbverlauf aus dem Titelbild (dasselbe Bild, stark weichgezeichnet und hell
+   überdeckt) */
 .project-top {
   /* Grauer Text etwas dunkler, damit er auch auf getöntem Grund gut lesbar bleibt */
   --muted: #4f4f4f;
   position: relative;
   isolation: isolate;
-  /* Kopf und Projekttext füllen zusammen einen Bildschirm, beide stehen gemeinsam in der Mitte
-     (oben bleibt Platz für die Navigation); mehr Inhalt darf darüber hinauswachsen */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 100vh;
-  min-height: 100svh;
-  padding: 6.5rem 0 3rem;
+  padding-bottom: 3rem;
+  /* Zuschneiden, ohne dass der Bereich verschiebbar wird (die vergrößerten Bilder ragen über den Rand) */
   overflow: hidden;
+  overflow: clip;
 }
 .project-glow {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: -3;
   width: 100%;
   height: 100%;
   object-fit: fill;
@@ -1222,6 +1219,8 @@ footer.footer--screen .copyright {
   opacity: 0.4;
   /* Die weichgezeichneten Ränder werden durchsichtig – größer gezogen liegen sie außerhalb */
   transform: scale(1.3);
+  /* Tiefe beim Scrollen (script.js setzt --shift) */
+  translate: 0 calc(var(--shift, 0px) * 0.3);
   pointer-events: none;
   user-select: none;
 }
@@ -1232,9 +1231,257 @@ footer.footer--screen .copyright {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.3) 50%, var(--bg) 100%);
   pointer-events: none;
+}
+
+/* Weiße Schrift auf dem Bild (Eyecatcher und „Nächstes Projekt“) */
+.project-hero {
+  --muted: rgba(255, 255, 255, 0.85);
+  --text-strong: #fff;
+  position: relative;
+  display: flex;
+  color: #fff;
+}
+
+/* Eyecatcher: ein ganzer Bildschirm, unten abgerundet wie der Kopf der Startseite */
+.project-top .project-hero {
+  isolation: isolate;
+  align-items: flex-end;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 7rem 0 4.5rem;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--ink);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+/* Das Titelbild füllt den Eyecatcher; ein dunkler Verlauf unten links hält die weiße Schrift lesbar */
+.project-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  cursor: zoom-in;
+}
+.project-hero-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(10, 10, 10, 0.72) 0%, rgba(10, 10, 10, 0.3) 38%, rgba(10, 10, 10, 0) 62%),
+    linear-gradient(to right, rgba(10, 10, 10, 0.45) 0%, rgba(10, 10, 10, 0) 55%);
+  pointer-events: none;
+}
+.project-hero-media:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: -6px;
+}
+.project-hero-image,
+.project-hero-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+.project-hero-backdrop {
+  z-index: -1;
+  display: none;
+}
+.project-hero-image[src=""],
+.project-top .project-hero-media img[src=""] {
+  display: none;
+}
+/* Tiefe: das Bild wandert beim Scrollen langsamer und folgt leicht der Maus (script.js); beim Laden zoomt es sanft heran */
+.project-top .project-hero-image {
+  translate: 0 calc(var(--shift, 0px) * 0.25);
+  transform: translate(var(--hero-x, 0px), var(--hero-y, 0px)) scale(1.06);
+  transition: transform 0.9s var(--ease);
+  animation: hero-in 1.6s var(--ease) both;
+}
+@keyframes hero-in {
+  from {
+    scale: 1.1;
+    opacity: 0.3;
+  }
+}
+
+/* Text dezent unten links, bündig mit dem Inhalt darunter */
+.project-top .project-hero .upperpart {
+  display: block;
+}
+.project-top .project-hero .titletext {
+  max-width: 40rem;
+}
+/* Seitenpfad als Überzeile */
+.hero-path ol {
+  margin-bottom: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.hero-path li + li::before {
+  color: currentColor;
+  opacity: 0.5;
+}
+.project-top .project-hero h1 {
+  font-size: clamp(2.4rem, 4.8vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+.project-top .project-hero .titletext p:not(.eyebrow) {
+  max-width: 44ch;
+  margin-top: 0.85rem;
+  font-size: 1.05rem;
+}
+.project-top .project-hero .tools {
+  margin-top: 1.4rem;
+}
+/* Tools und „Projekt bearbeiten“ als helle Glas-Chips */
+.project-top .project-hero .tool,
+.project-top .project-hero .edit-link {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.project-top .project-hero .edit-link {
+  margin-top: 1.1rem;
+}
+.project-top .project-hero .edit-link:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+/* Pfeil unten rechts: weiter zum Projekt */
+.hero-next {
+  position: absolute;
+  right: max(var(--gutter), calc((100% - var(--content)) / 2 + var(--gutter)));
+  bottom: 4.5rem;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  color: #fff;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+.hero-next:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+.hero-next:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.hero-next span {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  animation: hero-next 2.2s var(--ease) infinite;
+}
+@keyframes hero-next {
+  0%,
+  100% {
+    translate: 0 0;
+    opacity: 0.6;
+  }
+  50% {
+    translate: 0 4px;
+    opacity: 1;
+  }
+}
+
+/* „Ganz zeigen“ (z. B. Logos): hell – das Bild vollständig rechts, dahinter dasselbe Bild weichgezeichnet und
+   aufgehellt; die Schrift dunkel wie im Rest der Seite */
+.project-top[data-fit="contain"] .project-hero {
+  --muted: #4f4f4f;
+  --text-strong: var(--ink);
+  background: var(--surface);
+  color: var(--text);
+}
+.project-top[data-fit="contain"] .project-hero-media::after {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 50%);
+}
+.project-top[data-fit="contain"] .project-hero-backdrop,
+.next-project[data-fit="contain"] .project-hero-backdrop {
+  display: block;
+  filter: blur(50px) saturate(1.4);
+  opacity: 0.45;
+  transform: scale(1.3);
+}
+.project-top[data-fit="contain"] .project-hero-image,
+.next-project[data-fit="contain"] .project-hero-image {
+  object-fit: contain;
+}
+.project-top[data-fit="contain"] .project-hero-image {
+  padding: 7rem max(var(--gutter), calc((100% - var(--content)) / 2 + var(--gutter))) 5rem 52%;
+}
+.project-top[data-fit="contain"] .project-hero .titletext {
+  max-width: 46%;
+}
+.project-top[data-fit="contain"] .project-hero .tool,
+.project-top[data-fit="contain"] .project-hero .edit-link {
+  border-color: var(--border);
+  background: #fff;
+  color: var(--ink);
+}
+.project-top[data-fit="contain"] .hero-next {
+  border-color: rgba(17, 17, 17, 0.25);
+  color: var(--ink);
+}
+.project-top[data-fit="contain"] .hero-next:hover {
+  border-color: var(--ink);
+  background: rgba(17, 17, 17, 0.06);
+}
+
+/* Handy: der Text steht mittig, der Pfeil unten in der Mitte; „Ganz zeigen“ setzt das Bild oben über den Text */
+@media (max-width: 860px) {
+  .project-top .project-hero {
+    align-items: center;
+    padding: 6rem 0 18vh;
+    text-align: center;
+  }
+  .project-top .project-hero .titletext,
+  .project-top[data-fit="contain"] .project-hero .titletext {
+    max-width: none;
+  }
+  .hero-path ol,
+  .project-top .project-hero .tools {
+    justify-content: center;
+  }
+  .project-top .project-hero .titletext p:not(.eyebrow) {
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .project-hero-media::after {
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 48%, rgba(10, 10, 10, 0.5), rgba(10, 10, 10, 0) 75%),
+      linear-gradient(to bottom, rgba(10, 10, 10, 0.25) 0%, rgba(10, 10, 10, 0.15) 50%, rgba(10, 10, 10, 0.45) 100%);
+  }
+  .hero-next {
+    right: auto;
+    bottom: 1.75rem;
+    left: 50%;
+    margin-left: -22px;
+  }
+  .project-top[data-fit="contain"] .project-hero {
+    padding-top: calc(6rem + 34vh);
+  }
+  .project-top[data-fit="contain"] .project-hero-image {
+    bottom: auto;
+    height: calc(6rem + 34vh);
+    padding: 6rem var(--gutter) 1rem;
+  }
+  .project-top[data-fit="contain"] .project-hero-media::after {
+    background: none;
+  }
 }
 
 .upperpart {
@@ -1252,12 +1499,12 @@ footer.footer--screen .copyright {
   max-width: 34ch;
 }
 
-/* Ohne Trennstrich direkt unter dem Kopf */
+/* Projekttext direkt nach dem Eyecatcher, ohne Trennstrich */
 .middlepart {
   width: 100%;
   max-width: var(--content);
   margin: 0 auto;
-  padding: 3rem var(--gutter) 0;
+  padding: 4.5rem var(--gutter) 0;
   align-items: center;
 }
 
@@ -1391,6 +1638,8 @@ ol.rich-list {
 }
 .block-image figcaption,
 .block-code figcaption,
+.block-compare figcaption,
+.block-demo figcaption,
 .carousel-caption {
   margin-top: 0.75rem;
   font-size: 0.9rem;
@@ -1497,6 +1746,286 @@ ol.rich-list {
 }
 .code-body .hljs-strong {
   font-weight: 700;
+}
+
+/* Vorher/Nachher: beide Bilder übereinander, links vom Regler ist das Vorher-Bild zu sehen (script.js setzt --split).
+   Der unsichtbare Regler liegt über dem ganzen Bild: ziehen, tippen oder mit ← → bedienen */
+.compare {
+  --split: 50%;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  user-select: none;
+}
+.compare img {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--media-ratio);
+  object-fit: cover;
+}
+.compare .compare-before {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  clip-path: inset(0 calc(100% - var(--split)) 0 0);
+}
+.compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--split);
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.compare-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l-6 6 6 6M15 6l6 6-6 6'/%3E%3C/svg%3E") center / 22px no-repeat;
+  box-shadow: 0 8px 22px -6px rgba(0, 0, 0, 0.5);
+}
+.compare:has(.compare-range:focus-visible) .compare-handle::after {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+.compare-label {
+  position: absolute;
+  top: 0.9rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  pointer-events: none;
+}
+.compare-label--before {
+  left: 0.9rem;
+}
+.compare-label--after {
+  right: 0.9rem;
+}
+.compare-range {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+/* Schmaler Griff, damit die Linie genau unter dem Finger bzw. Mauszeiger liegt */
+.compare-range::-webkit-slider-thumb {
+  width: 2px;
+  height: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.compare-range::-moz-range-thumb {
+  width: 2px;
+  height: 100%;
+  border: 0;
+}
+
+/* Live-Demo: Browserfenster wie das Code-Fenster; die Seite lädt erst nach Klick auf „Starten“ (script.js) */
+.demo-window {
+  overflow: hidden;
+  background: var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+.demo-address {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.demo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font-size: 1rem;
+  color: #8a8a8a;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.demo-button[hidden] {
+  display: none;
+}
+.demo-button:hover,
+.demo-button:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.demo-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  background: radial-gradient(circle at 50% 40%, #2b2b2b, var(--ink) 70%);
+}
+.demo-stage[data-format="4-3"] {
+  aspect-ratio: 4 / 3;
+}
+.demo-stage[data-format="1-1"] {
+  aspect-ratio: 1 / 1;
+}
+.demo-stage:fullscreen {
+  aspect-ratio: auto;
+}
+.demo-stage iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+.demo-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+  transition: transform 0.35s var(--ease);
+}
+.demo-start:hover {
+  transform: scale(1.04);
+}
+.demo-start:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+.demo-play {
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 11px solid currentColor;
+}
+
+/* Übergang zum nächsten Projekt: wie dessen Eyecatcher, als große Karte über dem Footer */
+.next-project-wrap {
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 2rem var(--gutter) 0;
+}
+.next-project {
+  isolation: isolate;
+  align-items: flex-end;
+  min-height: 60vh;
+  min-height: 60svh;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+/* Dunkler Verlauf für die Schrift: unten und links am kräftigsten */
+.next-project::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to top, rgba(10, 10, 10, 0.82) 0%, rgba(10, 10, 10, 0.4) 42%, rgba(10, 10, 10, 0) 75%),
+    linear-gradient(to right, rgba(10, 10, 10, 0.5) 0%, rgba(10, 10, 10, 0) 65%);
+  pointer-events: none;
+}
+.next-project .project-hero-image {
+  z-index: -2;
+  transition: scale 1s var(--ease);
+}
+.next-project .project-hero-backdrop {
+  z-index: -3;
+}
+/* „Ganz zeigen“: hell, das Bild vollständig rechts (schmal: oben) */
+.next-project[data-fit="contain"] {
+  --muted: #4f4f4f;
+  --text-strong: var(--ink);
+  background: var(--surface);
+  color: var(--text);
+}
+.next-project[data-fit="contain"]::after {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 50%);
+}
+.next-project:hover .project-hero-image {
+  scale: 1.04;
+}
+.next-project:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+}
+.next-project-text {
+  padding: 3rem clamp(1.5rem, 4vw, 3.5rem);
+}
+.next-project-count {
+  margin-left: 0.75rem;
+  color: var(--text-strong);
+}
+.next-project-title {
+  margin-top: 0.6rem;
+  font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+  letter-spacing: -0.03em;
+}
+.next-project-arrow {
+  display: inline-block;
+  margin-left: 0.3em;
+  transition: transform 0.5s var(--ease);
+}
+.next-project:hover .next-project-arrow,
+.next-project:focus-visible .next-project-arrow {
+  transform: translateX(0.25em);
+}
+.next-project-text p:not(.eyebrow) {
+  margin-top: 0.75rem;
+  max-width: 44ch;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+@media (min-width: 861px) {
+  .next-project[data-fit="contain"] .project-hero-image {
+    padding: 2.5rem 2.5rem 2.5rem 52%;
+  }
+  .next-project[data-fit="contain"] .next-project-text {
+    max-width: 50%;
+  }
+}
+@media (max-width: 860px) {
+  .next-project[data-fit="contain"] .project-hero-image {
+    bottom: auto;
+    height: 45%;
+    padding: 1.5rem 1.5rem 0;
+  }
 }
 
 /* Projektbilder im festen Format: auf --media-ratio zugeschnitten, ein Klick zeigt das ganze Foto (Bildansicht) */
@@ -2735,13 +3264,98 @@ textarea.input {
   aspect-ratio: var(--media-ratio);
   background: repeating-linear-gradient(45deg, #f1f1f1 0 14px, #e9e9e9 14px 28px);
 }
-.inline-image.is-empty img {
+.inline-image.is-empty > img {
   display: none;
 }
-.inline-image.is-fallback img,
-.inline-image.is-removed img {
+.inline-image.is-fallback > img,
+.inline-image.is-removed > img {
   opacity: 0.4;
   filter: grayscale(1);
+}
+
+/* Eyecatcher im Bearbeitungsmodus: die Felder liegen weiß auf dem Titelbild; unten rechts Darstellung und Bildwahl.
+   Der ganze Bereich ist das Feld fürs Titelbild – ohne Bild zeigt der Kopf ein dunkles Streifenmuster */
+.page-editor .project-top.is-empty {
+  aspect-ratio: auto;
+  background: none;
+}
+.page-editor .project-top.is-empty .project-hero {
+  background: repeating-linear-gradient(45deg, #262626 0 14px, #1e1e1e 14px 28px);
+}
+.page-editor .project-top.is-missing {
+  outline-offset: -4px;
+}
+.page-editor .project-hero-media {
+  cursor: default;
+}
+.page-editor .project-hero .inline-field:focus,
+.page-editor .project-hero .inline-select:focus {
+  background: rgba(10, 10, 10, 0.55);
+  outline-color: #fff;
+}
+.page-editor .project-hero .inline-field::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+.page-editor .project-hero .inline-select option {
+  color: var(--ink);
+}
+/* Handy: mittig wie auf der Seite */
+@media (max-width: 860px) {
+  .page-editor .project-top .project-hero .inline-field {
+    text-align: center;
+  }
+  .page-editor .project-top .project-hero .inline-slug {
+    justify-content: center;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+/* Heller Kopf („Ganz zeigen“): Felder wie im Rest des Bearbeitungsmodus */
+.page-editor .project-top[data-fit="contain"] .project-hero .inline-field:focus,
+.page-editor .project-top[data-fit="contain"] .project-hero .inline-select:focus {
+  background: rgba(255, 255, 255, 0.9);
+  outline-color: var(--ink);
+}
+.page-editor .project-top[data-fit="contain"] .project-hero .inline-field::placeholder {
+  color: #9a9a9a;
+}
+/* Oben rechts unter der Kopfleiste – unten liegt die Leiste mit „Speichern“ */
+.hero-tools {
+  position: absolute;
+  top: 5.5rem;
+  right: max(var(--gutter), calc((100% - var(--content)) / 2 + var(--gutter)));
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.hero-tools .inline-image-btn {
+  position: static;
+}
+.hero-fit {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.45);
+}
+.hero-fit span {
+  display: block;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+}
+.hero-fit input:checked + span {
+  background: var(--ink);
+  color: #fff;
+}
+.hero-fit input:focus-visible + span {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 .inline-image.is-missing {
   outline: 3px solid #a11a1a;
@@ -3004,6 +3618,51 @@ textarea.input {
 /* Zwischen „+ Abschnitt hinzufügen“ und dem Strich über den Mitwirkenden etwas Luft lassen */
 .page-editor .project-sections:has(+ .project-credits) {
   padding-bottom: 2.5rem;
+}
+
+/* Vorher/Nachher im Bearbeitungsmodus: beide Bilder nebeneinander, darüber ihre Beschriftung */
+.edit-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.page-editor .edit-compare-label {
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.edit-compare .inline-image-btn {
+  left: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+/* Live-Demo im Bearbeitungsmodus: Adresse in der Leiste, das Format unten rechts im Fenster */
+.edit-demo-format {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.edit-demo-format select {
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  color: inherit;
+  cursor: pointer;
+}
+.page-editor .demo-start {
+  cursor: default;
 }
 
 /* Codesample: dasselbe Fenster, oben der Dateiname, darunter der Code als Textfeld (ohne Farben) */
@@ -3313,6 +3972,36 @@ textarea.input {
   opacity: 1;
   transform: none;
 }
+/* Projektseite: Bilder und Fenster öffnen sich aus einer Maske. Danach ohne Maske, damit ihre Schatten
+   (weich eingeblendet) wieder zu sehen sind; Überschriften gleiten von links herein */
+.reveal-mask {
+  opacity: 0;
+  clip-path: inset(9% 7% round var(--radius-lg));
+  transition: clip-path 1.2s var(--ease), opacity 0.8s ease, box-shadow 0.6s ease;
+}
+.reveal-mask.is-visible {
+  opacity: 1;
+  clip-path: inset(0 round var(--radius-lg));
+}
+.reveal-mask.is-done {
+  clip-path: none;
+}
+.reveal-mask :is(.zoom, .code-window, .compare, .demo-window) {
+  transition: box-shadow 0.6s ease;
+}
+.reveal-mask:not(.is-done),
+.reveal-mask:not(.is-done) :is(.zoom, .code-window, .compare, .demo-window) {
+  box-shadow: none;
+}
+.reveal-slide {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+}
+.reveal-slide.is-visible {
+  opacity: 1;
+  transform: none;
+}
 
 @media (prefers-reduced-motion: reduce) {
   html,
@@ -3322,6 +4011,8 @@ textarea.input {
     transition: none !important;
   }
   .reveal { opacity: 1; transform: none; }
+  .reveal-mask, .reveal-slide { opacity: 1; transform: none; clip-path: none; }
+  .project-top .project-hero-image { transform: none; translate: none; }
   .zoom:hover img { transform: none; }
 }
 

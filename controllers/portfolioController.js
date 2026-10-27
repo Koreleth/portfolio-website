@@ -5,6 +5,7 @@ let { isImagePath, collectImages, removeUnusedUploads } = require('../utils/uplo
 /*
  * Aufbau eines Projekts in models/portfoliowork.json:
  *   images:    [Titelbild, zweites Bild (optional)]
+ *   coverFit:  'cover' = das Titelbild füllt oben die ganze Breite, 'contain' = es steht ganz da (z. B. Logos)
  *   textTitle: Überschrift über dem Projekttext neben dem zweiten Bild (leer = Titel des Projekts)
  *   sections: beliebig viele Abschnitte untereinander. Jeder Abschnitt hat ein Spalten-Layout
  *             und pro Spalte beliebig viele Bausteine untereinander; divider = Trennstrich darüber
@@ -16,11 +17,27 @@ let { isImagePath, collectImages, removeUnusedUploads } = require('../utils/uplo
  *     { type: 'image', images: [bild], caption }
  *     { type: 'carousel', images: [...], caption }
  *     { type: 'code', text, file, caption }    – Codesample, nur angezeigt; die Endung von file bestimmt die Farben
+ *     { type: 'compare', images: [vorher, nachher], labels: [links, rechts], caption }
+ *                                              – Vorher/Nachher mit Regler; ein noch fehlendes Bild ist null
+ *     { type: 'demo', url, format, caption }  – Live-Demo: Website oder Spiel zum Ausprobieren (format '16-9', '4-3', '1-1')
  *   contributors:     Namen der Mitwirkenden (nach den Abschnitten, links unter der Überschrift „Mitwirkende“)
  *   contributorsText: freier Text rechts daneben, z. B. eine Danksagung
  *   (beide leer = der Bereich wird nicht angezeigt)
  */
-const BLOCK_TYPES = ['title', 'text', 'image', 'carousel', 'code'];
+const BLOCK_TYPES = ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo'];
+const DEMO_FORMATS = ['16-9', '4-3', '1-1'];
+
+// Adresse einer Live-Demo: nur http(s); ohne Angabe wird https:// ergänzt (z. B. „koreleth.github.io/spiel“)
+const toDemoUrl = (value) => {
+    const text = String(value || '').trim();
+    if (!text) return null;
+    try {
+        const url = new URL(/^[a-z][a-z0-9+.-]*:/i.test(text) ? text : 'https://' + text);
+        return ['https:', 'http:'].includes(url.protocol) ? url.href : null;
+    } catch (err) {
+        return null;
+    }
+};
 
 // Spalten-Layouts im Drittel-Raster und ihre Spaltenanzahl, z. B. '2-1' = ⅔ + ⅓
 const LAYOUTS = { '1': 1, '2-1': 2, '1-2': 2, '1-1-1': 3 };
@@ -84,6 +101,17 @@ const cleanBlock = (block) => {
             const file = String(block.file || '').trim().slice(0, 60);
             return code ? { type: 'code', text: code, file, caption } : null;
         }
+        case 'compare': {
+            // Die Position zählt (links vorher, rechts nachher); bleibt so lange erhalten, wie eins der Bilder da ist
+            const pair = [0, 1].map(index => isImagePath((block.images || [])[index]) ? block.images[index] : null);
+            const labels = [0, 1].map(index => String((block.labels || [])[index] || '').trim().slice(0, 40));
+            return pair.some(Boolean) ? { type: 'compare', images: pair, labels, caption } : null;
+        }
+        case 'demo': {
+            const url = toDemoUrl(block.url);
+            const format = DEMO_FORMATS.includes(block.format) ? block.format : '16-9';
+            return url ? { type: 'demo', url, format, caption } : null;
+        }
         default:
             return null;
     }
@@ -139,6 +167,33 @@ const getSinglePortfolio = (catSlug, slug) => {
     return { status: 200, data: { ...withTools(portfolio, store.read('tools')), sections: normalizeSections(portfolio.sections), categorie: categorieEntry } };
 };
 
+/**
+ * Das nächste Projekt für den Übergang am Seitenende: in der Reihenfolge der Portfolio-Übersicht
+ * (Kategorie für Kategorie), nach dem letzten Projekt wieder das erste.
+ * @returns {Object|null} - { title, description, image, url, number, total } oder null, wenn es kein anderes gibt
+ */
+const getNextPortfolio = (id) => {
+    const portfolios = store.read('portfoliowork');
+    const ordered = store.read('categorie').flatMap(categorie => portfolios
+        .filter(portfolio => portfolio.categoryID === parseInt(categorie.id))
+        .map(portfolio => ({ portfolio, categorie })));
+    const index = ordered.findIndex(entry => entry.portfolio.id === id);
+    if (index === -1 || ordered.length < 2) {
+        return null;
+    }
+    const position = (index + 1) % ordered.length;
+    const { portfolio, categorie } = ordered[position];
+    return {
+        title: portfolio.title,
+        description: portfolio.description,
+        image: portfolio.images[0],
+        coverFit: portfolio.coverFit === 'contain' ? 'contain' : 'cover',
+        url: '/portfolio/' + categorie.slug + '/' + portfolio.slug,
+        number: position + 1,
+        total: ordered.length
+    };
+};
+
 /* ---------- Admin: Projekte verwalten ---------- */
 
 // Alle Projekte mit ihrer Kategorie (für die Admin-Übersicht)
@@ -173,6 +228,7 @@ const validatePortfolio = (input, portfolios, current) => {
     const description = String(input.description || '').trim();
     const text = String(input.text || '').trim();
     const textTitle = String(input.textTitle || '').trim();
+    const coverFit = input.coverFit === 'contain' ? 'contain' : 'cover';
     const contributors = String(input.contributors || '').replace(/\r\n/g, '\n').trim();
     const contributorsText = String(input.contributorsText || '').replace(/\r\n/g, '\n').trim();
     const categoryID = parseInt(input.categoryID);
@@ -199,7 +255,7 @@ const validatePortfolio = (input, portfolios, current) => {
     const slug = uniqueSlug(baseSlug, candidate => portfolios.some(element =>
         element.id !== (current && current.id) && element.categoryID === categoryID && element.slug === candidate));
 
-    return { values: { title, description, textTitle, text, images: [cover, second].filter(Boolean), categoryID, slug, tools, sections, contributors, contributorsText } };
+    return { values: { title, description, textTitle, text, images: [cover, second].filter(Boolean), coverFit, categoryID, slug, tools, sections, contributors, contributorsText } };
 };
 
 const createPortfolio = (input) => {
@@ -253,6 +309,7 @@ module.exports = {
     toLayout,
     getPortfolioByCategorie,
     getSinglePortfolio,
+    getNextPortfolio,
     getPortfoliosForAdmin,
     getPortfolioById,
     createPortfolio,
