@@ -14,17 +14,21 @@ let { isImagePath, collectImages, removeUnusedUploads } = require('../utils/uplo
  *   Bausteine:
  *     { type: 'title', text }                  – Zwischenüberschrift
  *     { type: 'text', text }                   – Fließtext (Leerzeile = neuer Absatz, „- “ = Aufzählung)
- *     { type: 'image', images: [bild], caption }
- *     { type: 'carousel', images: [...], caption }
+ *     { type: 'image', images: [bild], fit, focus, caption }
+ *                                              – focus [x, y] in Prozent: der gezeigte Ausschnitt bei „Füllen“
+ *     { type: 'carousel', images: [...], fit, caption }
+ *                                              – fit 'contain' = Bild ganz zeigen statt aufs Format zuschneiden
  *     { type: 'code', text, file, caption }    – Codesample, nur angezeigt; die Endung von file bestimmt die Farben
  *     { type: 'compare', images: [vorher, nachher], labels: [links, rechts], caption }
  *                                              – Vorher/Nachher mit Regler; ein noch fehlendes Bild ist null
  *     { type: 'demo', url, format, caption }  – Live-Demo: Website oder Spiel zum Ausprobieren (format '16-9', '4-3', '1-1')
  *     { type: 'youtube', video, start, format, caption }
  *                                              – YouTube-Video: video = ID, start = Sekunden, format '9-16' bei Shorts
- *   contributors:     Namen der Mitwirkenden (nach den Abschnitten, links unter der Überschrift „Mitwirkende“)
- *   contributorsText: freier Text rechts daneben, z. B. eine Danksagung
- *   (beide leer = der Bereich wird nicht angezeigt)
+ *   Abspann nach den Abschnitten (alles leer = der Bereich wird nicht angezeigt):
+ *   thanks:      freier Text oben ohne Überschrift, z. B. eine Danksagung
+ *   credits:     Mitwirkende wie im Filmabspann, [{ role, name }] – die Rolle darf fehlen; mehrere Zeilen
+ *                mit derselben Rolle hintereinander stehen auf der Seite unter einer Rolle
+ *   (ältere Projekte haben stattdessen contributors als Text und contributorsText, siehe normalizeCredits)
  */
 const BLOCK_TYPES = ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo', 'youtube'];
 const DEMO_FORMATS = ['16-9', '4-3', '1-1'];
@@ -118,19 +122,28 @@ const normalizeSections = (sections) => {
     return result;
 };
 
+// Ausschnitt eines zugeschnittenen Bildes aus „x,y“ (Prozent); die Mitte (Standard) wird nicht gespeichert
+const toFocus = (value) => {
+    const [x, y] = String(value || '').split(/[ ,]+/).map(Number);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined;
+    const focus = [x, y].map(n => Math.round(Math.min(100, Math.max(0, n))));
+    return focus[0] === 50 && focus[1] === 50 ? undefined : focus;
+};
+
 // Einen Baustein prüfen; leere Bausteine (ohne Text bzw. ohne Bilder) fallen weg
 const cleanBlock = (block) => {
     const text = String(block.text || '').replace(/\r\n/g, '\n').trim();
     const caption = String(block.caption || '').trim();
     const images = [].concat(block.images || []).filter(isImagePath);
+    const fit = block.fit === 'contain' ? 'contain' : 'cover';
     switch (block.type) {
         case 'title':
         case 'text':
             return text ? { type: block.type, text } : null;
         case 'image':
-            return images.length > 0 ? { type: 'image', images: images.slice(0, 1), caption } : null;
+            return images.length > 0 ? { type: 'image', images: images.slice(0, 1), fit, focus: fit === 'cover' ? toFocus(block.focus) : undefined, caption } : null;
         case 'carousel':
-            return images.length > 0 ? { type: 'carousel', images, caption } : null;
+            return images.length > 0 ? { type: 'carousel', images, fit, caption } : null;
         case 'code': {
             // Code behält seine Einrückung: nur leere Zeilen am Anfang und Leerraum am Ende fallen weg
             const code = String(block.text || '').replace(/\r\n/g, '\n').replace(/^(?:[ \t]*\n)+/, '').trimEnd();
@@ -194,6 +207,44 @@ const getPortfolioByCategorie = (slug) => {
     return { status: 200, data: { categorie: categorieEntry, portfolios: filteredPortfolios } };
 };
 
+/**
+ * Abspann eines Projekts im aktuellen Aufbau. Ältere Projekte haben contributors als Text: eine Zeile pro
+ * Person als „Rolle: Name“ oder „Name – Rolle“; Zeilen ohne Rolle gehören zur Rolle davor. contributorsText
+ * war die Danksagung. Gespeichert wird beim nächsten Speichern im neuen Aufbau.
+ */
+const normalizeCredits = (portfolio) => {
+    if (Array.isArray(portfolio.credits)) {
+        return { credits: portfolio.credits, thanks: portfolio.thanks || '' };
+    }
+    let role = '';
+    const credits = String(portfolio.contributors || '').split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => {
+            const colon = line.indexOf(':');
+            if (colon > 0) {
+                role = line.slice(0, colon).trim();
+                return { role, name: line.slice(colon + 1).trim() };
+            }
+            const dash = /^(.+?)\s+[-–—]\s+(.+)$/.exec(line);
+            if (dash) {
+                role = dash[2].trim();
+                return { role, name: dash[1].trim() };
+            }
+            return { role, name: line };
+        })
+        .filter(credit => credit.name);
+    return { credits, thanks: portfolio.thanks || portfolio.contributorsText || '' };
+};
+
+// Abspann prüfen: Zeilen ohne Namen fallen weg
+const cleanCredits = (credits) => (credits || [])
+    .map(credit => ({
+        role: String(credit.role || '').trim().slice(0, 80),
+        name: String(credit.name || '').trim().slice(0, 120)
+    }))
+    .filter(credit => credit.name);
+
 const getSinglePortfolio = (catSlug, slug) => {
     // Das Projekt muss zur angefragten Kategorie gehören
     const categorieEntry = store.read('categorie').find(element => element.slug === catSlug);
@@ -204,34 +255,33 @@ const getSinglePortfolio = (catSlug, slug) => {
         return { status: 404, data: "Portfolio not found" };
     }
 
-    return { status: 200, data: { ...withTools(portfolio, store.read('tools')), sections: normalizeSections(portfolio.sections), categorie: categorieEntry } };
+    return { status: 200, data: { ...withTools(portfolio, store.read('tools')), sections: normalizeSections(portfolio.sections), ...normalizeCredits(portfolio), categorie: categorieEntry } };
 };
 
 /**
- * Das nächste Projekt für den Übergang am Seitenende: in der Reihenfolge der Portfolio-Übersicht
- * (Kategorie für Kategorie), nach dem letzten Projekt wieder das erste.
- * @returns {Object|null} - { title, description, image, url, number, total } oder null, wenn es kein anderes gibt
+ * Weitere Projekte für das Seitenende: die nächsten (höchstens count) in der Reihenfolge der Portfolio-Übersicht
+ * (Kategorie für Kategorie), am Ende geht es vorne weiter; das Projekt selbst ist nie dabei.
+ * @returns {Array} - je { title, image, coverFit, categorie, url }
  */
-const getNextPortfolio = (id) => {
+const getMoreProjects = (id, count = 3) => {
     const portfolios = store.read('portfoliowork');
     const ordered = store.read('categorie').flatMap(categorie => portfolios
         .filter(portfolio => portfolio.categoryID === parseInt(categorie.id))
         .map(portfolio => ({ portfolio, categorie })));
     const index = ordered.findIndex(entry => entry.portfolio.id === id);
-    if (index === -1 || ordered.length < 2) {
-        return null;
+    if (index === -1) {
+        return [];
     }
-    const position = (index + 1) % ordered.length;
-    const { portfolio, categorie } = ordered[position];
-    return {
-        title: portfolio.title,
-        description: portfolio.description,
-        image: portfolio.images[0],
-        coverFit: portfolio.coverFit === 'contain' ? 'contain' : 'cover',
-        url: '/portfolio/' + categorie.slug + '/' + portfolio.slug,
-        number: position + 1,
-        total: ordered.length
-    };
+    return Array.from({ length: Math.min(count, ordered.length - 1) }, (_, offset) => {
+        const { portfolio, categorie } = ordered[(index + offset + 1) % ordered.length];
+        return {
+            title: portfolio.title,
+            image: portfolio.images[0],
+            coverFit: portfolio.coverFit === 'contain' ? 'contain' : 'cover',
+            categorie: categorie.name,
+            url: '/portfolio/' + categorie.slug + '/' + portfolio.slug
+        };
+    });
 };
 
 /* ---------- Admin: Projekte verwalten ---------- */
@@ -251,14 +301,14 @@ const getPortfolioById = (id) => {
     if (!portfolio) {
         return { status: 404, data: "Portfolio not found" };
     }
-    return { status: 200, data: { ...portfolio, sections: normalizeSections(portfolio.sections) } };
+    return { status: 200, data: { ...portfolio, sections: normalizeSections(portfolio.sections), ...normalizeCredits(portfolio) } };
 };
 
 /**
  * Prüft die Formulardaten und baut daraus die Felder eines Projekts.
  * @param {Object} input - title, slug, categoryID, description, text, tools,
  *                         cover / second (neu hochgeladene Bilder), removeSecond, sections,
- *                         contributors (Namen der Mitwirkenden), contributorsText (Text daneben, z. B. Danksagung)
+ *                         thanks (Danksagung), credits ([{ role, name }])
  * @param {Array} portfolios - alle vorhandenen Projekte
  * @param {Object|null} current - das bearbeitete Projekt (null beim Anlegen)
  * @returns {Object} - { values } oder { error }
@@ -269,8 +319,8 @@ const validatePortfolio = (input, portfolios, current) => {
     const text = String(input.text || '').trim();
     const textTitle = String(input.textTitle || '').trim();
     const coverFit = input.coverFit === 'contain' ? 'contain' : 'cover';
-    const contributors = String(input.contributors || '').replace(/\r\n/g, '\n').trim();
-    const contributorsText = String(input.contributorsText || '').replace(/\r\n/g, '\n').trim();
+    const thanks = String(input.thanks || '').replace(/\r\n/g, '\n').trim();
+    const credits = cleanCredits(input.credits);
     const categoryID = parseInt(input.categoryID);
     const categorie = store.read('categorie').find(element => parseInt(element.id) === categoryID);
     const knownTools = store.read('tools').map(tool => tool.id);
@@ -295,7 +345,7 @@ const validatePortfolio = (input, portfolios, current) => {
     const slug = uniqueSlug(baseSlug, candidate => portfolios.some(element =>
         element.id !== (current && current.id) && element.categoryID === categoryID && element.slug === candidate));
 
-    return { values: { title, description, textTitle, text, images: [cover, second].filter(Boolean), coverFit, categoryID, slug, tools, sections, contributors, contributorsText } };
+    return { values: { title, description, textTitle, text, images: [cover, second].filter(Boolean), coverFit, categoryID, slug, tools, sections, thanks, credits } };
 };
 
 const createPortfolio = (input) => {
@@ -326,6 +376,11 @@ const updatePortfolio = (id, input) => {
 
     const previous = portfolios[index];
     portfolios[index] = { ...previous, ...result.values };
+    // Der Abspann steht jetzt in thanks und credits (früher contributors und contributorsText)
+    delete portfolios[index].contributors;
+    delete portfolios[index].contributorsText;
+    // Die Danksagung hat keine eigene Überschrift mehr
+    delete portfolios[index].thanksTitle;
     store.write('portfoliowork', portfolios);
     // Ersetzte oder entfernte Bilder löschen, sofern sie nirgends mehr verwendet werden
     removeUnusedUploads(allImages(previous));
@@ -349,7 +404,7 @@ module.exports = {
     toLayout,
     getPortfolioByCategorie,
     getSinglePortfolio,
-    getNextPortfolio,
+    getMoreProjects,
     getPortfoliosForAdmin,
     getPortfolioById,
     createPortfolio,

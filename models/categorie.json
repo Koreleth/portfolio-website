@@ -15,9 +15,10 @@
         "name": "Games",
         "description": "Let´s Play!",
         "images": [
-            "/img/uploads/1792676753379-2ktr-bbm.png"
+            "/img/uploads/1793188436574-a0vd-1793108484763-kle5-bomberman-titelbild.jpg"
         ],
-        "slug": "games"
+        "slug": "games",
+        "featured": false
     },
     {
         "id": 3,
@@ -58,5 +59,16 @@
             "/img/uploads/1792676691736-zqxi-watchify.jpg"
         ],
         "slug": "webseiten"
+    },
+    {
+        "id": 7,
+        "type": "categorie",
+        "name": "Software",
+        "description": "Enwickelte Programme für Dekstop und Mobil",
+        "images": [
+            "/img/uploads/1793207926032-scvz-myshift.png"
+        ],
+        "slug": "software",
+        "featured": false
     }
 ]

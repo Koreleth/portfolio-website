@@ -1,0 +1,14 @@
+<%#
+  Eine Zeile im Abspann: links die Rolle, rechts der Name – wie auf der Seite. Parameter: key, credit ({ role, name }).
+  Die Reihenfolge ergibt sich aus der Reihenfolge der versteckten creditKeys-Felder (Verschieben/Entfernen: admin.js)
+%>
+<div class="credit-row" data-repeat-item>
+    <input type="hidden" name="creditKeys" value="<%= key %>">
+    <input class="inline-field credit-role" name="credit_<%= key %>_role" value="<%= credit.role || '' %>" maxlength="80" placeholder="Rolle, z. B. Kamera" aria-label="Rolle">
+    <input class="inline-field credit-name" name="credit_<%= key %>_name" value="<%= credit.name || '' %>" maxlength="120" placeholder="Name" aria-label="Name">
+    <div class="credit-tools">
+        <button type="button" data-move="up" title="Nach oben" aria-label="Zeile nach oben">&uarr;</button>
+        <button type="button" data-move="down" title="Nach unten" aria-label="Zeile nach unten">&darr;</button>
+        <button class="credit-remove" type="button" data-remove title="Entfernen" aria-label="Zeile entfernen">&times;</button>
+    </div>
+</div>

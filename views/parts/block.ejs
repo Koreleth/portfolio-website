@@ -5,11 +5,11 @@
 <div class="block-text"><%- include('rich-text', { text: block.text }) %></div>
 <% } else if (block.type === 'image') { %>
 <figure class="block-image">
-    <%- include('zoom-image', { src: block.images[0], alt: block.caption || fallbackAlt, caption: block.caption, lazy: true, focusable: true }) %>
+    <%- include('zoom-image', { src: block.images[0], alt: block.caption || fallbackAlt, caption: block.caption, lazy: true, focusable: true, fit: block.fit, focus: block.focus }) %>
     <% if (block.caption) { %><figcaption><%= block.caption %></figcaption><% } %>
 </figure>
 <% } else if (block.type === 'carousel') { %>
-<%- include('carousel', { images: block.images, caption: block.caption, label: block.caption || fallbackAlt }) %>
+<%- include('carousel', { images: block.images, caption: block.caption, label: block.caption || fallbackAlt, fit: block.fit }) %>
 <% } else if (block.type === 'code') { %>
 <%# Codesample im Editor-Fenster wie bei „Über mich“: nur zum Ansehen, eingefärbt in utils/code.js (html ist maskiert) %>
 <% const code = highlightCode(block.text, block.file); %>

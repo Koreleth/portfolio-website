@@ -101,9 +101,6 @@
                 <div class="inline-text"><textarea class="inline-field" name="text" rows="5" data-autosize placeholder="Projekttext – eine Leerzeile beginnt einen neuen Absatz" aria-label="Projekttext"><%= project.text || '' %></textarea></div>
             </div>
         </div>
-
-        <%# Farbverlauf hinter dem Projekttext; steht am Ende, damit das Titelbild das erste Bild im Feld bleibt %>
-        <img class="project-glow" src="<%= images[0] || '' %>" alt="" data-cover-glow>
     </div>
 
     <%# Weitere Abschnitte: Layout und Reihenfolge in der Leiste über jedem Abschnitt, Bausteine direkt in den Spalten %>
@@ -116,15 +113,23 @@
         <button class="edit-add-section" type="button" data-repeat-add="section">+ Abschnitt hinzufügen</button>
     </div>
 
-    <%# Mitwirkende: auf der Seite nach dem letzten Abschnitt, mit Strich darüber; links die Namen, rechts ein freier Text.
-        Beide leer = der Bereich erscheint nicht %>
+    <%# Abspann wie auf der Seite, nach dem letzten Abschnitt mit Strich darüber: oben die Danksagung (ohne Überschrift),
+        darunter die Mitwirkenden – je Zeile Rolle und Name. Alles leer = der Bereich erscheint nicht %>
     <div class="project-credits">
         <section class="credits">
-            <div>
-                <h2 class="block-title">Mitwirkende</h2>
-                <div class="block-text credits-names"><textarea class="inline-field" name="contributors" rows="3" data-autosize placeholder="Namen, eine Zeile pro Person – z. B. Kamera: Name" aria-label="Namen der Mitwirkenden"><%= project.contributors || '' %></textarea></div>
+            <div class="credits-thanks">
+                <div class="credits-thanks-text"><textarea class="inline-field" name="thanks" rows="2" data-autosize placeholder="Danke an alle, die mitgeholfen haben … (optional)" aria-label="Danksagung"><%= project.thanks || '' %></textarea></div>
             </div>
-            <div class="block-text credits-text"><textarea class="inline-field" name="contributorsText" rows="3" data-autosize placeholder="Text daneben, z. B. eine Danksagung (optional). Sind beide Felder leer, erscheint dieser Bereich nicht." aria-label="Text neben den Mitwirkenden, z. B. Danksagung"><%= project.contributorsText || '' %></textarea></div>
+            <div class="credits-roll">
+                <h2 class="credits-label">Mitwirkende</h2>
+                <div class="credits-edit" data-repeat-list="credit" data-remove-title="Zeile entfernen?" data-remove-confirm="Rolle und Name verschwinden aus dem Abspann. Endgültig ist das erst nach dem Speichern.">
+                    <% (project.credits || []).forEach((credit, index) => { %>
+                    <%- include('parts/credit-row', { key: 'c' + index, credit: credit }) %>
+                    <% }); %>
+                </div>
+                <button class="edit-add-credit" type="button" data-repeat-add="credit">+ Mitwirkende hinzufügen</button>
+                <p class="credits-hint">Gleiche Rolle mehrmals hintereinander = die Namen stehen auf der Seite untereinander unter dieser Rolle.</p>
+            </div>
         </section>
     </div>
 
@@ -140,6 +145,9 @@
 <%# Vorlagen: neuer Abschnitt (__KEY__) und neue Bausteine je Typ (__BLOCK__) – per JavaScript eingesetzt %>
 <template data-repeat-template="section">
     <%- include('parts/inline-section', { key: '__KEY__', section: { layout: '1', valign: 'top', columns: [[]] } }) %>
+</template>
+<template data-repeat-template="credit">
+    <%- include('parts/credit-row', { key: '__KEY__', credit: {} }) %>
 </template>
 <% ['title', 'text', 'image', 'carousel', 'code', 'compare', 'demo', 'youtube'].forEach((type) => { %>
 <template data-block-template="<%= type %>">

@@ -334,7 +334,7 @@ document.addEventListener('change', (e) => {
     box.querySelector('img').src = URL.createObjectURL(file);
     box.classList.remove('is-empty', 'is-fallback', 'is-missing');
     box.querySelector('.inline-image-btn span').textContent = 'Bild ändern';
-    // Der Farbverlauf hinter Kopf und Projekttext folgt dem Titelbild
+    // Der weichgezeichnete Hintergrund im Eyecatcher („Ganz zeigen“) folgt dem Titelbild
     if (input.name === 'cover') {
         document.querySelectorAll('[data-cover-glow]').forEach(glow => { glow.src = box.querySelector('img').src; });
     }
@@ -354,6 +354,37 @@ document.addEventListener('change', (e) => {
     } else if (e.target.matches('[data-demo-format]')) {
         e.target.closest('[data-format]').dataset.format = e.target.value;
     }
+});
+
+// Bild „Füllen“: Klicken oder Ziehen auf dem Bild wählt den gezeigten Ausschnitt (gespeichert als „x,y“ in Prozent)
+document.addEventListener('pointerdown', (e) => {
+    const box = e.target.closest('.block-image[data-fit="cover"] [data-focus-area]');
+    if (!box || e.button !== 0 || box.classList.contains('is-empty') || e.target.closest('label, button, input')) return;
+    e.preventDefault();
+    const input = box.querySelector('[data-focus-input]');
+    const place = (event) => {
+        const rect = box.getBoundingClientRect();
+        const x = Math.round(Math.min(100, Math.max(0, (event.clientX - rect.left) / rect.width * 100)));
+        const y = Math.round(Math.min(100, Math.max(0, (event.clientY - rect.top) / rect.height * 100)));
+        input.value = x + ',' + y;
+        box.querySelector('img').style.objectPosition = x + '% ' + y + '%';
+        const dot = box.querySelector('.focus-dot');
+        dot.style.left = x + '%';
+        dot.style.top = y + '%';
+    };
+    place(e);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    box.setPointerCapture(e.pointerId);
+    box.classList.add('is-focusing');
+    const end = () => {
+        box.classList.remove('is-focusing');
+        box.removeEventListener('pointermove', place);
+        box.removeEventListener('pointerup', end);
+        box.removeEventListener('pointercancel', end);
+    };
+    box.addEventListener('pointermove', place);
+    box.addEventListener('pointerup', end);
+    box.addEventListener('pointercancel', end);
 });
 
 // YouTube-Baustein: Vorschaubild und Format (Shorts hochkant) gleich beim Einfügen der Adresse zeigen.

@@ -507,7 +507,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const top = document.querySelector('.project-top');
     if (!top || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // Scrollweite im Kopf als --shift: style.css bewegt Titelbild und Farbverlauf damit unterschiedlich schnell
+    // Scrollweite im Kopf als --shift: style.css lässt das Titelbild damit langsamer wandern als die Seite
     let frame = null;
     const update = () => {
         frame = null;
@@ -532,13 +532,13 @@ document.addEventListener("DOMContentLoaded", function() {
         top.style.removeProperty('--hero-y');
     });
 
-    // Abschnitte und „Nächstes Projekt“: Bilder und Fenster öffnen sich aus einer Maske, Überschriften gleiten
-    // von links, Texte von unten herein – die Bausteine einer Spalte nacheinander
+    // Abschnitte: Bilder und Fenster öffnen sich aus einer Maske, Überschriften gleiten von links, Texte von unten
+    // herein – die Bausteine einer Spalte nacheinander; ebenso Abspann und Projekt-Navigation am Seitenende
     if (!('IntersectionObserver' in window)) return;
     const effects = [
-        ['.psection-col > :is(.block-image, .carousel, .block-code, .block-compare, .block-demo, .block-youtube), .next-project', 'reveal-mask'],
-        ['.psection-col > .block-title, .credits .block-title', 'reveal-slide'],
-        ['.psection-col > .block-text, .credits .block-text', 'reveal']
+        ['.psection-col > :is(.block-image, .carousel, .block-code, .block-compare, .block-demo, .block-youtube)', 'reveal-mask'],
+        ['.psection-col > .block-title', 'reveal-slide'],
+        ['.psection-col > .block-text, .credits-label, .credits-thanks-text, .more-projects-head, .more-projects-grid > *', 'reveal']
     ];
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -553,6 +553,14 @@ document.addEventListener("DOMContentLoaded", function() {
             element.classList.add(effect);
             element.style.transitionDelay = Math.min([...element.parentElement.children].indexOf(element), 4) * 90 + 'ms';
             observer.observe(element);
+        });
+    });
+    // Abspann: Rollen und Namen erscheinen Zeile für Zeile von oben nach unten
+    document.querySelectorAll('.credits-list').forEach(list => {
+        list.querySelectorAll('dt:not(:empty), dd').forEach((line, index) => {
+            line.classList.add('reveal');
+            line.style.transitionDelay = Math.min(index, 14) * 60 + 'ms';
+            observer.observe(line);
         });
     });
     // Nach dem Öffnen ohne Maske, damit die Schatten wieder zu sehen sind
@@ -734,4 +742,83 @@ document.addEventListener("DOMContentLoaded", function() {
             iframe.focus();
         });
     });
+});
+
+// SCROLLLEISTE: statt der Leiste des Browsers ein schmaler Balken über dem Inhalt am rechten Rand – er nimmt keinen
+// Platz weg, erscheint beim Scrollen und am Rand und lässt sich ziehen (Aussehen in style.css unter .scrollbar).
+// Ohne JavaScript bleibt die Leiste des Browsers
+document.addEventListener("DOMContentLoaded", function() {
+    const root = document.documentElement;
+    const bar = document.createElement('div');
+    bar.className = 'scrollbar';
+    bar.setAttribute('aria-hidden', 'true');
+    bar.innerHTML = '<div class="scrollbar-thumb"></div>';
+    document.body.appendChild(bar);
+    const thumb = bar.firstChild;
+    root.classList.add('has-scrollbar');
+
+    let frame = null;
+    let hideTimer = null;
+    let drag = null;
+    const range = () => ({ view: window.innerHeight, total: root.scrollHeight });
+
+    const update = () => {
+        frame = null;
+        const { view, total } = range();
+        bar.hidden = total <= view + 1;
+        if (bar.hidden) return;
+        const height = Math.max(40, view * view / total);
+        thumb.style.height = height + 'px';
+        thumb.style.transform = 'translateY(' + (view - height) * (window.scrollY / (total - view)) + 'px)';
+    };
+    const schedule = () => {
+        if (!frame) frame = requestAnimationFrame(update);
+    };
+    // Kurz sichtbar, dann blendet der Balken wieder aus (nicht, solange die Maus darauf ist oder gezogen wird)
+    const show = () => {
+        bar.classList.add('is-active');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+            if (!drag && !bar.matches(':hover')) bar.classList.remove('is-active');
+        }, 1200);
+    };
+
+    window.addEventListener('scroll', () => { schedule(); show(); }, { passive: true });
+    window.addEventListener('resize', schedule);
+    if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(document.body);
+    bar.addEventListener('pointerenter', show);
+    bar.addEventListener('pointerleave', show);
+
+    // Ziehen; währenddessen rastet die Startseite nicht ein
+    thumb.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        drag = { y: e.clientY, scroll: window.scrollY };
+        thumb.setPointerCapture(e.pointerId);
+        root.classList.add('is-scrollbar-dragging');
+        bar.classList.add('is-dragging');
+    });
+    thumb.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        const { view, total } = range();
+        window.scrollTo({ top: drag.scroll + (e.clientY - drag.y) * (total - view) / (view - thumb.offsetHeight), behavior: 'instant' });
+    });
+    const stop = () => {
+        if (!drag) return;
+        drag = null;
+        root.classList.remove('is-scrollbar-dragging');
+        bar.classList.remove('is-dragging');
+        show();
+    };
+    thumb.addEventListener('pointerup', stop);
+    thumb.addEventListener('lostpointercapture', stop);
+
+    // Klick neben den Balken blättert eine Bildschirmhöhe in diese Richtung
+    bar.addEventListener('pointerdown', (e) => {
+        if (e.target !== bar || e.button !== 0) return;
+        const above = e.clientY < thumb.getBoundingClientRect().top;
+        window.scrollBy({ top: (above ? -1 : 1) * window.innerHeight * 0.9 });
+    });
+
+    update();
 });

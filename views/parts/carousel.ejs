@@ -1,5 +1,5 @@
 <%#
-  Bilder-Karussell. Parameter: images, caption (optional), label (für Screenreader)
+  Bilder-Karussell. Parameter: images, caption (optional), label (für Screenreader), fit ('contain' = Bilder ganz zeigen)
   Wischen und Trackpad laufen über natives Scrollen, Pfeile/Punkte/Tastatur über public/js/script.js.
   Ein Klick auf ein Bild (oder Enter im Karussell) zeigt das ganze Foto in der Bildansicht.
 %>
@@ -8,7 +8,7 @@
         <div class="carousel-track"<%- images.length > 1 ? ' tabindex="0"' : '' %>>
             <% images.forEach((image, index) => { %>
             <div class="carousel-slide" role="group" aria-roledescription="Bild" aria-label="<%= index + 1 %> von <%= images.length %>">
-                <%- include('zoom-image', { src: image, alt: label + ' – Bild ' + (index + 1), caption: caption, lazy: index > 0, focusable: images.length === 1 }) %>
+                <%- include('zoom-image', { src: image, alt: label + ' – Bild ' + (index + 1), caption: caption, lazy: index > 0, focusable: images.length === 1, fit: locals.fit }) %>
             </div>
             <% }); %>
         </div>

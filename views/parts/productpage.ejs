@@ -10,8 +10,6 @@
 <% const hasSections = data.sections && data.sections.length > 0; %>
 <%# coverFit „contain“ zeigt das Titelbild vollständig (z. B. Logos) auf hellem Grund %>
 <div class="project-top" data-fit="<%= data.coverFit === 'contain' ? 'contain' : 'cover' %>">
-    <%# Farbverlauf hinter dem Projekttext: das Titelbild, stark weichgezeichnet und hell überdeckt (nur Deko) %>
-    <img class="project-glow" src="<%= data.images[0] %>" alt="">
 
     <%# Eyecatcher: ein ganzer Bildschirm mit dem Titelbild; Titel und Kurzbeschreibung stehen dezent unten links
         darauf (auf dem Handy mittig). Ein Klick aufs Bild zeigt es ganz %>
@@ -85,31 +83,56 @@
 </div>
 <% } %>
 
-<% if (data.contributors || data.contributorsText) { %>
-<%# Mitwirkende: nach dem letzten Abschnitt, mit Strich darüber; links (⅓) Überschrift und Namen, rechts (⅔) ein freier Text, z. B. eine Danksagung %>
+<% if (data.thanks || data.credits.length > 0) { %>
+<%# Abspann wie im Film, nach dem letzten Abschnitt mit Strich darüber: oben die Danksagung, darunter die Mitwirkenden –
+    links die Rolle, rechts der Name. Mehrere Namen mit derselben Rolle stehen untereinander unter einer Rolle %>
+<% const creditGroups = data.credits.reduce((groups, credit) => {
+    const last = groups[groups.length - 1];
+    if (last && credit.role && last.role === credit.role) last.names.push(credit.name);
+    else groups.push({ role: credit.role, names: [credit.name] });
+    return groups;
+}, []); %>
 <div class="project-credits">
     <section class="credits">
-        <div>
-            <h2 class="block-title">Mitwirkende</h2>
-            <% if (data.contributors) { %><div class="block-text credits-names"><%- include('rich-text', { text: data.contributors }) %></div><% } %>
+        <% if (data.thanks) { %>
+        <div class="credits-thanks">
+            <div class="credits-thanks-text"><%- include('rich-text', { text: data.thanks }) %></div>
         </div>
-        <div class="block-text credits-text"><%- include('rich-text', { text: data.contributorsText }) %></div>
+        <% } %>
+        <% if (creditGroups.length > 0) { %>
+        <div class="credits-roll">
+            <h2 class="credits-label">Mitwirkende</h2>
+            <dl class="credits-list">
+                <% creditGroups.forEach((group) => { %>
+                <div class="credits-group">
+                    <dt><%= group.role %></dt>
+                    <% group.names.forEach((name) => { %><dd><%= name %></dd><% }); %>
+                </div>
+                <% }); %>
+            </dl>
+        </div>
+        <% } %>
     </section>
 </div>
 <% } %>
 
-<% if (locals.nextProject) { %>
-<%# Übergang zum nächsten Projekt (Reihenfolge wie in der Portfolio-Übersicht): wie dessen Eyecatcher, als große Karte %>
-<div class="next-project-wrap">
-    <a class="next-project project-hero" href="<%= nextProject.url %>" data-fit="<%= nextProject.coverFit %>">
-        <img class="project-hero-backdrop" src="<%= nextProject.image %>" alt="" loading="lazy">
-        <img class="project-hero-image" src="<%= nextProject.image %>" alt="" loading="lazy">
-        <div class="next-project-text">
-            <p class="eyebrow">Nächstes Projekt <span class="next-project-count"><%= String(nextProject.number).padStart(2, '0') %> / <%= String(nextProject.total).padStart(2, '0') %></span></p>
-            <h2 class="next-project-title"><%= nextProject.title %><span class="next-project-arrow" aria-hidden="true">&rarr;</span></h2>
-            <p><%= nextProject.description %></p>
-        </div>
-    </a>
+<% if (locals.moreProjects && moreProjects.length > 0) { %>
+<%# Am Seitenende: die nächsten Projekte (Reihenfolge wie in der Portfolio-Übersicht) als kleine Karten, daneben der
+    Weg zu allen. Kein <section>: dort bekäme die Überschrift eine Nummer %>
+<div class="more-projects">
+    <div class="more-projects-head">
+        <h2>Weitere Projekte</h2>
+        <a class="more-projects-all" href="/portfolio">Alle ansehen <span aria-hidden="true">&rarr;</span></a>
+    </div>
+    <div class="more-projects-grid">
+        <% moreProjects.forEach((project) => { %>
+        <a class="more-project" href="<%= project.url %>">
+            <span class="more-project-img" data-fit="<%= project.coverFit %>"><img src="<%= project.image %>" alt="" loading="lazy" draggable="false"></span>
+            <strong><%= project.title %></strong>
+            <small><%= project.categorie %></small>
+        </a>
+        <% }); %>
+    </div>
 </div>
 <% } %>
 

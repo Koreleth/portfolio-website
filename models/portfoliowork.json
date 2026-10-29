@@ -17,6 +17,7 @@
             {
                 "layout": "2-1",
                 "valign": "top",
+                "divider": false,
                 "columns": [
                     [
                         {
@@ -38,42 +39,71 @@
                                 "/img/uploads/1792741132220-88tp-whatsapp-image-2026-10-22-at-22-40-56.jpeg",
                                 "/img/uploads/1792668602587-0zxt-beautys.png"
                             ],
+                            "fit": "contain",
                             "caption": ""
                         }
                     ]
                 ]
             },
             {
-                "layout": "1-2",
+                "layout": "1-1-1",
                 "valign": "top",
+                "divider": false,
                 "columns": [
                     [
                         {
-                            "type": "carousel",
+                            "type": "title",
+                            "text": "Griff"
+                        },
+                        {
+                            "type": "image",
                             "images": [
-                                "/img/uploads/1792752386843-u5xy-whatsapp-image-2026-10-22-at-22-41-26.jpeg",
-                                "/img/uploads/1792752386846-j6d7-whatsapp-image-2026-10-22-at-22-41-27-1.jpeg",
-                                "/img/uploads/1792752386847-7idt-whatsapp-image-2026-10-22-at-22-41-27-2.jpeg",
-                                "/img/uploads/1792752386849-us9f-whatsapp-image-2026-10-22-at-22-41-27.jpeg"
+                                "/img/uploads/1793287788971-bx5x-whatsapp-image-2026-10-22-at-22-41-26.jpeg"
                             ],
+                            "fit": "contain",
                             "caption": ""
                         }
                     ],
                     [
                         {
                             "type": "title",
-                            "text": "Texturen"
+                            "text": "Kanne"
                         },
                         {
-                            "type": "text",
-                            "text": "Die Texturen wurden nicht eigenständig erstell. Diese wurden von folgender Seite herungeladen:\nhttps://ambientcg.com/"
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793287788972-gofs-whatsapp-image-2026-10-22-at-22-41-27-1.jpeg"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "title",
+                            "text": "Schraube"
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793287788973-q3wf-whatsapp-image-2026-10-22-at-22-41-27-2.jpeg"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
                         }
                     ]
                 ]
             }
         ],
-        "contributors": "Leiter: Oliver Zangenberg Minde",
-        "contributorsText": "Vielen Dank an die sehr gute grandiose Volesung etc."
+        "textTitle": "",
+        "coverFit": "cover",
+        "thanks": "Vielen Dank an die sehr gute grandiose Volesung etc.",
+        "credits": [
+            {
+                "role": "Leiter",
+                "name": "Oliver Zangenberg Minde"
+            }
+        ]
     },
     {
         "id": 5,
@@ -81,13 +111,15 @@
         "description": "Abgabe im 1. Semester - Videospiel",
         "text": "Wir sollten ein Videospiel abgeben. Das ist daraus geworden.\r\nHier könnt ihr es Spielen:\r\nhttps://koreleth.github.io/arcade-game/\r\n\r\nEs wurde auch eine zweite Version mit Claude und einigen mehr Möglichkeiten erstellt:\r\nhttps://koreleth.github.io/bomberman-2/",
         "images": [
-            "/img/uploads/1793013321555-0zdw-bbm-home.jpg",
+            "/img/uploads/1793277407643-sr8y-bbm-titel.png",
             "/img/uploads/1793013321558-j85k-bbm-home.jpg"
         ],
         "categoryID": 2,
         "slug": "bomberman",
         "tools": [
-            "vscode"
+            "vscode",
+            "processing",
+            "java"
         ],
         "sections": [
             {
@@ -111,14 +143,15 @@
                             "images": [
                                 "/img/uploads/1793013478877-9pr0-original-bbm.jpeg"
                             ],
+                            "fit": "contain",
                             "caption": "Quelle: https://www.maniac.de/wp-content/uploads/2017/03/08-14-640.jpg"
                         },
                         {
-                            "type": "carousel",
+                            "type": "image",
                             "images": [
-                                "/img/uploads/1793013667683-0a29-karte2.jpeg",
-                                "/img/uploads/1793013667683-xxot-karte1.jpeg"
+                                "/img/uploads/1793287179146-v4k1-karte2.jpeg"
                             ],
+                            "fit": "contain",
                             "caption": ""
                         }
                     ]
@@ -254,6 +287,7 @@
                             "images": [
                                 "/img/uploads/1793023323179-evvk-wall0.jpeg"
                             ],
+                            "fit": "contain",
                             "caption": "Unzerstörbare Wand"
                         },
                         {
@@ -267,6 +301,7 @@
                             "images": [
                                 "/img/uploads/1793023323182-tb9r-wall1.jpeg"
                             ],
+                            "fit": "contain",
                             "caption": "Durchlaufbare Wand"
                         },
                         {
@@ -280,6 +315,7 @@
                             "images": [
                                 "/img/uploads/1793023323182-4g3v-wall2.jpeg"
                             ],
+                            "fit": "contain",
                             "caption": "Zerstörbare Wand"
                         },
                         {
@@ -290,28 +326,54 @@
                 ]
             },
             {
-                "layout": "1",
+                "layout": "1-2",
                 "valign": "top",
                 "divider": false,
                 "columns": [
                     [
                         {
-                            "type": "carousel",
+                            "type": "image",
                             "images": [
-                                "/img/uploads/1793018544444-702l-gameplay-1.png",
-                                "/img/uploads/1793018544451-yark-gameplay-2.png",
-                                "/img/uploads/1793018544462-xagf-gameplay-3.png"
+                                "/img/uploads/1793287277122-si1j-gameplay-1.png"
                             ],
+                            "fit": "contain",
+                            "caption": ""
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793287277126-fw8s-gameplay-2.png"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793287277133-8ief-gameplay-3.png"
+                            ],
+                            "fit": "contain",
                             "caption": ""
                         }
                     ]
                 ]
             }
         ],
-        "contributors": "Leiter: Manuel Nachname",
-        "contributorsText": "Vielen Dank :)",
         "textTitle": "Let´s Play",
-        "coverFit": "contain"
+        "coverFit": "cover",
+        "thanks": "",
+        "credits": [
+            {
+                "role": "ModulLeiter",
+                "name": "Manuel Richardt"
+            },
+            {
+                "role": "Code by",
+                "name": "Korel Öztekin"
+            }
+        ]
     },
     {
         "id": 6,
@@ -320,7 +382,7 @@
         "text": "Das Modul bestand daraus mit Kamera und Ton umzugehen. Hierfür sollten verscheidene gelernte Kameratechniken benutzt werden welche wir uns im Verlauf unseres Studiums angeeignet haben.",
         "images": [
             "/img/uploads/1793099353082-v41d-voices.png",
-            "/img/uploads/1793105466356-ma1x-voices-text.png"
+            "/img/uploads/1793188603653-sji0-voices-cam.png"
         ],
         "categoryID": 3,
         "slug": "voices",
@@ -328,6 +390,22 @@
             "premiere-pro"
         ],
         "sections": [
+            {
+                "layout": "1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "youtube",
+                            "video": "BwQMkzwDvD8",
+                            "start": 0,
+                            "format": "16-9",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
             {
                 "layout": "1",
                 "valign": "top",
@@ -343,12 +421,76 @@
                         }
                     ]
                 ]
+            },
+            {
+                "layout": "1-2",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "title",
+                            "text": "Athena"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Zweiter Film. Die Regieleitung von Marcel Otto."
+                        }
+                    ],
+                    [
+                        {
+                            "type": "youtube",
+                            "video": "olhjmn3FJ1c",
+                            "start": 0,
+                            "format": "16-9",
+                            "caption": ""
+                        }
+                    ]
+                ]
             }
         ],
         "textTitle": "Audio & Videoproduktion",
         "coverFit": "cover",
-        "contributors": "",
-        "contributorsText": ""
+        "thanks": "",
+        "thanksTitle": "",
+        "credits": [
+            {
+                "role": "Modulleitung",
+                "name": "Prof. Dr. Jan-Torsten Milde"
+            },
+            {
+                "role": "Co-Leiter",
+                "name": "Manuel"
+            },
+            {
+                "role": "Projekt-Mitwirkende",
+                "name": "Mia Haworth"
+            },
+            {
+                "role": "Projekt-Mitwirkende",
+                "name": "Clarissa Stracke"
+            },
+            {
+                "role": "Projekt-Mitwirkende",
+                "name": "Kaylee Andres"
+            },
+            {
+                "role": "Projekt-Mitwirkende",
+                "name": "Marcel Otto"
+            },
+            {
+                "role": "Projekt-Mitwirkende",
+                "name": "Robert Stein"
+            },
+            {
+                "role": "Projekt-Mitwirkende",
+                "name": "Daniel Bergmiller"
+            },
+            {
+                "role": "Projekt-Mitwirkende",
+                "name": "Korel Öztekin"
+            }
+        ]
     },
     {
         "id": 7,
@@ -392,7 +534,8 @@
         "description": "Fiktives Kartenspiel",
         "text": "Das Modul bestand aus mehreren Workshops. Eines davon war ein Illustrator Workshop. Dort war die Abgabe ein logo zu deisngen.",
         "images": [
-            "/img/uploads/1792669041225-i9g9-cog.png"
+            "/img/uploads/1793206684196-6trc-dunkles-ik-logo-im-betonlook.png",
+            "/img/uploads/1793206524835-ptw2-carcare-logo.png"
         ],
         "categoryID": 5,
         "slug": "cog",
@@ -401,8 +544,9 @@
         ],
         "sections": [],
         "textTitle": "Weitere Logos",
-        "contributors": "",
-        "contributorsText": ""
+        "coverFit": "cover",
+        "thanks": "",
+        "credits": []
     },
     {
         "id": 9,
@@ -410,15 +554,249 @@
         "description": "Flyer, Social Media Post, etc. gestalten.",
         "text": "Bestimtes Sachen. Instagram Post, sowie Story-Posts etc.",
         "images": [
-            "/img/uploads/1792675634345-elo3-2022-logo-spielgemeinschaft-marbach-dietershan-cmyk.png",
+            "/img/uploads/1793205941716-vho1-dramatisches-duell-auf-dem-rasen.png",
             "/img/uploads/1792675634346-p0jz-h-2-ehrenberg.png"
         ],
         "categoryID": 4,
         "slug": "sgmd",
         "tools": [
             "photoshop",
+            "indesign",
             "figma"
         ],
-        "sections": []
+        "sections": [
+            {
+                "layout": "2-1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "title",
+                            "text": "Formate"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Vorlagen über Canva für einen Live Feed mit Bildern aller Spieler wurde angelegt. Das hat das Story Format von Instagram (9:16)."
+                        }
+                    ],
+                    [
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793206380168-db2t-toooor.png"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1-2",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "carousel",
+                            "images": [
+                                "/img/uploads/1793270527515-vyv9-whatsapp-image-2026-10-28-at-21-49-47-1.jpeg",
+                                "/img/uploads/1793270527522-fl20-whatsapp-image-2026-10-28-at-21-49-47.jpeg"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "title",
+                            "text": "Transfer Anouncement"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Informationen über neue Transfers. Angekündigt über Instagram"
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "title",
+                            "text": "Mannschaftsfoto"
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793270590423-j3gj-whatsapp-image-2026-10-28-at-21-47-43.jpeg"
+                            ],
+                            "fit": "cover",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "2-1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "title",
+                            "text": "Plakate/Druck"
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793270724589-keb5-whatsapp-image-2026-10-28-at-21-49-16.jpeg"
+                            ],
+                            "fit": "cover",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "title",
+                            "text": "Posts"
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793270724594-4700-whatsapp-image-2026-10-28-at-21-49-30.jpeg"
+                            ],
+                            "fit": "cover",
+                            "caption": ""
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793270724610-kzve-whatsapp-image-2026-10-28-at-21-49-31.jpeg"
+                            ],
+                            "fit": "cover",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            },
+            {
+                "layout": "1-1-1",
+                "valign": "top",
+                "divider": false,
+                "columns": [
+                    [
+                        {
+                            "type": "title",
+                            "text": "Ankündigung"
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793270883473-sik4-2026-11-15-sg-marbach-dietershan-spieltag.png"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "title",
+                            "text": "Event"
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793270883494-5qku-whatsapp-image-2026-10-28-at-21-47-59.jpeg"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
+                        }
+                    ],
+                    [
+                        {
+                            "type": "title",
+                            "text": "Danksagung"
+                        },
+                        {
+                            "type": "image",
+                            "images": [
+                                "/img/uploads/1793270883495-ums8-whatsapp-image-2026-10-28-at-21-38-53-1.jpeg"
+                            ],
+                            "fit": "contain",
+                            "caption": ""
+                        }
+                    ]
+                ]
+            }
+        ],
+        "textTitle": "Assets für Social Media",
+        "coverFit": "cover",
+        "thanks": "",
+        "credits": []
+    },
+    {
+        "id": 10,
+        "title": "MyShift",
+        "description": "Zeitmanagementsystem für kleine Betriebe",
+        "textTitle": "Anwendung für Mobile",
+        "text": "Eine Zeitmanagement App zum Ein/Ausstempel, Schichtplanung, Gehaltabrechnungen und mehr für Arbeitnehmer und Arbeitgeber.",
+        "images": [
+            "/img/uploads/1793208061659-bqje-myshift.png",
+            "/img/uploads/1793208061659-xusa-myshift.png"
+        ],
+        "coverFit": "cover",
+        "categoryID": 7,
+        "slug": "myshift",
+        "tools": [
+            "vscode",
+            "flutter"
+        ],
+        "sections": [],
+        "thanks": "",
+        "credits": []
+    },
+    {
+        "id": 11,
+        "title": "Cafe Eisberg",
+        "description": "Gelateria und Café in Petersberg",
+        "textTitle": "One Pager",
+        "text": "Die Webseite soll als One Pager dienen und nur ein schnelle Sichtbarkeit für Kunden dienen.",
+        "images": [
+            "/img/uploads/1793208997527-8jrt-eisberg.png"
+        ],
+        "coverFit": "cover",
+        "categoryID": 6,
+        "slug": "eisberg",
+        "tools": [
+            "figma",
+            "vscode"
+        ],
+        "sections": [],
+        "thanks": "",
+        "credits": []
+    },
+    {
+        "id": 12,
+        "title": "Manipulations",
+        "description": "Elemente in Bilde reinfügen",
+        "textTitle": "Workshop im 1. Semester",
+        "text": "Im ersten Semester gab es einen Workshop bezüglich Photoshop. Dort war das Ziel Fotos stark zu Bearbeitung und Elemente einzufügen, sodass sie stimmig aussehen.\r\nHeut zu tage sind diese Bilder nicht mehr so spannend, da durch Generative KI solche Bilder in Handumdrehen gemacht werden können.",
+        "images": [
+            "/img/uploads/1793271145732-e8hc-whatsapp-image-2026-10-28-at-21-38-30.jpeg"
+        ],
+        "coverFit": "cover",
+        "categoryID": 3,
+        "slug": "manipulations",
+        "tools": [
+            "photoshop"
+        ],
+        "sections": [],
+        "thanks": "",
+        "credits": []
     }
 ]

@@ -108,5 +108,20 @@
         "id": "blender",
         "name": "Blender",
         "icon": "/img/blender/blender_icon.svg"
+    },
+    {
+        "id": "processing",
+        "name": "Processing",
+        "icon": "/img/uploads/icons/1793190885738-kjyf-processing.svg"
+    },
+    {
+        "id": "java",
+        "name": "Java",
+        "icon": "/img/uploads/icons/1793190971702-os18-java.svg"
+    },
+    {
+        "id": "flutter",
+        "name": "Flutter",
+        "icon": "/img/uploads/icons/1793208170591-163t-icon-flutter.svg"
     }
 ]

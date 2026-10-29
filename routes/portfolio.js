@@ -31,9 +31,9 @@ router.route('/:catSlug/:slug')
   }
   // Nach dem Speichern im Bearbeitungsmodus (?gespeichert) bekommt der Admin einen kurzen Hinweis
   const saved = 'gespeichert' in req.query && res.locals.isAdmin;
-  // Am Seitenende geht es zum nächsten Projekt
-  const nextProject = portfolioController.getNextPortfolio(response.data.id);
-  res.render('portfolio/portfoliowork', {data: response.data, title: response.data.title, activeNav: 'portfolio', saved, nextProject});
+  // Am Seitenende: die nächsten drei Projekte
+  const moreProjects = portfolioController.getMoreProjects(response.data.id);
+  res.render('portfolio/portfoliowork', {data: response.data, title: response.data.title, activeNav: 'portfolio', saved, moreProjects});
 })
 
 module.exports = router;

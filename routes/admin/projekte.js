@@ -15,7 +15,7 @@ const isKey = (key) => /^[a-z0-9]{1,20}$/.test(key);
 
 /**
  * Einen Baustein aus den Formularfeldern lesen: block_<key>_type, _text, _caption,
- * _file (Dateiname beim Codesample), _url und _format (Live-Demo), _images (behaltene Bilder, in Reihenfolge)
+ * _file (Dateiname beim Codesample), _url und _format (Live-Demo), _fit (Bild/Karussell: Füllen oder Ganz zeigen), _focus (Ausschnitt beim Bild), _images (behaltene Bilder, in Reihenfolge)
  * und _files (neue Bilder). Vorher/Nachher hat je Seite eigene Felder: _before/_after (bisheriges Bild),
  * _beforeFile/_afterFile (neues Bild) und _beforeLabel/_afterLabel.
  */
@@ -41,6 +41,8 @@ const readBlock = (body, filesByField, key) => {
     file: field('file'),
     url: field('url'),
     format: field('format'),
+    fit: field('fit'),
+    focus: field('focus'),
     caption: field('caption'),
     // Bild: ein neues ersetzt das bisherige; Karussell: neue Bilder kommen hinten dazu
     images: type === 'image' ? (uploaded.length > 0 ? uploaded : kept).slice(0, 1) : [...kept, ...uploaded]
@@ -68,6 +70,13 @@ const readSections = (body, filesByField) => [].concat(body.sectionKeys || [])
     };
   });
 
+/**
+ * Abspann aus den Formularfeldern lesen: creditKeys (Reihenfolge) und je Zeile credit_<key>_role und _name.
+ */
+const readCredits = (body) => [].concat(body.creditKeys || [])
+  .filter(isKey)
+  .map(key => ({ role: body['credit_' + key + '_role'], name: body['credit_' + key + '_name'] }));
+
 // Formulardaten für den Controller
 const readForm = (req) => {
   const file = (field) => (req.filesByField[field] || [])[0];
@@ -76,7 +85,8 @@ const readForm = (req) => {
     cover: file('cover') ? publicPath(file('cover')) : null,
     second: file('second') ? publicPath(file('second')) : null,
     removeSecond: req.body.removeSecond === '1',
-    sections: readSections(req.body, req.filesByField)
+    sections: readSections(req.body, req.filesByField),
+    credits: readCredits(req.body)
   };
 };
 
@@ -90,8 +100,8 @@ const formProject = (req, current) => ({
   textTitle: req.body.textTitle,
   coverFit: req.body.coverFit,
   text: req.body.text,
-  contributors: req.body.contributors,
-  contributorsText: req.body.contributorsText,
+  thanks: req.body.thanks,
+  credits: readCredits(req.body),
   tools: [].concat(req.body.tools || []),
   sections: readSections(req.body, {})
 });

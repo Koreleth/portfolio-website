@@ -21,17 +21,25 @@
     <% } else if (block.type === 'text') { %>
     <div class="block-text"><textarea class="inline-field" name="block_<%= key %>_text" rows="3" data-autosize placeholder="Text – eine Leerzeile beginnt einen neuen Absatz" aria-label="Text"><%= block.text || '' %></textarea></div>
     <% } else if (block.type === 'image') { %>
-    <figure class="block-image">
-        <div class="zoom inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image>
+    <%# Bei „Füllen“ wählt ein Klick (oder Ziehen) auf dem Bild den gezeigten Ausschnitt – admin.js %>
+    <% const focus = Array.isArray(block.focus) ? block.focus : String(block.focus || '50,50').split(',').map(Number); %>
+    <% const [focusX, focusY] = focus.length === 2 && focus.every(Number.isFinite) ? focus : [50, 50]; %>
+    <figure class="block-image" data-fit="<%= block.fit === 'contain' ? 'contain' : 'cover' %>">
+        <div class="zoom inline-image<%= images[0] ? '' : ' is-empty' %>" data-inline-image data-focus-area>
             <% if (images[0]) { %><input type="hidden" name="block_<%= key %>_images" value="<%= images[0] %>"><% } %>
-            <img src="<%= images[0] || '' %>" alt="">
+            <input type="hidden" name="block_<%= key %>_focus" value="<%= focusX %>,<%= focusY %>" data-focus-input>
+            <img src="<%= images[0] || '' %>" alt="" style="object-position: <%= focusX %>% <%= focusY %>%">
+            <span class="focus-dot" style="left: <%= focusX %>%; top: <%= focusY %>%" aria-hidden="true"></span>
             <label class="inline-image-btn"><span><%= images[0] ? 'Bild ändern' : 'Bild wählen' %></span><input class="sr-only" type="file" name="block_<%= key %>_files" accept="image/jpeg,image/png,image/webp,image/gif"></label>
         </div>
+        <%- include('fit-switch', { name: 'block_' + key + '_fit', value: block.fit, labels: ['Standardformat', 'Originalformat'] }) %>
+        <small class="focus-hint">Ausschnitt: auf das Bild klicken oder ziehen</small>
         <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Bildunterschrift (optional)" aria-label="Bildunterschrift">
     </figure>
     <% } else if (block.type === 'carousel') { %>
-    <figure class="carousel edit-carousel">
+    <figure class="carousel edit-carousel" data-fit="<%= block.fit === 'contain' ? 'contain' : 'cover' %>">
         <%- include('uploader', { key: key, images: images, multiple: true }) %>
+        <%- include('fit-switch', { name: 'block_' + key + '_fit', value: block.fit }) %>
         <input class="inline-field inline-caption" name="block_<%= key %>_caption" value="<%= block.caption || '' %>" placeholder="Bildunterschrift zum Karussell (optional)" aria-label="Bildunterschrift">
     </figure>
     <% } else if (block.type === 'code') { %>

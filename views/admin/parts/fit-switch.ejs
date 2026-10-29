@@ -1,0 +1,11 @@
+<%#
+  Darstellung eines Bildes: 'cover' schneidet es aufs feste Format zu, 'contain' zeigt es vollständig.
+  Parameter: name (Feldname), value ('cover' oder 'contain'), labels (optional, z. B. ['Standardformat', 'Originalformat']).
+  admin.js setzt data-fit am nächsten [data-fit] sofort mit
+%>
+<% const [coverLabel, containLabel] = locals.labels || ['Füllen', 'Ganz zeigen']; %>
+<div class="hero-fit block-fit" role="radiogroup" aria-label="Darstellung des Bildes">
+    <% [['cover', coverLabel], ['contain', containLabel]].forEach(([option, label]) => { %>
+    <label><input class="sr-only" type="radio" name="<%= name %>" value="<%= option %>"<%= (value === 'contain' ? 'contain' : 'cover') === option ? ' checked' : '' %> data-fit-input><span><%= label %></span></label>
+    <% }); %>
+</div>

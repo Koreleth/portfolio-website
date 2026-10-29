@@ -2,6 +2,9 @@
   Projektbild im festen Format (zugeschnitten, siehe .zoom in style.css). Ein Klick zeigt das ganze Foto
   in der Bildansicht (lightbox.ejs); ohne JavaScript öffnet der Link einfach das Bild.
   Parameter: src, alt, caption (steht in der Bildansicht), lazy (erst beim Hineinscrollen laden),
-             focusable (false = nicht per Tab erreichbar, z. B. Folien im Karussell)
+             focusable (false = nicht per Tab erreichbar, z. B. Folien im Karussell),
+             focus ([x, y] in Prozent: gezeigter Ausschnitt beim Zuschneiden),
+             fit ('contain' = ganz zeigen statt zuschneiden; im Karussell liegt dahinter eine unscharfe Kopie des Bildes,
+             die nach dem eigentlichen Bild steht, damit die Bildansicht weiter das erste Bild nimmt)
 %>
-<a class="zoom" href="<%= src %>" data-zoom data-caption="<%= caption %>"<%- focusable ? '' : ' tabindex="-1"' %> draggable="false"><img src="<%= src %>" alt="<%= alt %>"<%- lazy ? ' loading="lazy"' : '' %> draggable="false"><span class="sr-only"> – ganzes Bild anzeigen</span></a>
+<a class="zoom<%= locals.fit === 'contain' ? ' zoom--contain' : '' %>" href="<%= src %>" data-zoom data-caption="<%= caption %>"<%- focusable ? '' : ' tabindex="-1"' %> draggable="false"><img src="<%= src %>" alt="<%= alt %>"<%- lazy ? ' loading="lazy"' : '' %><% if (locals.focus && locals.fit !== 'contain') { %> style="object-position: <%= focus[0] %>% <%= focus[1] %>%"<% } %> draggable="false"><% if (locals.fit === 'contain') { %><img class="zoom-backdrop" src="<%= src %>" alt=""<%- lazy ? ' loading="lazy"' : '' %> draggable="false"><% } %><span class="sr-only"> – ganzes Bild anzeigen</span></a>

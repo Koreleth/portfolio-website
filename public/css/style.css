@@ -1475,8 +1475,7 @@ footer.footer--screen .copyright {
    ========================================================== */
 .upperpart,
 .middlepart,
-.psection,
-.credits {
+.psection {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--grid-gap);
@@ -1484,13 +1483,11 @@ footer.footer--screen .copyright {
 @media (min-width: 861px) {
   .upperpart,
   .middlepart,
-  .psection,
-  .credits {
+  .psection {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .titletext,
   .middletext,
-  .credits-text,
   .psection--2-1 > .psection-col:first-child,
   .psection--1-2 > .psection-col:last-child {
     grid-column: span 2;
@@ -1506,44 +1503,12 @@ footer.footer--screen .copyright {
 
 /* Eyecatcher und Projekttext. Der Eyecatcher füllt einen ganzen Bildschirm mit dem Titelbild über die ganze Breite;
    Seitenpfad, Titel, Kurzbeschreibung und Tools stehen dezent unten links darauf (auf dem Handy mittig). Der
-   Projekttext folgt darunter auf einem Farbverlauf aus dem Titelbild (dasselbe Bild, stark weichgezeichnet und hell
-   überdeckt) */
+   Projekttext folgt darunter auf weißem Grund wie die Abschnitte (der Eyecatcher schneidet sein Bild selbst zu,
+   damit die Schatten der Bilder im Projekttext nicht abgeschnitten werden) */
 .project-top {
-  /* Grauer Text etwas dunkler, damit er auch auf getöntem Grund gut lesbar bleibt */
-  --muted: #4f4f4f;
   position: relative;
   isolation: isolate;
   padding-bottom: 3rem;
-  /* Zuschneiden, ohne dass der Bereich verschiebbar wird (die vergrößerten Bilder ragen über den Rand) */
-  overflow: hidden;
-  overflow: clip;
-}
-.project-glow {
-  position: absolute;
-  inset: 0;
-  z-index: -3;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  filter: blur(90px) saturate(1.4);
-  opacity: 0.4;
-  /* Die weichgezeichneten Ränder werden durchsichtig – größer gezogen liegen sie außerhalb */
-  transform: scale(1.3);
-  /* Tiefe beim Scrollen (script.js setzt --shift) */
-  translate: 0 calc(var(--shift, 0px) * 0.3);
-  pointer-events: none;
-  user-select: none;
-}
-.project-glow[src=""] {
-  display: none;
-}
-.project-top::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.3) 50%, var(--bg) 100%);
-  pointer-events: none;
 }
 
 /* Weiße Schrift auf dem Bild (Eyecatcher und „Nächstes Projekt“) */
@@ -1719,15 +1684,13 @@ footer.footer--screen .copyright {
 .project-top[data-fit="contain"] .project-hero-media::after {
   background: linear-gradient(to right, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 50%);
 }
-.project-top[data-fit="contain"] .project-hero-backdrop,
-.next-project[data-fit="contain"] .project-hero-backdrop {
+.project-top[data-fit="contain"] .project-hero-backdrop {
   display: block;
   filter: blur(50px) saturate(1.4);
   opacity: 0.45;
   transform: scale(1.3);
 }
-.project-top[data-fit="contain"] .project-hero-image,
-.next-project[data-fit="contain"] .project-hero-image {
+.project-top[data-fit="contain"] .project-hero-image {
   object-fit: contain;
 }
 .project-top[data-fit="contain"] .project-hero-image {
@@ -1851,26 +1814,115 @@ footer.footer--screen .copyright {
   border-top: 1px solid var(--border);
 }
 
-/* Mitwirkende: nach dem letzten Abschnitt, wieder mit Strich darüber; Überschrift ⅓, Text ⅔ */
+/* Abspann: nach dem letzten Abschnitt, wieder mit Strich darüber. Mittig wie im Film: oben die Danksagung (ohne Überschrift),
+   darunter die Mitwirkenden – links die Rolle (rechtsbündig), rechts der Name; script.js lässt die Zeilen
+   nacheinander erscheinen */
 .project-credits {
   max-width: var(--content);
   margin: 0 auto;
   padding: 0 var(--gutter) 4rem;
 }
-/* Vor den Mitwirkenden reicht der Abstand des letzten Abschnitts */
+/* Vor dem Abspann reicht der Abstand des letzten Abschnitts */
 .project-sections:has(+ .project-credits) {
   padding-bottom: 0;
 }
 .credits {
-  align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3.5rem;
   max-width: none;
   margin: 0;
   padding: 3.5rem 0 0;
   border-top: 1px solid var(--border);
+  text-align: center;
 }
-/* Namen unter der Überschrift */
-.credits-names {
-  margin-top: 0.75rem;
+.credits-thanks,
+.credits-roll {
+  width: 100%;
+  max-width: 46rem;
+}
+/* Überschriften klein und gesperrt, mit feinen Linien links und rechts */
+.credits-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.credits-label::before,
+.credits-label::after {
+  content: '';
+  flex: none;
+  width: 2.5rem;
+  height: 1px;
+  background: #d0d0d0;
+}
+.credits-thanks-text {
+  font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+  line-height: 1.75;
+  color: var(--text);
+}
+.credits-thanks-text .rich-list {
+  display: inline-block;
+  text-align: left;
+}
+.credits-list {
+  display: grid;
+  gap: 1.15rem;
+  margin: 0;
+}
+.credits-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.3rem 2.5rem;
+}
+.credits-group dt {
+  grid-column: 1;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.credits-group dd {
+  grid-column: 2;
+  margin: 0;
+  text-align: left;
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--text-strong);
+}
+/* Namen ohne Rolle stehen mittig */
+.credits-group dt:empty {
+  display: none;
+}
+.credits-group:has(> dt:empty) dd {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+/* Sehr schmal: die Rolle über den Namen */
+@media (max-width: 480px) {
+  .credits-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .credits-group dt,
+  .credits-group dd {
+    grid-column: 1;
+    text-align: center;
+  }
+  .credits-group dt {
+    margin-bottom: 0.1rem;
+  }
 }
 /* Bausteine in einer Spalte stehen untereinander, immer mit gleichem Abstand
    (als Lücke statt Außenabstand, damit kein Baustein ihn mit margin: 0 aufhebt) */
@@ -2314,98 +2366,121 @@ ol.rich-list {
   border: 0;
 }
 
-/* Übergang zum nächsten Projekt: wie dessen Eyecatcher, als große Karte über dem Footer */
-.next-project-wrap {
-  max-width: var(--content);
-  margin: 0 auto;
-  padding: 2rem var(--gutter) 0;
-}
-.next-project {
-  isolation: isolate;
-  align-items: flex-end;
-  min-height: 60vh;
-  min-height: 60svh;
-  overflow: hidden;
-  overflow: clip;
-  background: var(--ink);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-}
-/* Dunkler Verlauf für die Schrift: unten und links am kräftigsten */
-.next-project::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(to top, rgba(10, 10, 10, 0.82) 0%, rgba(10, 10, 10, 0.4) 42%, rgba(10, 10, 10, 0) 75%),
-    linear-gradient(to right, rgba(10, 10, 10, 0.5) 0%, rgba(10, 10, 10, 0) 65%);
-  pointer-events: none;
-}
-.next-project .project-hero-image {
-  z-index: -2;
-  transition: scale 1s var(--ease);
-}
-.next-project .project-hero-backdrop {
-  z-index: -3;
-}
-/* „Ganz zeigen“: hell, das Bild vollständig rechts (schmal: oben) */
-.next-project[data-fit="contain"] {
-  --muted: #4f4f4f;
-  --text-strong: var(--ink);
+/* Am Seitenende: „Weitere Projekte“ – die nächsten drei als kleine Karten (Bild 4:3, Titel, Kategorie), rechts oben
+   der Weg zu allen. Auf dem Handy eine Reihe zum Wischen */
+/* Gehört nicht mehr zum Projekt: eigene graue Fläche über die ganze Breite, oben abgerundet wie der Footer, der
+   direkt darauf folgt (die Fläche reicht unter seine runden Ecken) */
+.more-projects {
+  margin: 2rem 0 calc(var(--radius-lg) * -1);
+  padding: 3.5rem max(var(--gutter), calc((100% - var(--content)) / 2 + var(--gutter))) calc(4.5rem + var(--radius-lg));
   background: var(--surface);
-  color: var(--text);
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
-.next-project[data-fit="contain"]::after {
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 50%);
+body:has(.more-projects) > footer {
+  position: relative;
+  margin-top: 0;
 }
-.next-project:hover .project-hero-image {
-  scale: 1.04;
+.more-projects-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
-.next-project:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 4px;
+.more-projects-head h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
 }
-.next-project-text {
-  padding: 3rem clamp(1.5rem, 4vw, 3.5rem);
-}
-.next-project-count {
-  margin-left: 0.75rem;
+.more-projects-all {
+  flex: none;
+  font-size: 0.92rem;
+  font-weight: 500;
   color: var(--text-strong);
 }
-.next-project-title {
-  margin-top: 0.6rem;
-  font-size: clamp(2.2rem, 5.5vw, 4.2rem);
-  letter-spacing: -0.03em;
-}
-.next-project-arrow {
+.more-projects-all span {
   display: inline-block;
-  margin-left: 0.3em;
-  transition: transform 0.5s var(--ease);
+  transition: transform 0.35s var(--ease);
 }
-.next-project:hover .next-project-arrow,
-.next-project:focus-visible .next-project-arrow {
-  transform: translateX(0.25em);
+.more-projects-all:hover span {
+  transform: translateX(4px);
 }
-.next-project-text p:not(.eyebrow) {
-  margin-top: 0.75rem;
-  max-width: 44ch;
-  font-size: 1.05rem;
+.more-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.more-project {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  border-radius: var(--radius);
+}
+.more-project-img {
+  display: block;
+  margin-bottom: 0.65rem;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.45s var(--ease), transform 0.45s var(--ease);
+}
+.more-project-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease);
+}
+/* „Ganz zeigen“ (Logos): vollständig auf hellem Grund */
+.more-project-img[data-fit="contain"] img {
+  padding: 1.25rem;
+  object-fit: contain;
+}
+.more-project strong {
+  overflow: hidden;
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-strong);
+}
+.more-project small {
+  font-size: 0.85rem;
   color: var(--muted);
 }
-@media (min-width: 861px) {
-  .next-project[data-fit="contain"] .project-hero-image {
-    padding: 2.5rem 2.5rem 2.5rem 52%;
-  }
-  .next-project[data-fit="contain"] .next-project-text {
-    max-width: 50%;
-  }
+.more-project:hover .more-project-img {
+  box-shadow: var(--shadow);
+  transform: translateY(-4px);
 }
-@media (max-width: 860px) {
-  .next-project[data-fit="contain"] .project-hero-image {
-    bottom: auto;
-    height: 45%;
-    padding: 1.5rem 1.5rem 0;
+.more-project:hover .more-project-img img {
+  transform: scale(1.05);
+}
+.more-project:focus-visible,
+.more-projects-all:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+@media (max-width: 640px) {
+  .more-projects-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 72%;
+    gap: 0.9rem;
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 0 var(--gutter) 0.5rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--gutter);
+    scrollbar-width: none;
+  }
+  .more-projects-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .more-project {
+    scroll-snap-align: start;
   }
 }
 
@@ -2424,6 +2499,30 @@ ol.rich-list {
   aspect-ratio: var(--media-ratio);
   object-fit: cover;
   transition: transform 0.6s var(--ease);
+}
+/* „Ganz zeigen“: das Bild vollständig, ohne Zuschnitt. Ein einzelnes Bild behält sein eigenes Format (die Box passt
+   sich an); im Karussell bleibt das feste Format, dahinter liegt eine unscharfe Kopie desselben Bildes */
+.zoom--contain img {
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+.zoom-backdrop {
+  display: none;
+}
+.carousel-slide .zoom--contain img {
+  height: 100%;
+}
+.carousel-slide .zoom--contain .zoom-backdrop {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  object-fit: cover;
+  filter: blur(24px) saturate(1.2) brightness(0.92);
+  transform: scale(1.15);
+  pointer-events: none;
 }
 /* Vergrößern-Symbol oben rechts, sobald die Maus (oder der Tastatur-Fokus) auf dem Bild ist */
 .zoom::after {
@@ -2453,6 +2552,10 @@ ol.rich-list {
 @media (hover: hover) {
   .zoom:hover img {
     transform: scale(1.03);
+  }
+  /* Die unscharfe Kopie bleibt größer, sonst zeigen sich ihre hellen Ränder */
+  .zoom:hover .zoom-backdrop {
+    transform: scale(1.15);
   }
   .zoom:hover::after {
     opacity: 1;
@@ -3777,6 +3880,54 @@ textarea.input {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+/* Dieselbe Wahl bei Bild und Karussell in den Abschnitten: mittig unter dem Bild */
+.block-fit {
+  display: flex;
+  width: max-content;
+  margin: 0.75rem auto 0;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.block-fit span {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+}
+/* Ausschnitt bei „Füllen“: Klicken oder Ziehen setzt den Punkt, um den herum das Bild zugeschnitten wird (admin.js) */
+.page-editor .block-image[data-fit="cover"] [data-focus-area]:not(.is-empty) {
+  cursor: crosshair;
+  touch-action: none;
+}
+.focus-dot {
+  position: absolute;
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.block-image[data-fit="cover"] [data-focus-area]:not(.is-empty):is(:hover, .is-focusing) .focus-dot {
+  opacity: 1;
+}
+.focus-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--muted);
+}
+.block-image[data-fit="contain"] .focus-hint {
+  display: none;
+}
+.page-editor .block-image[data-fit="contain"] .zoom img {
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
 .inline-image.is-missing {
   outline: 3px solid #a11a1a;
   outline-offset: 3px;
@@ -4035,9 +4186,126 @@ textarea.input {
   border-radius: var(--radius);
   font-size: 0.95rem;
 }
-/* Zwischen „+ Abschnitt hinzufügen“ und dem Strich über den Mitwirkenden etwas Luft lassen */
+/* Zwischen „+ Abschnitt hinzufügen“ und dem Strich über dem Abspann etwas Luft lassen */
 .page-editor .project-sections:has(+ .project-credits) {
   padding-bottom: 2.5rem;
+}
+
+/* Abspann im Bearbeitungsmodus: Danksagung mittig, je Zeile Rolle | Name wie auf der Seite;
+   Verschieben und Entfernen rechts neben der Zeile (auf schmalen Bildschirmen in der Zeile) */
+.page-editor .credits-thanks-text .inline-field {
+  text-align: center;
+}
+.credits-edit {
+  display: grid;
+  gap: 0.6rem;
+}
+.credit-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 2.5rem;
+}
+.page-editor .credit-role {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.page-editor .credit-name {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--text-strong);
+}
+.credit-tools {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  translate: 0.75rem -50%;
+  transition: opacity 0.2s ease;
+}
+.credit-row:is(:hover, :focus-within) .credit-tools {
+  opacity: 1;
+}
+.credit-tools button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+.credit-tools button:hover {
+  background: var(--surface-2);
+}
+.credit-tools .credit-remove {
+  color: #a11a1a;
+}
+.edit-add-credit {
+  margin-top: 1.25rem;
+  padding: 0.45rem 1rem;
+  border: 1px dashed #c4c4c4;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.edit-add-credit:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.credits-hint {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+@media (max-width: 1100px), (hover: none) {
+  .credit-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    column-gap: 1rem;
+  }
+  .credit-tools {
+    position: static;
+    opacity: 1;
+    translate: none;
+  }
+}
+/* Handy: die Rolle über dem Namen, die Knöpfe daneben */
+@media (max-width: 560px) {
+  .credit-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 0.25rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-editor .credit-role,
+  .page-editor .credit-name {
+    grid-column: 1;
+    text-align: left;
+  }
+  .credit-tools {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
 }
 
 /* Vorher/Nachher im Bearbeitungsmodus: beide Bilder nebeneinander, darüber ihre Beschriftung */
@@ -4614,5 +4882,61 @@ textarea.input {
   nav a {
     padding: 0.4rem 0.55rem;
     font-size: 0.8rem;
+  }
+}
+
+/* ==========================================================
+   Scrollleiste: die des Browsers ist ausgeblendet (script.js setzt has-scrollbar), stattdessen ein schmaler Balken
+   über dem Inhalt am rechten Rand – er nimmt keinen Platz weg und erscheint beim Scrollen oder am Rand.
+   mix-blend-mode macht ihn auf hellem Grund dunkel und auf dunklem (Hero, Footer) hell
+   ========================================================== */
+html.has-scrollbar {
+  scrollbar-width: none;
+}
+html.has-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+html.is-scrollbar-dragging {
+  scroll-snap-type: none;
+}
+.scrollbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  width: 14px;
+  mix-blend-mode: difference;
+}
+.scrollbar[hidden] {
+  display: none;
+}
+.scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  width: 5px;
+  border-radius: 999px;
+  background: #fff;
+  opacity: 0;
+  cursor: grab;
+  transition: opacity 0.35s ease, width 0.2s ease;
+}
+.scrollbar.is-active .scrollbar-thumb,
+.scrollbar:hover .scrollbar-thumb {
+  opacity: 0.45;
+}
+.scrollbar:hover .scrollbar-thumb,
+.scrollbar.is-dragging .scrollbar-thumb {
+  width: 8px;
+  opacity: 0.65;
+}
+.scrollbar.is-dragging .scrollbar-thumb {
+  cursor: grabbing;
+}
+/* Auf Touch-Geräten nur eine Anzeige, sie fängt keine Wischgesten am Rand ab */
+@media (hover: none) {
+  .scrollbar {
+    pointer-events: none;
   }
 }
